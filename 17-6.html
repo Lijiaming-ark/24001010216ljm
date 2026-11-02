@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：Promise 与 async/await 异步流程演示（包饺子）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promise · async/await 包饺子流程</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    background: #fff7ed;
+    color: #3a2a1c;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 顶部 ===== */
+  .ljm_header {
+    position: relative;
+    padding: 56px 24px 84px;
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(135deg, #7c2d12 0%, #c2410c 48%, #f59e0b 100%);
+    overflow: hidden;
+  }
+
+  .ljm_header::before,
+  .ljm_header::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .12);
+  }
+
+  .ljm_header::before { width: 250px; height: 250px; top: -110px; right: -70px; }
+  .ljm_header::after { width: 310px; height: 310px; bottom: -170px; left: -80px; }
+
+  .ljm_kicker {
+    position: relative;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, .85);
+  }
+
+  .ljm_kicker .iconfont { margin-right: 6px; }
+
+  .ljm_title {
+    position: relative;
+    margin: 10px 0 8px;
+    font-size: 32px;
+    letter-spacing: 2px;
+  }
+
+  .ljm_subtitle {
+    position: relative;
+    font-size: 15px;
+    color: rgba(255, 255, 255, .92);
+  }
+
+  .ljm_tags {
+    position: relative;
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ljm_tag {
+    padding: 5px 14px;
+    font-size: 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .5);
+    background: rgba(255, 255, 255, .16);
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  /* ===== 主体 ===== */
+  .ljm_main {
+    max-width: 1080px;
+    margin: -48px auto 0;
+    padding: 0 20px 44px;
+  }
+
+  .ljm_section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 26px rgba(124, 45, 18, .1);
+    padding: 22px 24px 24px;
+    margin-bottom: 22px;
+  }
+
+  .ljm_sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    color: #7c2d12;
+    margin-bottom: 16px;
+  }
+
+  .ljm_sectionTitle .iconfont {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #c2410c, #f59e0b);
+  }
+
+  /* ===== 流程总览 ===== */
+  .ljm_flowChart {
+    margin-top: 14px;
+  }
+
+  .ljm_flowRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .ljm_node {
+    min-width: 140px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fff7ed;
+    border: 2px dashed #fdba74;
+    text-align: center;
+    transition: all .3s;
+  }
+
+  .ljm_nodeActive {
+    border-style: solid;
+    border-color: #c2410c;
+    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+    box-shadow: 0 8px 18px rgba(194, 65, 12, .22);
+  }
+
+  .ljm_nodeDone {
+    border-style: solid;
+    border-color: #059669;
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    color: #065f46;
+  }
+
+  .ljm_nodeTitle { font-size: 14.5px; font-weight: 700; margin-bottom: 4px; color: #7c2d12; }
+  .ljm_nodeDone .ljm_nodeTitle { color: #065f46; }
+  .ljm_nodeMeta { font-size: 12px; color: #9a3412; }
+  .ljm_nodeDone .ljm_nodeMeta { color: #047857; }
+
+  .ljm_nodeIcon {
+    font-size: 26px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .ljm_arrow {
+    font-size: 22px;
+    color: #c2410c;
+    font-weight: 700;
+  }
+
+  .ljm_parallelWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ljm_parallelBar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #9a3412;
+  }
+
+  .ljm_parallelBar::before,
+  .ljm_parallelBar::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: #fdba74;
+    min-width: 40px;
+  }
+
+  .ljm_parallelNodes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ===== 控制区 ===== */
+  .ljm_controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 14px;
+  }
+
+  .ljm_btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 20px;
+    font-size: 14px;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #c2410c, #f59e0b);
+    cursor: pointer;
+    transition: opacity .2s, transform .2s;
+    font-family: inherit;
+  }
+
+  .ljm_btn:hover { opacity: .92; transform: translateY(-1px); }
+  .ljm_btn:active { transform: translateY(0); }
+  .ljm_btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .ljm_btn--ghost {
+    color: #9a3412;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+  }
+
+  .ljm_btn--danger {
+    background: linear-gradient(135deg, #b91c1c, #ef4444);
+  }
+
+  .ljm_speedRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #7c2d12;
+  }
+
+  .ljm_speedRow input[type="range"] { accent-color: #c2410c; width: 160px; }
+
+  .ljm_timerDisplay {
+    font-family: Consolas, Monaco, monospace;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: #fff7ed;
+    color: #9a3412;
+    font-size: 13px;
+  }
+
+  /* ===== 步骤明细 ===== */
+  .ljm_steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .ljm_step {
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid #fed7aa;
+    background: #fffaf0;
+    position: relative;
+    overflow: hidden;
+    transition: all .3s;
+  }
+
+  .ljmStep--waiting { border-color: #fed7aa; background: #fffaf0; }
+  .ljmStep--running { border-color: #c2410c; background: #fff7ed; }
+  .ljmStep--done { border-color: #059669; background: #ecfdf5; }
+
+  .ljm_stepHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .ljm_stepIdx {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fdba74;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ljmStep--running .ljm_stepIdx { background: #c2410c; }
+  .ljmStep--done .ljm_stepIdx { background: #059669; }
+
+  .ljm_stepStatus {
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fed7aa;
+    color: #9a3412;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .ljmStep--running .ljm_stepStatus { background: #c2410c; color: #fff; }
+  .ljmStep--done .ljm_stepStatus { background: #059669; color: #fff; }
+
+  .ljm_stepName { font-size: 14.5px; font-weight: 700; color: #7c2d12; margin-bottom: 3px; }
+  .ljmStep--done .ljm_stepName { color: #065f46; }
+
+  .ljm_stepDesc { font-size: 12px; color: #9a3412; }
+  .ljmStep--done .ljm_stepDesc { color: #047857; }
+
+  .ljm_progress {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 4px;
+    width: 0%;
+    background: linear-gradient(90deg, #c2410c, #f59e0b);
+    transition: width .12s linear;
+  }
+
+  .ljmStep--done .ljm_progress { background: #059669; width: 100% !important; }
+
+  /* ===== 时间轴 ===== */
+  .ljm_timeline {
+    margin-top: 18px;
+    max-height: 240px;
+    overflow: auto;
+    border-radius: 12px;
+    background: #1c1410;
+    padding: 12px 14px;
+  }
+
+  .ljm_tlLine {
+    padding: 3px 0;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    color: #fed7aa;
+    line-height: 1.7;
+    border-bottom: 1px dashed rgba(253, 186, 116, .15);
+  }
+
+  .ljm_tlLine:last-child { border-bottom: none; }
+  .ljm_tlTime { color: #fde68a; margin-right: 10px; }
+  .ljm_tlTag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-right: 8px;
+  }
+  .ljm_tlTag--start { background: #c2410c; color: #fff; }
+  .ljm_tlTag--end { background: #059669; color: #fff; }
+  .ljm_tlTag--parallel { background: #7c3aed; color: #fff; }
+  .ljm_tlMsg { color: #fed7aa; }
+
+  /* ===== 代码 ===== */
+  .ljm_code {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #1c1410;
+    color: #fde68a;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12.5px;
+    line-height: 1.75;
+    max-height: 360px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin-top: 12px;
+  }
+
+  .ljm_code .ljm_keyword { color: #f472b6; }
+  .ljm_code .ljm_fn { color: #86efac; }
+  .ljm_code .ljm_str { color: #fde68a; }
+  .ljm_code .ljm_comment { color: #a8a29e; }
+
+  .ljm_footer {
+    text-align: center;
+    font-size: 12px;
+    color: #b8a594;
+    padding: 6px 0 34px;
+  }
+
+  @media (max-width: 720px) {
+    .ljm_title { font-size: 27px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="ljm_header">
+  <p class="ljm_kicker"><i class="iconfont icon-canshushezhi"></i>第 17 章 · Promise / async</p>
+  <h1 class="ljm_title">包饺子的异步流程</h1>
+  <p class="ljm_subtitle">Promise + async/await 串联顺序与并行任务</p>
+  <div class="ljm_tags">
+    <span class="ljm_tag">new Promise()</span>
+    <span class="ljm_tag">async / await</span>
+    <span class="ljm_tag">Promise.all()</span>
+  </div>
+</header>
+
+<main class="ljm_main">
+
+  <!-- 流程总览 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-diancai"></i>流程总览</h2>
+    <div class="ljm_flowChart">
+      <div class="ljm_flowRow">
+        <div class="ljm_node" id="ljm_node_buy">
+          <span class="ljm_nodeIcon">🛒</span>
+          <div class="ljm_nodeTitle">买原料</div>
+          <div class="ljm_nodeMeta">6000 ms</div>
+        </div>
+        <span class="ljm_arrow">→</span>
+        <div class="ljm_parallelWrap">
+          <div class="ljm_parallelBar">Promise.all 同时进行</div>
+          <div class="ljm_parallelNodes">
+            <div class="ljm_node" id="ljm_node_dough">
+              <span class="ljm_nodeIcon">🫓</span>
+              <div class="ljm_nodeTitle">和面</div>
+              <div class="ljm_nodeMeta">4000 ms</div>
+            </div>
+            <div class="ljm_node" id="ljm_node_filling">
+              <span class="ljm_nodeIcon">🥬</span>
+              <div class="ljm_nodeTitle">和馅</div>
+              <div class="ljm_nodeMeta">5000 ms</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ljm_flowRow">
+        <span class="ljm_arrow">↓ 都完成</span>
+      </div>
+      <div class="ljm_flowRow">
+        <div class="ljm_node" id="ljm_node_make">
+          <span class="ljm_nodeIcon">🥟</span>
+          <div class="ljm_nodeTitle">包饺子</div>
+          <div class="ljm_nodeMeta">7000 ms</div>
+        </div>
+        <span class="ljm_arrow">→</span>
+        <div class="ljm_node" id="ljm_node_eat">
+          <span class="ljm_nodeIcon">😋</span>
+          <div class="ljm_nodeTitle">吃饺子</div>
+          <div class="ljm_nodeMeta">4000 ms</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ljm_controls">
+      <button class="ljm_btn" id="ljm_btnStart" type="button"><i class="iconfont icon-diancai"></i>开始流程</button>
+      <button class="ljm_btn ljm_btn--ghost" id="ljm_btnReset" type="button">重置</button>
+      <div class="ljm_speedRow">
+        速度 × <input type="range" id="ljm_speed" min="1" max="6" step="1" value="1">
+        <span class="ljm_timerDisplay" id="ljm_speedLabel">1.0 ×</span>
+      </div>
+      <span class="ljm_timerDisplay" id="ljm_total">总计时 0 ms</span>
+    </div>
+  </section>
+
+  <!-- 步骤明细 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-changguichuzhi"></i>步骤状态</h2>
+    <div class="ljm_steps" id="ljm_steps"></div>
+  </section>
+
+  <!-- 时间轴 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-caipintiaomahong"></i>执行日志</h2>
+    <div class="ljm_timeline" id="ljm_timeline">
+      <div class="ljm_tlLine"><span class="ljm_tlTime">—</span><span class="ljm_tlMsg">点击"开始流程"后这里会显示每一个 Promise 的 resolve 时刻</span></div>
+    </div>
+  </section>
+
+  <!-- 代码 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-canshushezhi"></i>核心代码</h2>
+    <p class="ljm_desc">下面是包饺子流程的 <code>async/await</code> 实现，<code>Promise.all</code> 让和面与和馅同时开始，谁慢就等谁。</p>
+    <pre class="ljm_code"><span class="ljm_keyword">function</span> <span class="ljm_fn">delay</span>(ms) {
+  <span class="ljm_keyword">return new</span> <span class="ljm_fn">Promise</span>(resolve =&gt; <span class="ljm_fn">setTimeout</span>(resolve, ms));
+}
+
+<span class="ljm_keyword">async function</span> <span class="ljm_fn">makeDumplings</span>() {
+  <span class="ljm_comment">// 1. 买原料（顺序）</span>
+  <span class="ljm_keyword">await</span> <span class="ljm_fn">buyIngredients</span>(6000);
+
+  <span class="ljm_comment">// 2. 和面 + 和馅（并行）</span>
+  <span class="ljm_keyword">await</span> <span class="ljm_fn">Promise</span>.<span class="ljm_fn">all</span>([
+    <span class="ljm_fn">makeDough</span>(4000),
+    <span class="ljm_fn">makeFilling</span>(5000)
+  ]);
+
+  <span class="ljm_comment">// 3. 包饺子（顺序，需要面和馅都 ready）</span>
+  <span class="ljm_keyword">await</span> <span class="ljm_fn">wrapDumplings</span>(7000);
+
+  <span class="ljm_comment">// 4. 吃饺子（顺序）</span>
+  <span class="ljm_keyword">await</span> <span class="ljm_fn">eatDumplings</span>(4000);
+}</pre>
+  </section>
+
+</main>
+
+<footer class="ljm_footer">姓名：李佳明 · 2026-11-02 · Promise + async/await</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 步骤定义 ===== */
+  var ljm_stepDefs = [
+    { id: 'buy',     name: '买原料',   desc: '去超市采购面粉、猪肉、白菜…', ms: 6000, node: 'ljm_node_buy',     idx: 1, seq: true  },
+    { id: 'dough',   name: '和面',     desc: '加水揉面，等待光滑面团成型',   ms: 4000, node: 'ljm_node_dough',   idx: 2, seq: false },
+    { id: 'filling', name: '和馅',     desc: '剁馅、调味、搅拌上劲',         ms: 5000, node: 'ljm_node_filling', idx: 3, seq: false },
+    { id: 'make',    name: '包饺子',   desc: '擀皮、包馅、捏褶子',           ms: 7000, node: 'ljm_node_make',    idx: 4, seq: true  },
+    { id: 'eat',     name: '吃饺子',   desc: '下锅煮熟，蘸醋开吃 🥢',       ms: 4000, node: 'ljm_node_eat',     idx: 5, seq: true  }
+  ];
+
+  var ljm_speedInput = document.getElementById('ljm_speed');
+  var ljm_speedLabel = document.getElementById('ljm_speedLabel');
+  var ljm_total = document.getElementById('ljm_total');
+  var ljm_btnStart = document.getElementById('ljm_btnStart');
+  var ljm_btnReset = document.getElementById('ljm_btnReset');
+  var ljm_steps = document.getElementById('ljm_steps');
+  var ljm_timeline = document.getElementById('ljm_timeline');
+
+  var ljm_totalStart = 0;
+  var ljm_isRunning = false;
+  var ljm_aborted = false;
+  var ljm_globalTimer = null;
+  var ljm_progressTimers = [];
+
+  /* ===== 初始化 ===== */
+  function ljm_reset() {
+    ljm_isRunning = false;
+    ljm_aborted = false;
+    if (ljm_globalTimer !== null) { clearInterval(ljm_globalTimer); ljm_globalTimer = null; }
+    ljm_progressTimers.forEach(function (t) { clearInterval(t); });
+    ljm_progressTimers = [];
+
+    ljm_stepDefs.forEach(function (ljm_s) {
+      var ljm_node = document.getElementById(ljm_s.node);
+      ljm_node.classList.remove('ljm_nodeActive', 'ljm_nodeDone');
+      ljm_node.classList.add('ljmStep--waiting');
+
+      var ljm_step = document.getElementById('ljm_step_' + ljm_s.id);
+      ljm_step.className = 'ljm_step ljmStep--waiting';
+      ljm_step.querySelector('.ljm_stepStatus').textContent = '未开始';
+      ljm_step.querySelector('.ljm_progress').style.width = '0%';
+    });
+
+    ljm_timeline.innerHTML = '<div class="ljm_tlLine"><span class="ljm_tlTime">—</span><span class="ljm_tlMsg">点击"开始流程"后这里会显示每一个 Promise 的 resolve 时刻</span></div>';
+    ljm_total.textContent = '总计时 0 ms';
+    ljm_btnStart.disabled = false;
+  }
+
+  function ljm_renderSteps() {
+    ljm_steps.innerHTML = ljm_stepDefs.map(function (ljm_s) {
+      return '<div class="ljm_step ljmStep--waiting" id="ljm_step_' + ljm_s.id + '">' +
+        '<div class="ljm_stepHead">' +
+        '<span class="ljm_stepIdx">' + ljm_s.idx + '</span>' +
+        '<span class="ljm_stepStatus">未开始</span>' +
+        '</div>' +
+        '<div class="ljm_stepName">' + ljm_s.name + '</div>' +
+        '<div class="ljm_stepDesc">' + ljm_s.desc + '（' + ljm_s.ms + ' ms）</div>' +
+        '<div class="ljm_progress"></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  ljm_renderSteps();
+
+  /* ===== 辅助：当前速度下的延迟 ===== */
+  function ljm_applySpeed(ljm_ms) {
+    var ljm_speed = Number(ljm_speedInput.value) || 1;
+    return Math.round(ljm_ms / ljm_speed);
+  }
+
+  ljm_speedInput.addEventListener('input', function () {
+    ljm_speedLabel.textContent = (Number(ljm_speedInput.value) || 1).toFixed(1) + ' ×';
+  });
+
+  /* ===== 日志 ===== */
+  function ljm_nowMs() {
+    return performance.now() - ljm_totalStart;
+  }
+
+  function ljm_log(ljm_tag, ljm_msg) {
+    var ljm_time = ljm_nowMs().toFixed(0).padStart(5, '0') + ' ms';
+    var ljm_line = document.createElement('div');
+    ljm_line.className = 'ljm_tlLine';
+    ljm_line.innerHTML =
+      '<span class="ljm_tlTime">+' + ljm_time + '</span>' +
+      '<span class="ljm_tlTag ljm_tlTag--' + ljm_tag + '">' + ljm_tag.toUpperCase() + '</span>' +
+      '<span class="ljm_tlMsg">' + ljm_msg + '</span>';
+    ljm_timeline.appendChild(ljm_line);
+    ljm_timeline.scrollTop = ljm_timeline.scrollHeight;
+  }
+
+  /* ===== Promise 封装 ===== */
+  function ljm_delay(ljm_ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ljm_ms);
+    });
+  }
+
+  function ljm_markRunning(ljm_id) {
+    var ljm_def = ljm_stepDefs.find(function (s) { return s.id === ljm_id; });
+    var ljm_node = document.getElementById(ljm_def.node);
+    ljm_node.classList.add('ljm_nodeActive');
+    ljm_node.classList.remove('ljmNode--done');
+
+    var ljm_step = document.getElementById('ljm_step_' + ljm_id);
+    ljm_step.className = 'ljm_step ljmStep--running';
+    ljm_step.querySelector('.ljm_stepStatus').textContent = '进行中';
+
+    /* 进度条 */
+    var ljm_progress = ljm_step.querySelector('.ljm_progress');
+    var ljm_totalMs = ljm_applySpeed(ljm_def.ms);
+    var ljm_start = performance.now();
+    ljm_progress.style.width = '0%';
+    var ljm_t = setInterval(function () {
+      var ljm_elapsed = performance.now() - ljm_start;
+      var ljm_pct = Math.min(100, (ljm_elapsed / ljm_totalMs) * 100);
+      ljm_progress.style.width = ljm_pct + '%';
+      if (ljm_pct >= 100) { clearInterval(ljm_t); }
+    }, 50);
+    ljm_progressTimers.push(ljm_t);
+  }
+
+  function ljm_markDone(ljm_id) {
+    var ljm_def = ljm_stepDefs.find(function (s) { return s.id === ljm_id; });
+    var ljm_node = document.getElementById(ljm_def.node);
+    ljm_node.classList.remove('ljm_nodeActive');
+    ljm_node.classList.add('ljm_nodeDone');
+
+    var ljm_step = document.getElementById('ljm_step_' + ljm_id);
+    ljm_step.className = 'ljm_step ljmStep--done';
+    ljm_step.querySelector('.ljm_stepStatus').textContent = '已完成';
+    ljm_step.querySelector('.ljm_progress').style.width = '100%';
+  }
+
+  /* ===== 单步任务（返回真正可 await 的 Promise） ===== */
+  function ljm_stepTask(ljm_id) {
+    var ljm_def = ljm_stepDefs.find(function (s) { return s.id === ljm_id; });
+    var ljm_ms = ljm_applySpeed(ljm_def.ms);
+
+    return new Promise(function (resolve, reject) {
+      if (ljm_aborted) { reject(new Error('aborted')); return; }
+      ljm_markRunning(ljm_id);
+      ljm_log('start', ljm_def.name + ' 开始（预计 ' + ljm_ms + ' ms）');
+
+      setTimeout(function () {
+        if (ljm_aborted) { reject(new Error('aborted')); return; }
+        ljm_markDone(ljm_id);
+        ljm_log('end', ljm_def.name + ' 完成');
+        resolve(ljm_id);
+      }, ljm_ms);
+    });
+  }
+
+  /* ===== async 主流程 ===== */
+  async function ljm_makeDumplings() {
+    ljm_btnStart.disabled = true;
+    ljm_isRunning = true;
+    ljm_totalStart = performance.now();
+
+    ljm_globalTimer = setInterval(function () {
+      ljm_total.textContent = '总计时 ' + ljm_nowMs().toFixed(0) + ' ms';
+    }, 100);
+
+    try {
+      ljm_log('start', '🍜 流程开始');
+
+      /* 1. 买原料 */
+      await ljm_stepTask('buy');
+
+      /* 2. 和面 + 和馅 并行 */
+      ljm_log('parallel', '开始 Promise.all 并行执行：和面 + 和馅');
+      await Promise.all([
+        ljm_stepTask('dough'),
+        ljm_stepTask('filling')
+      ]);
+      ljm_log('parallel', '两个并行任务都完成，继续下一步');
+
+      /* 3. 包饺子 */
+      await ljm_stepTask('make');
+
+      /* 4. 吃饺子 */
+      await ljm_stepTask('eat');
+
+      ljm_log('end', '🎉 全部完成，饺子好吃！');
+    } catch (ljm_err) {
+      if (ljm_err.message === 'aborted') {
+        ljm_log('end', '流程被用户中止');
+      } else {
+        ljm_log('end', '流程异常：' + ljm_err.message);
+      }
+    } finally {
+      clearInterval(ljm_globalTimer);
+      ljm_globalTimer = null;
+      ljm_isRunning = false;
+      ljm_btnStart.disabled = false;
+    }
+  }
+
+  ljm_btnStart.addEventListener('click', function () {
+    if (ljm_isRunning) { return; }
+    ljm_reset();
+    ljm_makeDumplings();
+  });
+
+  ljm_btnReset.addEventListener('click', function () {
+    ljm_aborted = true;
+    ljm_reset();
+    /* 延迟把 aborted 置回 false，不影响下一次点击 */
+    setTimeout(function () { ljm_aborted = false; }, 200);
+  });
+
+  ljm_reset();
+})();
+</script>
+</body>
+</html>

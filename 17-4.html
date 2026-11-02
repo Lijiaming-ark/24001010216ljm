@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：远程接口测试控制台（支持 GET / POST / PUT / DELETE）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>接口测试控制台</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    background: #f4f6fb;
+    color: #2b3a55;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 顶部 ===== */
+  .ljm_header {
+    position: relative;
+    padding: 56px 24px 84px;
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(135deg, #312e81 0%, #4338ca 48%, #06b6d4 100%);
+    overflow: hidden;
+  }
+
+  .ljm_header::before,
+  .ljm_header::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .1);
+  }
+
+  .ljm_header::before { width: 250px; height: 250px; top: -110px; right: -70px; }
+  .ljm_header::after { width: 310px; height: 310px; bottom: -170px; left: -80px; }
+
+  .ljm_kicker {
+    position: relative;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, .82);
+  }
+
+  .ljm_kicker .iconfont { margin-right: 6px; }
+
+  .ljm_title {
+    position: relative;
+    margin: 10px 0 8px;
+    font-size: 34px;
+    letter-spacing: 2px;
+  }
+
+  .ljm_subtitle {
+    position: relative;
+    font-size: 15px;
+    color: rgba(255, 255, 255, .9);
+  }
+
+  /* ===== 主体 ===== */
+  .ljm_main {
+    max-width: 1100px;
+    margin: -48px auto 0;
+    padding: 0 20px 44px;
+  }
+
+  .ljm_section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 26px rgba(49, 46, 129, .08);
+    padding: 22px 24px 24px;
+    margin-bottom: 22px;
+  }
+
+  .ljm_sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    color: #312e81;
+    margin-bottom: 16px;
+  }
+
+  .ljm_sectionTitle .iconfont {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #4338ca, #06b6d4);
+  }
+
+  /* ===== 快捷示例 ===== */
+  .ljm_presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .ljm_preset {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    background: #eef2ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    font-family: inherit;
+  }
+
+  .ljm_preset:hover { background: #4338ca; color: #fff; }
+
+  /* ===== 请求表单 ===== */
+  .ljm_formRow {
+    display: grid;
+    grid-template-columns: 110px 1fr 120px;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .ljm_method {
+    border-radius: 10px;
+    border: 1px solid #d7dcef;
+    background: #f7f8ff;
+    color: #312e81;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 10px;
+    outline: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .ljm_urlInput {
+    border-radius: 10px;
+    border: 1px solid #d7dcef;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    font-family: Consolas, Monaco, monospace;
+    color: #1f2937;
+    background: #fff;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .ljm_urlInput:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, .14); }
+
+  .ljm_sendBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #4338ca, #06b6d4);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .2s, transform .2s;
+    font-family: inherit;
+  }
+
+  .ljm_sendBtn:hover { opacity: .92; transform: translateY(-1px); }
+  .ljm_sendBtn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  .ljm_sendBtn .iconfont { font-size: 15px; }
+
+  /* ===== Body ===== */
+  .ljm_bodyWrap { margin-top: 16px; }
+
+  .ljm_bodyLabel {
+    font-size: 13px;
+    color: #4b5563;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ljm_bodyLabel .ljm_small { font-size: 11.5px; color: #9ca3af; font-weight: 400; }
+
+  .ljm_bodyActions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .ljm_minBtn {
+    padding: 3px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+    background: #eef2ff;
+    color: #4338ca;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .ljm_minBtn:hover { background: #e0e7ff; }
+
+  .ljm_bodyInput {
+    width: 100%;
+    min-height: 160px;
+    border-radius: 10px;
+    border: 1px solid #d7dcef;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-family: Consolas, Monaco, monospace;
+    color: #1f2937;
+    background: #fcfcff;
+    outline: none;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .ljm_bodyInput:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, .14); }
+
+  /* ===== 响应区 ===== */
+  .ljm_responseHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .ljm_badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .ljm_badge--ok { background: #e8f8ee; color: #15803d; }
+  .ljm_badge--redirect { background: #fef3c7; color: #92400e; }
+  .ljm_badge--client { background: #fdeceb; color: #b91c1c; }
+  .ljm_badge--server { background: #fdeceb; color: #7f1d1d; }
+  .ljm_badge--error { background: #fdeceb; color: #b91c1c; }
+  .ljm_badge--idle { background: #eef2ff; color: #4338ca; }
+
+  .ljm_badge strong { font-weight: 700; margin-left: 2px; }
+
+  .ljm_tabBar {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+  }
+
+  .ljm_tab {
+    padding: 8px 14px;
+    font-size: 13px;
+    color: #6b7280;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .ljm_tab:hover { color: #4338ca; }
+  .ljm_tab--active { color: #4338ca; border-bottom-color: #4338ca; font-weight: 700; }
+
+  .ljm_tabPane { display: none; }
+  .ljm_tabPane--active { display: block; }
+
+  .ljm_code {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    max-height: 420px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ljm_empty {
+    text-align: center;
+    padding: 30px 16px;
+    color: #9ca3af;
+    font-size: 13px;
+  }
+
+  .ljm_hRow {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 8px 14px;
+    font-size: 12.5px;
+  }
+
+  .ljm_hRow dt { color: #6b7280; word-break: break-all; }
+  .ljm_hRow dd { color: #1f2937; word-break: break-all; }
+
+  /* ===== 错误面板 ===== */
+  .ljm_errorPanel {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+  }
+
+  .ljm_errorPanel h4 { font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .ljm_errorPanel p { font-size: 12.5px; word-break: break-all; }
+
+  /* ===== 历史记录 ===== */
+  .ljm_historyList {
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  .ljm_historyItem {
+    display: grid;
+    grid-template-columns: 60px 1fr 70px 60px;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: background .15s;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .ljm_historyItem:hover { background: #f7f8ff; }
+  .ljm_historyItem:last-child { border-bottom: none; }
+
+  .ljm_historyItem .ljm_methodTag {
+    font-weight: 700;
+    color: #4338ca;
+  }
+
+  .ljm_historyItem .ljm_urlCell {
+    color: #334155;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ljm_historyItem .ljm_statusCell { text-align: right; }
+  .ljm_historyItem .ljm_timeCell { color: #94a3b8; text-align: right; }
+
+  .ljm_clearBtn {
+    padding: 4px 10px;
+    font-size: 12px;
+    color: #6b7280;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .ljm_clearBtn:hover { background: #e5e7eb; color: #1f2937; }
+
+  .ljm_footer {
+    text-align: center;
+    font-size: 12px;
+    color: #9ba3b6;
+    padding: 6px 0 34px;
+  }
+
+  @media (max-width: 720px) {
+    .ljm_formRow { grid-template-columns: 1fr; }
+    .ljm_title { font-size: 27px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="ljm_header">
+  <p class="ljm_kicker"><i class="iconfont icon-canshushezhi"></i>第 17 章 · 接口与跨域</p>
+  <h1 class="ljm_title">接口测试控制台</h1>
+  <p class="ljm_subtitle">输入 URL 和参数，点击发送即可看到响应体、响应头和错误提示</p>
+</header>
+
+<main class="ljm_main">
+
+  <!-- 请求表单 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-diancai"></i>快速开始</h2>
+    <div class="ljm_presets" id="ljm_presets">
+      <button class="ljm_preset" data-method="GET" data-url="https://jsonplaceholder.typicode.com/posts/1">GET posts/1</button>
+      <button class="ljm_preset" data-method="GET" data-url="https://dummyjson.com/products/1">GET products/1</button>
+      <button class="ljm_preset" data-method="GET" data-url="https://dog.ceo/api/breeds/image/random">GET 随机狗图</button>
+      <button class="ljm_preset" data-method="POST" data-url="https://jsonplaceholder.typicode.com/posts"
+              data-body='{"title":"我的第一篇","body":"来自接口测试控制台","userId":1}'>POST 创建 post</button>
+      <button class="ljm_preset" data-method="PUT" data-url="https://jsonplaceholder.typicode.com/posts/1"
+              data-body='{"id":1,"title":"更新后的标题","body":"更新内容","userId":1}'>PUT 更新 post</button>
+      <button class="ljm_preset" data-method="DELETE" data-url="https://jsonplaceholder.typicode.com/posts/1">DELETE post</button>
+    </div>
+
+    <div class="ljm_formRow">
+      <select class="ljm_method" id="ljm_method">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="PATCH">PATCH</option>
+        <option value="DELETE">DELETE</option>
+        <option value="HEAD">HEAD</option>
+      </select>
+      <input class="ljm_urlInput" id="ljm_url" type="url" placeholder="例如 https://jsonplaceholder.typicode.com/posts">
+      <button class="ljm_sendBtn" id="ljm_send" type="button"><i class="iconfont icon-POSzhandian"></i>发送请求</button>
+    </div>
+
+    <div class="ljm_bodyWrap">
+      <div class="ljm_bodyLabel">
+        <span>Request Body（JSON）</span>
+        <span class="ljm_small">GET / HEAD / DELETE 通常无 body；POST / PUT / PATCH 传 JSON</span>
+        <div class="ljm_bodyActions">
+          <button class="ljm_minBtn" id="ljm_btnFormat" type="button">格式化</button>
+          <button class="ljm_minBtn" id="ljm_btnCompress" type="button">压缩</button>
+          <button class="ljm_minBtn" id="ljm_btnClear" type="button">清空</button>
+        </div>
+      </div>
+      <textarea class="ljm_bodyInput" id="ljm_body" placeholder='{"title":"hello","value":1}'></textarea>
+    </div>
+  </section>
+
+  <!-- 响应 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-changguichuzhi"></i>响应结果</h2>
+
+    <div class="ljm_responseHead">
+      <span class="ljm_badge ljm_badge--idle" id="ljm_statusBadge">● 尚未发送请求</span>
+      <span class="ljm_badge" id="ljm_costBadge" hidden><i>耗时</i><strong id="ljm_costVal">0</strong> ms</span>
+      <span class="ljm_badge" id="ljm_sizeBadge" hidden><i>响应大小</i><strong id="ljm_sizeVal">0</strong></span>
+      <span class="ljm_badge" id="ljm_typeBadge" hidden><i>类型</i><strong id="ljm_typeVal">—</strong></span>
+    </div>
+
+    <div class="ljm_tabBar">
+      <button class="ljm_tab ljm_tab--active" data-tab="body">Body</button>
+      <button class="ljm_tab" data-tab="headers">Headers</button>
+      <button class="ljm_tab" data-tab="raw">Raw</button>
+    </div>
+
+    <div class="ljm_tabPane ljm_tabPane--active" id="ljm_tab_body">
+      <pre class="ljm_code" id="ljm_bodyOut" hidden></pre>
+      <div class="ljm_empty" id="ljm_bodyEmpty">发送请求后这里会显示响应体</div>
+    </div>
+
+    <div class="ljm_tabPane" id="ljm_tab_headers">
+      <dl class="ljm_hRow" id="ljm_headersOut"></dl>
+    </div>
+
+    <div class="ljm_tabPane" id="ljm_tab_raw">
+      <pre class="ljm_code" id="ljm_rawOut" hidden></pre>
+      <div class="ljm_empty" id="ljm_rawEmpty">点击 Raw 查看原始字符串</div>
+    </div>
+
+    <div class="ljm_errorPanel" id="ljm_errorPanel" hidden>
+      <h4><i class="iconfont icon-caipintiaomahong"></i>请求错误</h4>
+      <p id="ljm_errorMsg"></p>
+    </div>
+  </section>
+
+  <!-- 历史记录 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-canshushezhi"></i>历史记录
+      <button class="ljm_clearBtn" id="ljm_clearHistory" type="button">清空</button>
+    </h2>
+    <div class="ljm_historyList" id="ljm_history">
+      <div class="ljm_empty">还没有请求记录</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="ljm_footer">姓名：李佳明 · 2026-11-02 · 原生 fetch + Promise</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var ljm_method = document.getElementById('ljm_method');
+  var ljm_url = document.getElementById('ljm_url');
+  var ljm_body = document.getElementById('ljm_body');
+  var ljm_send = document.getElementById('ljm_send');
+
+  var ljm_statusBadge = document.getElementById('ljm_statusBadge');
+  var ljm_costBadge = document.getElementById('ljm_costBadge');
+  var ljm_costVal = document.getElementById('ljm_costVal');
+  var ljm_sizeBadge = document.getElementById('ljm_sizeBadge');
+  var ljm_sizeVal = document.getElementById('ljm_sizeVal');
+  var ljm_typeBadge = document.getElementById('ljm_typeBadge');
+  var ljm_typeVal = document.getElementById('ljm_typeVal');
+
+  var ljm_bodyOut = document.getElementById('ljm_bodyOut');
+  var ljm_bodyEmpty = document.getElementById('ljm_bodyEmpty');
+  var ljm_rawOut = document.getElementById('ljm_rawOut');
+  var ljm_rawEmpty = document.getElementById('ljm_rawEmpty');
+  var ljm_headersOut = document.getElementById('ljm_headersOut');
+  var ljm_errorPanel = document.getElementById('ljm_errorPanel');
+  var ljm_errorMsg = document.getElementById('ljm_errorMsg');
+
+  var ljm_presets = document.getElementById('ljm_presets');
+  var ljm_history = document.getElementById('ljm_history');
+  var ljm_clearHistory = document.getElementById('ljm_clearHistory');
+
+  /* ===== 工具 ===== */
+  function ljm_setStatusBadge(ljm_text, ljm_kind) {
+    ljm_statusBadge.className = 'ljm_badge ljm_badge--' + (ljm_kind || 'idle');
+    ljm_statusBadge.innerHTML = ljm_text;
+  }
+
+  function ljm_parseBody(ljm_text) {
+    if (!ljm_text) { return { ok: true, value: null }; }
+    try {
+      return { ok: true, value: JSON.parse(ljm_text) };
+    } catch (ljm_error) {
+      return { ok: false, error: ljm_error.message };
+    }
+  }
+
+  function ljm_formatSize(ljm_bytes) {
+    if (ljm_bytes < 1024) { return ljm_bytes + ' B'; }
+    if (ljm_bytes < 1024 * 1024) { return (ljm_bytes / 1024).toFixed(1) + ' KB'; }
+    return (ljm_bytes / 1024 / 1024).toFixed(2) + ' MB';
+  }
+
+  function ljm_statusKind(ljm_status) {
+    if (ljm_status >= 200 && ljm_status < 300) { return 'ok'; }
+    if (ljm_status >= 300 && ljm_status < 400) { return 'redirect'; }
+    if (ljm_status >= 400 && ljm_status < 500) { return 'client'; }
+    if (ljm_status >= 500) { return 'server'; }
+    return 'error';
+  }
+
+  function ljm_escapeHtml(ljm_text) {
+    return String(ljm_text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ===== Tab 切换 ===== */
+  var ljm_tabs = document.querySelectorAll('.ljm_tab');
+  ljm_tabs.forEach(function (ljm_tab) {
+    ljm_tab.addEventListener('click', function () {
+      ljm_tabs.forEach(function (ljm_t) { ljm_t.classList.remove('ljm_tab--active'); });
+      document.querySelectorAll('.ljm_tabPane').forEach(function (ljm_pane) {
+        ljm_pane.classList.remove('ljm_tabPane--active');
+      });
+      ljm_tab.classList.add('ljm_tab--active');
+      var ljm_name = ljm_tab.dataset.tab;
+      document.getElementById('ljm_tab_' + ljm_name).classList.add('ljm_tabPane--active');
+    });
+  });
+
+  /* ===== 历史记录 ===== */
+  var ljm_historyList = [];
+
+  function ljm_renderHistory() {
+    if (ljm_historyList.length === 0) {
+      ljm_history.innerHTML = '<div class="ljm_empty">还没有请求记录</div>';
+      return;
+    }
+    ljm_history.innerHTML = ljm_historyList.map(function (ljm_item) {
+      return '<div class="ljm_historyItem" data-index="' + ljm_item.index + '">' +
+        '<span class="ljm_methodTag">' + ljm_item.method + '</span>' +
+        '<span class="ljm_urlCell" title="' + ljm_escapeHtml(ljm_item.url) + '">' + ljm_escapeHtml(ljm_item.url) + '</span>' +
+        '<span class="ljm_statusCell">' + (ljm_item.status || 'ERR') + '</span>' +
+        '<span class="ljm_timeCell">' + ljm_item.time + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  ljm_history.addEventListener('click', function (ljm_event) {
+    var ljm_row = ljm_event.target.closest('.ljm_historyItem');
+    if (!ljm_row) { return; }
+    var ljm_index = Number(ljm_row.dataset.index);
+    var ljm_item = ljm_historyList.find(function (ljm_i) { return ljm_i.index === ljm_index; });
+    if (!ljm_item) { return; }
+    ljm_method.value = ljm_item.method;
+    ljm_url.value = ljm_item.url;
+    ljm_body.value = ljm_item.body || '';
+    ljm_send.click();
+  });
+
+  ljm_clearHistory.addEventListener('click', function () {
+    ljm_historyList = [];
+    ljm_renderHistory();
+  });
+
+  /* ===== 发送请求 ===== */
+  function ljm_appendHistory(ljm_methodVal, ljm_urlVal, ljm_bodyVal, ljm_status) {
+    var ljm_date = new Date();
+    var ljm_time = ljm_date.toTimeString().slice(0, 8);
+    ljm_historyList.unshift({
+      index: Date.now() + Math.random(),
+      method: ljm_methodVal,
+      url: ljm_urlVal,
+      body: ljm_bodyVal,
+      status: status,
+      time: ljm_time
+    });
+    if (ljm_historyList.length > 10) { ljm_historyList.length = 10; }
+    ljm_renderHistory();
+  }
+
+  function ljm_sendRequest() {
+    var ljm_methodVal = ljm_method.value;
+    var ljm_urlVal = ljm_url.value.trim();
+    var ljm_bodyVal = ljm_body.value.trim();
+
+    if (!ljm_urlVal) {
+      ljm_setStatusBadge('● 请先输入 URL', 'error');
+      return;
+    }
+
+    var ljm_upper = ljm_methodVal.toUpperCase();
+    var ljm_init = { method: ljm_upper };
+
+    /* GET / HEAD 不带 body，避免在 fetch 里触发非标准行为 */
+    if (ljm_upper !== 'GET' && ljm_upper !== 'HEAD' && ljm_bodyVal) {
+      var ljm_parsed = ljm_parseBody(ljm_bodyVal);
+      if (!ljm_parsed.ok) {
+        ljm_setStatusBadge('● Body 里的 JSON 不合法', 'error');
+        ljm_errorPanel.hidden = false;
+        ljm_errorMsg.textContent = 'JSON 解析错误：' + ljm_parsed.error;
+        return;
+      }
+      ljm_init.headers = { 'Content-Type': 'application/json' };
+      ljm_init.body = ljm_bodyVal;
+    } else {
+      ljm_init.headers = { 'Accept': 'application/json, text/plain, */*' };
+    }
+
+    /* 重置界面 */
+    ljm_errorPanel.hidden = true;
+    ljm_bodyOut.hidden = true;
+    ljm_bodyEmpty.hidden = false;
+    ljm_rawOut.hidden = true;
+    ljm_rawEmpty.hidden = false;
+    ljm_headersOut.innerHTML = '';
+    ljm_costBadge.hidden = true;
+    ljm_sizeBadge.hidden = true;
+    ljm_typeBadge.hidden = true;
+
+    ljm_setStatusBadge('● 请求中…', 'idle');
+    ljm_send.disabled = true;
+    var ljm_start = performance.now();
+
+    var ljm_index = Date.now() + Math.random();
+
+    fetch(ljm_urlVal, ljm_init)
+      .then(function (ljm_response) {
+        var ljm_cost = Math.round(performance.now() - ljm_start);
+        var ljm_kind = ljm_statusKind(ljm_response.status);
+        ljm_setStatusBadge('<strong>' + ljm_response.status + ' ' + ljm_response.statusText + '</strong>', ljm_kind);
+        ljm_costBadge.hidden = false;
+        ljm_costVal.textContent = ljm_cost;
+
+        /* 响应头 */
+        var ljm_headersHtml = '';
+        ljm_response.headers.forEach(function (ljm_value, ljm_key) {
+          ljm_headersHtml += '<dt>' + ljm_escapeHtml(ljm_key) + '</dt><dd>' + ljm_escapeHtml(ljm_value) + '</dd>';
+        });
+        ljm_headersOut.innerHTML = ljm_headersHtml || '<div class="ljm_empty">（无）</div>';
+
+        var ljm_ct = ljm_response.headers.get('content-type') || '';
+        if (ljm_ct) {
+          ljm_typeBadge.hidden = false;
+          ljm_typeVal.textContent = ljm_ct.split(';')[0];
+        }
+
+        var ljm_textPromise = ljm_response.text();
+
+        ljm_appendHistory(ljm_upper, ljm_urlVal, ljm_bodyVal, ljm_response.status);
+        ljm_historyList[0].index = ljm_index;
+
+        return ljm_textPromise.then(function (ljm_text) {
+          ljm_sizeBadge.hidden = false;
+          ljm_sizeVal.textContent = ljm_formatSize(new Blob([ljm_text]).size);
+
+          ljm_rawOut.textContent = ljm_text;
+          ljm_rawOut.hidden = false;
+          ljm_rawEmpty.hidden = true;
+
+          /* 尝试格式化为 JSON */
+          var ljm_parsed2 = ljm_parseBody(ljm_text);
+          if (ljm_parsed2.ok && ljm_text && ljm_text[0] !== '<') {
+            ljm_bodyOut.textContent = JSON.stringify(ljm_parsed2.value, null, 2);
+            ljm_bodyOut.hidden = false;
+            ljm_bodyEmpty.hidden = true;
+          } else if (ljm_text) {
+            ljm_bodyOut.textContent = ljm_text;
+            ljm_bodyOut.hidden = false;
+            ljm_bodyEmpty.hidden = true;
+          } else {
+            ljm_bodyEmpty.textContent = '响应为空（' + ljm_response.status + ' ' + ljm_response.statusText + '）';
+          }
+
+          if (!ljm_response.ok) {
+            ljm_errorPanel.hidden = false;
+            ljm_errorMsg.textContent = 'HTTP ' + ljm_response.status + ' ' + ljm_response.statusText +
+              '，响应体：' + ljm_text.slice(0, 300);
+          }
+        });
+      })
+      .catch(function (ljm_error) {
+        var ljm_cost = Math.round(performance.now() - ljm_start);
+        ljm_setStatusBadge('● 请求失败', 'error');
+        ljm_costBadge.hidden = false;
+        ljm_costVal.textContent = ljm_cost;
+        ljm_errorPanel.hidden = false;
+
+        var ljm_message = ljm_error.message || String(ljm_error);
+        if (/Failed to fetch|NetworkError|Load failed/i.test(ljm_message)) {
+          ljm_errorMsg.textContent = '网络错误，最常见原因是接口未开放 CORS 跨域，或者接口地址本身不可达。错误信息：' + ljm_message;
+        } else {
+          ljm_errorMsg.textContent = ljm_message;
+        }
+
+        ljm_appendHistory(ljm_upper, ljm_urlVal, ljm_bodyVal, 0);
+        ljm_historyList[0].index = ljm_index;
+      })
+      .then(function () {
+        ljm_send.disabled = false;
+      });
+  }
+
+  ljm_send.addEventListener('click', ljm_sendRequest);
+
+  /* 快捷示例 */
+  ljm_presets.addEventListener('click', function (ljm_event) {
+    var ljm_btn = ljm_event.target.closest('.ljm_preset');
+    if (!ljm_btn) { return; }
+    ljm_method.value = ljm_btn.dataset.method;
+    ljm_url.value = ljm_btn.dataset.url;
+    ljm_body.value = ljm_btn.dataset.body || '';
+    ljm_sendRequest();
+  });
+
+  /* Body 工具栏 */
+  document.getElementById('ljm_btnFormat').addEventListener('click', function () {
+    var ljm_p = ljm_parseBody(ljm_body.value);
+    if (ljm_p.ok) { ljm_body.value = JSON.stringify(ljm_p.value, null, 2); }
+    else { ljm_errorMsg.textContent = 'JSON 不合法：' + ljm_p.error; ljm_errorPanel.hidden = false; }
+  });
+
+  document.getElementById('ljm_btnCompress').addEventListener('click', function () {
+    var ljm_p = ljm_parseBody(ljm_body.value);
+    if (ljm_p.ok) { ljm_body.value = JSON.stringify(ljm_p.value); }
+  });
+
+  document.getElementById('ljm_btnClear').addEventListener('click', function () {
+    ljm_body.value = '';
+    ljm_errorPanel.hidden = true;
+  });
+
+  /* Enter 快捷发送（URL 框） */
+  ljm_url.addEventListener('keydown', function (ljm_event) {
+    if ((ljm_event.ctrlKey || ljm_event.metaKey) && ljm_event.key === 'Enter') {
+      ljm_sendRequest();
+    }
+  });
+})();
+</script>
+</body>
+</html>

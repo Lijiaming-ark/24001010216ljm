@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：商品列表页（接口数据 + 列表跳转详情）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品列表 · 跨域接口</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    background: #f1f7f6;
+    color: #1f3733;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 顶部 ===== */
+  .ljm_header {
+    position: relative;
+    padding: 58px 24px 88px;
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(135deg, #064e3b 0%, #0f766e 48%, #14b8a6 100%);
+    overflow: hidden;
+  }
+
+  .ljm_header::before,
+  .ljm_header::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .12);
+  }
+
+  .ljm_header::before { width: 250px; height: 250px; top: -110px; left: -60px; }
+  .ljm_header::after { width: 300px; height: 300px; bottom: -170px; right: -70px; }
+
+  .ljm_kicker {
+    position: relative;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, .82);
+  }
+
+  .ljm_kicker .iconfont { margin-right: 6px; }
+
+  .ljm_title {
+    position: relative;
+    margin: 10px 0 8px;
+    font-size: 34px;
+    letter-spacing: 2px;
+  }
+
+  .ljm_subtitle {
+    position: relative;
+    font-size: 15px;
+    color: rgba(255, 255, 255, .9);
+  }
+
+  .ljm_tags {
+    position: relative;
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ljm_tag {
+    padding: 5px 14px;
+    font-size: 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .45);
+    background: rgba(255, 255, 255, .14);
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  /* ===== 主体 ===== */
+  .ljm_main {
+    max-width: 1080px;
+    margin: -48px auto 0;
+    padding: 0 20px 44px;
+  }
+
+  .ljm_section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 26px rgba(6, 78, 59, .08);
+    padding: 24px 26px 28px;
+    margin-bottom: 22px;
+  }
+
+  .ljm_sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    color: #0f766e;
+    margin-bottom: 16px;
+  }
+
+  .ljm_sectionTitle .iconfont {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+  }
+
+  /* ===== 接口栏 ===== */
+  .ljm_apiBar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 11px;
+    background: #f2fbf9;
+    border: 1px dashed #9fd8ce;
+  }
+
+  .ljm_method {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: #fff;
+    background: #0f766e;
+  }
+
+  .ljm_url {
+    flex: 1 1 280px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    color: #115e59;
+    word-break: break-all;
+  }
+
+  .ljm_status {
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+
+  .ljm_status--ok { background: #e8f8ee; color: #15803d; }
+  .ljm_status--error { background: #fdeceb; color: #b91c1c; }
+
+  .ljm_note { font-size: 12.5px; color: #7b8c88; margin-top: 10px; }
+
+  .ljm_toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 16px; }
+
+  .ljm_btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    font-size: 13.5px;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+    cursor: pointer;
+    transition: opacity .2s, transform .2s;
+    font-family: inherit;
+    text-decoration: none;
+  }
+
+  .ljm_btn:hover { opacity: .9; transform: translateY(-1px); }
+  .ljm_btn:active { transform: translateY(0); }
+
+  .ljm_btn--ghost {
+    color: #115e59;
+    background: #e6f7f4;
+    border: 1px solid #a7e0d6;
+  }
+
+  /* ===== 商品网格 ===== */
+  .ljm_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 16px;
+  }
+
+  .ljm_card {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 13px;
+    background: #fff;
+    border: 1px solid #e2eeeb;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+
+  .ljm_card:hover {
+    transform: translateY(-4px);
+    border-color: #9fd8ce;
+    box-shadow: 0 10px 22px rgba(15, 118, 110, .16);
+  }
+
+  .ljm_cardImg {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    border-radius: 9px;
+    background: #f6fbfa;
+  }
+
+  .ljm_cardTitle {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f3733;
+    line-height: 1.45;
+    min-height: 41px;
+  }
+
+  .ljm_brand { margin-top: 4px; font-size: 12px; color: #8fa5a0; }
+
+  .ljm_cardMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .ljm_price { font-size: 16px; font-weight: 700; color: #0f766e; }
+  .ljm_rating { font-size: 12px; color: #8fa5a0; }
+
+  .ljm_cardFoot {
+    margin-top: 10px;
+    padding-top: 9px;
+    border-top: 1px dashed #e2eeeb;
+    font-size: 12.5px;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ljm_cardFoot .iconfont { font-size: 13px; }
+
+  /* ===== 骨架屏 ===== */
+  .ljm_skeleton {
+    height: 288px;
+    border-radius: 13px;
+    background: linear-gradient(100deg, #edf5f3 30%, #f7fbfa 50%, #edf5f3 70%);
+    background-size: 220% 100%;
+    animation: ljm_shimmer 1.4s infinite linear;
+  }
+
+  @keyframes ljm_shimmer {
+    from { background-position: 120% 0; }
+    to { background-position: -80% 0; }
+  }
+
+  /* ===== 错误提示 ===== */
+  .ljm_errorBox {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 34px 20px;
+    border-radius: 13px;
+    background: #fdf3f2;
+    border: 1px solid #f7d2cd;
+  }
+
+  .ljm_errorTitle { font-size: 15px; font-weight: 700; color: #b91c1c; margin-bottom: 6px; }
+  .ljm_errorDesc { font-size: 13px; color: #8a5a55; margin-bottom: 14px; word-break: break-all; }
+
+  .ljm_footer {
+    text-align: center;
+    font-size: 12px;
+    color: #93a5a1;
+    padding: 6px 0 34px;
+  }
+</style>
+</head>
+<body>
+
+<header class="ljm_header">
+  <p class="ljm_kicker"><i class="iconfont icon-POSzhandian"></i>第 17 章 · 接口与跨域</p>
+  <h1 class="ljm_title">商品列表</h1>
+  <p class="ljm_subtitle">fetch 请求接口数据，点击商品进入列表详情</p>
+  <div class="ljm_tags">
+    <span class="ljm_tag">GET /products?limit=8</span>
+    <span class="ljm_tag">fetch</span>
+    <span class="ljm_tag">列表 → 详情</span>
+  </div>
+</header>
+
+<main class="ljm_main">
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-canshushezhi"></i>接口与数据</h2>
+    <div class="ljm_apiBar">
+      <span class="ljm_method">GET</span>
+      <span class="ljm_url">https://dummyjson.com/products?limit=8</span>
+      <span class="ljm_status" id="ljm_listStatus">尚未请求</span>
+    </div>
+    <p class="ljm_note">
+      点击任意商品卡片会跳转到 17-3-detail.html?id=商品ID，详情页用同一个接口的详情地址按 ID 重新请求数据。
+    </p>
+    <div class="ljm_toolbar">
+      <button class="ljm_btn" id="ljm_btnReload" type="button"><i class="iconfont icon-canshushezhi"></i>重新请求</button>
+    </div>
+    <div class="ljm_grid" id="ljm_grid"></div>
+  </section>
+</main>
+
+<footer class="ljm_footer">姓名：李佳明 · 2026-11-02 · 数据来源：https://dummyjson.com</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var ljm_listUrl = 'https://dummyjson.com/products?limit=8';
+  var ljm_detailUrlBase = '17-3-detail.html?id=';
+
+  var ljm_grid = document.getElementById('ljm_grid');
+  var ljm_listStatus = document.getElementById('ljm_listStatus');
+  var ljm_btnReload = document.getElementById('ljm_btnReload');
+
+  function ljm_setStatus(ljm_text, ljm_type) {
+    ljm_listStatus.textContent = ljm_text;
+    ljm_listStatus.className = 'ljm_status' + (ljm_type ? ' ljm_status--' + ljm_type : '');
+  }
+
+  function ljm_escapeHtml(ljm_text) {
+    return String(ljm_text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function ljm_renderSkeleton() {
+    var ljm_html = '';
+    for (var ljm_i = 0; ljm_i < 8; ljm_i++) {
+      ljm_html += '<div class="ljm_skeleton"></div>';
+    }
+    ljm_grid.innerHTML = ljm_html;
+  }
+
+  function ljm_renderProducts(ljm_products) {
+    ljm_grid.innerHTML = ljm_products.map(function (ljm_item) {
+      return '<a class="ljm_card" href="' + ljm_detailUrlBase + ljm_item.id + '">' +
+        '<img class="ljm_cardImg" src="' + ljm_escapeHtml(ljm_item.thumbnail) + '" alt="' + ljm_escapeHtml(ljm_item.title) + '">' +
+        '<p class="ljm_cardTitle">' + ljm_escapeHtml(ljm_item.title) + '</p>' +
+        '<p class="ljm_brand">' + ljm_escapeHtml(ljm_item.brand || ljm_item.category) + '</p>' +
+        '<div class="ljm_cardMeta">' +
+        '<span class="ljm_price">$' + Number(ljm_item.price).toFixed(2) + '</span>' +
+        '<span class="ljm_rating">评分 ' + Number(ljm_item.rating).toFixed(1) + '</span>' +
+        '</div>' +
+        '<div class="ljm_cardFoot">' +
+        '<span>商品 ID：' + ljm_item.id + '</span>' +
+        '<span>查看详情 <i class="iconfont icon-diancai"></i></span>' +
+        '</div>' +
+        '</a>';
+    }).join('');
+  }
+
+  function ljm_renderError(ljm_message) {
+    ljm_grid.innerHTML =
+      '<div class="ljm_errorBox">' +
+      '<p class="ljm_errorTitle">请求失败</p>' +
+      '<p class="ljm_errorDesc">' + ljm_escapeHtml(ljm_message) + '</p>' +
+      '<button class="ljm_btn" id="ljm_btnRetry" type="button">重新请求</button>' +
+      '</div>';
+    document.getElementById('ljm_btnRetry').addEventListener('click', ljm_loadProducts);
+  }
+
+  function ljm_loadProducts() {
+    ljm_setStatus('请求中…', '');
+    ljm_renderSkeleton();
+    var ljm_start = performance.now();
+
+    fetch(ljm_listUrl)
+      .then(function (ljm_response) {
+        if (!ljm_response.ok) {
+          throw new Error('HTTP ' + ljm_response.status);
+        }
+        return ljm_response.json();
+      })
+      .then(function (ljm_data) {
+        var ljm_cost = Math.round(performance.now() - ljm_start);
+        ljm_renderProducts(ljm_data.products);
+        ljm_setStatus('成功 · ' + ljm_data.products.length + ' 条 · ' + ljm_cost + ' ms', 'ok');
+      })
+      .catch(function (ljm_error) {
+        ljm_renderError(ljm_error.message);
+        ljm_setStatus('请求失败', 'error');
+      });
+  }
+
+  ljm_btnReload.addEventListener('click', ljm_loadProducts);
+
+  ljm_loadProducts();
+})();
+</script>
+</body>
+</html>

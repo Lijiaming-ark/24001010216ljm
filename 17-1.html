@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：JSON 数据格式展示
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON 数据格式展示</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    background: #f1f4fa;
+    color: #2b3445;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 顶部 ===== */
+  .ljm_header {
+    position: relative;
+    padding: 60px 24px 92px;
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 48%, #4f46e5 100%);
+    overflow: hidden;
+  }
+
+  .ljm_header::before,
+  .ljm_header::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .09);
+  }
+
+  .ljm_header::before { width: 260px; height: 260px; top: -110px; left: -70px; }
+  .ljm_header::after { width: 320px; height: 320px; bottom: -170px; right: -80px; }
+
+  .ljm_kicker {
+    position: relative;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, .78);
+  }
+
+  .ljm_kicker .iconfont { margin-right: 6px; }
+
+  .ljm_title {
+    position: relative;
+    margin: 10px 0 8px;
+    font-size: 34px;
+    letter-spacing: 2px;
+  }
+
+  .ljm_subtitle {
+    position: relative;
+    font-size: 15px;
+    color: rgba(255, 255, 255, .85);
+  }
+
+  .ljm_tags {
+    position: relative;
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ljm_tag {
+    padding: 5px 14px;
+    font-size: 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .4);
+    background: rgba(255, 255, 255, .12);
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  /* ===== 主体 ===== */
+  .ljm_main {
+    max-width: 1060px;
+    margin: -48px auto 0;
+    padding: 0 20px 40px;
+  }
+
+  .ljm_section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 26px rgba(30, 60, 114, .08);
+    padding: 26px 28px 30px;
+    margin-bottom: 22px;
+  }
+
+  .ljm_sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    color: #1e3c72;
+    margin-bottom: 18px;
+  }
+
+  .ljm_sectionTitle .iconfont {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #2a5298, #4f46e5);
+  }
+
+  .ljm_desc { font-size: 14px; color: #5b6б7f; }
+  .ljm_desc { color: #5b6579; }
+
+  .ljm_desc code {
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+  }
+
+  /* ===== 规则卡 ===== */
+  .ljm_ruleGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .ljm_ruleCard {
+    padding: 15px 16px;
+    border-radius: 12px;
+    background: #f7f9ff;
+    border-left: 4px solid #4f46e5;
+  }
+
+  .ljm_ruleCard h3 { font-size: 14px; color: #1e3c72; margin-bottom: 5px; }
+  .ljm_ruleCard p { font-size: 13px; color: #5b6579; }
+
+  /* ===== 类型卡 ===== */
+  .ljm_typeGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+  }
+
+  .ljm_typeCard {
+    padding: 16px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e6ebf5;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+
+  .ljm_typeCard:hover {
+    transform: translateY(-3px);
+    border-color: #c7d2fe;
+    box-shadow: 0 8px 18px rgba(79, 70, 229, .14);
+  }
+
+  .ljm_typeHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .ljm_typeName { font-size: 15px; font-weight: 700; color: #1e3c72; }
+
+  .ljm_typeBadge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: #4338ca;
+    background: #eef2ff;
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  .ljm_code {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-x: auto;
+  }
+
+  .ljm_code .ljm_key { color: #93c5fd; }
+  .ljm_code .ljm_str { color: #86efac; }
+  .ljm_code .ljm_num { color: #fbbf24; }
+  .ljm_code .ljm_bool { color: #f472b6; }
+  .ljm_code .ljm_null { color: #a5b4fc; }
+
+  /* ===== 合法 / 非法对比 ===== */
+  .ljm_compare {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .ljm_compareBox {
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid #e6ebf5;
+  }
+
+  .ljm_compareBox--ok { background: #f2fbf4; border-color: #bbf7d0; }
+  .ljm_compareBox--bad { background: #fef3f2; border-color: #fecaca; }
+
+  .ljm_compareBox h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ljm_compareBox--ok h3 { color: #15803d; }
+  .ljm_compareBox--bad h3 { color: #b91c1c; }
+
+  .ljm_compareBox .ljm_code { background: #ffffff; color: #334155; }
+  .ljm_compareBox .ljm_code + .ljm_code { margin-top: 8px; }
+
+  /* ===== 交互演示 ===== */
+  .ljm_demoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .ljm_panel {
+    padding: 16px;
+    border-radius: 12px;
+    background: #f7f9ff;
+    border: 1px solid #e6ebf5;
+  }
+
+  .ljm_panelTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e3c72;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ljm_textarea {
+    width: 100%;
+    min-height: 168px;
+    padding: 12px;
+    border-radius: 9px;
+    border: 1px solid #d7dfec;
+    background: #fff;
+    color: #263041;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    resize: vertical;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .ljm_textarea:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(99, 102, 241, .14); }
+
+  .ljm_btnRow { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+
+  .ljm_btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #2a5298, #4f46e5);
+    cursor: pointer;
+    transition: opacity .2s, transform .2s;
+    font-family: inherit;
+  }
+
+  .ljm_btn:hover { opacity: .88; transform: translateY(-1px); }
+  .ljm_btn:active { transform: translateY(0); }
+
+  .ljm_btn--ghost {
+    color: #4338ca;
+    background: #eef2ff;
+  }
+
+  .ljm_status {
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+    background: #eef2ff;
+    color: #4338ca;
+  }
+
+  .ljm_status--ok { background: #e8f8ee; color: #15803d; }
+  .ljm_status--error { background: #fdeceb; color: #b91c1c; }
+
+  .ljm_output {
+    min-height: 96px;
+    max-height: 260px;
+    overflow: auto;
+    margin: 0;
+  }
+
+  .ljm_hint { font-size: 12px; color: #7b8497; margin-top: 8px; }
+
+  /* ===== fetch 区域 ===== */
+  .ljm_fetchMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .ljm_chip {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    background: #eef2ff;
+    color: #4338ca;
+  }
+
+  .ljm_statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .ljm_stat {
+    text-align: center;
+    padding: 14px 10px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f7f9ff, #eef2ff);
+    border: 1px solid #e6ebf5;
+  }
+
+  .ljm_statNum { display: block; font-size: 22px; font-weight: 700; color: #2a5298; }
+  .ljm_statLabel { font-size: 12px; color: #6b7488; }
+
+  .ljm_pageList { display: grid; gap: 10px; margin-bottom: 16px; }
+
+  .ljm_pageItem {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    background: #f7f9ff;
+    border-left: 3px solid #4f46e5;
+    font-size: 13px;
+  }
+
+  .ljm_pageId {
+    font-family: Consolas, Monaco, monospace;
+    color: #1e3c72;
+    font-weight: 700;
+  }
+
+  .ljm_pageType {
+    margin-left: auto;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4338ca;
+  }
+
+  .ljm_fetchNote { font-size: 12.5px; color: #7b8497; }
+
+  .ljm_footer {
+    text-align: center;
+    font-size: 12px;
+    color: #8b93a7;
+    padding: 6px 0 34px;
+  }
+</style>
+</head>
+<body>
+
+<header class="ljm_header">
+  <p class="ljm_kicker"><i class="iconfont icon-canshushezhi"></i>第 17 章 · 数据交互</p>
+  <h1 class="ljm_title">JSON 数据格式</h1>
+  <p class="ljm_subtitle">JavaScript 中最常用的数据交换格式</p>
+  <div class="ljm_tags">
+    <span class="ljm_tag">JSON.parse()</span>
+    <span class="ljm_tag">JSON.stringify()</span>
+    <span class="ljm_tag">fetch</span>
+  </div>
+</header>
+
+<main class="ljm_main">
+
+  <!-- JSON 简介 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-diancai"></i>JSON 是什么</h2>
+    <p class="ljm_desc">
+      JSON（JavaScript Object Notation）是一种轻量级的数据交换格式。它用文本描述数据，
+      既方便人阅读，也方便机器解析，因此常作为前后端传输数据的格式。
+      浏览器通过 <code>fetch</code> 拿到 JSON 文本后，用 <code>JSON.parse()</code> 转成 JavaScript 对象。
+    </p>
+    <div class="ljm_ruleGrid">
+      <div class="ljm_ruleCard">
+        <h3>键必须用双引号</h3>
+        <p>属性名只能是 <code>"name"</code> 这种双引号形式，不能是 <code>name</code> 或 <code>'name'</code>。</p>
+      </div>
+      <div class="ljm_ruleCard">
+        <h3>值只有 6 种类型</h3>
+        <p>对象、数组、字符串、数字、布尔值、null，不支持函数、undefined、日期对象。</p>
+      </div>
+      <div class="ljm_ruleCard">
+        <h3>不允许注释和多余逗号</h3>
+        <p>JSON 是纯数据，不能写 <code>//</code> 注释，最后一个成员后面也不能留逗号。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 种值类型 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-changguichuzhi"></i>JSON 允许的 6 种值</h2>
+    <div class="ljm_typeGrid">
+      <div class="ljm_typeCard">
+        <div class="ljm_typeHead"><span class="ljm_typeName">对象 object</span><span class="ljm_typeBadge">{ }</span></div>
+        <code class="ljm_code">{ "name": <span class="ljm_str">"李佳明"</span> }</code>
+      </div>
+      <div class="ljm_typeCard">
+        <div class="ljm_typeHead"><span class="ljm_typeName">数组 array</span><span class="ljm_typeBadge">[ ]</span></div>
+        <code class="ljm_code">[ <span class="ljm_str">"HTML"</span>, <span class="ljm_str">"CSS"</span>, <span class="ljm_str">"JS"</span> ]</code>
+      </div>
+      <div class="ljm_typeCard">
+        <div class="ljm_typeHead"><span class="ljm_typeName">字符串 string</span><span class="ljm_typeBadge">" "</span></div>
+        <code class="ljm_code"><span class="ljm_str">"JavaScript"</span></code>
+      </div>
+      <div class="ljm_typeCard">
+        <div class="ljm_typeHead"><span class="ljm_typeName">数字 number</span><span class="ljm_typeBadge">0-9</span></div>
+        <code class="ljm_code"><span class="ljm_num">20</span> / <span class="ljm_num">3.14</span> / <span class="ljm_num">-8</span></code>
+      </div>
+      <div class="ljm_typeCard">
+        <div class="ljm_typeHead"><span class="ljm_typeName">布尔 boolean</span><span class="ljm_typeBadge">true | false</span></div>
+        <code class="ljm_code"><span class="ljm_bool">true</span> / <span class="ljm_bool">false</span></code>
+      </div>
+      <div class="ljm_typeCard">
+        <div class="ljm_typeHead"><span class="ljm_typeName">空值 null</span><span class="ljm_typeBadge">null</span></div>
+        <code class="ljm_code"><span class="ljm_null">null</span></code>
+      </div>
+    </div>
+  </section>
+
+  <!-- 合法 / 非法 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-caipintiaomahong"></i>合法写法与常见错误</h2>
+    <div class="ljm_compare">
+      <div class="ljm_compareBox ljm_compareBox--ok">
+        <h3>✓ 合法 JSON</h3>
+        <code class="ljm_code">{
+  "name": "李佳明",
+  "age": 20,
+  "online": true
+}</code>
+      </div>
+      <div class="ljm_compareBox ljm_compareBox--bad">
+        <h3>✗ 非法 JSON</h3>
+        <code class="ljm_code">{
+  name: '李佳明',      // 键没引号、用了单引号
+  "age": 20,          // 有注释
+}</code>
+      </div>
+    </div>
+    <p class="ljm_hint">注意：JSON 的字符串只能用双引号，键名也必须用双引号，对象末尾不能有逗号。</p>
+  </section>
+
+  <!-- 交互演示 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-canshushezhi"></i>JSON.parse() 与 JSON.stringify()</h2>
+    <div class="ljm_demoGrid">
+
+      <div class="ljm_panel">
+        <p class="ljm_panelTitle"><i class="iconfont icon-diancai"></i>JSON 文本 → JavaScript 对象</p>
+        <textarea class="ljm_textarea" id="ljm_jsonInput">{
+  "name": "李佳明",
+  "age": 20,
+  "skills": ["HTML", "CSS", "JavaScript"],
+  "online": true,
+  "address": null
+}</textarea>
+        <div class="ljm_btnRow">
+          <button class="ljm_btn" id="ljm_btnParse" type="button">JSON.parse()</button>
+          <button class="ljm_btn ljm_btn--ghost" id="ljm_btnFormat" type="button">格式化</button>
+          <button class="ljm_btn ljm_btn--ghost" id="ljm_btnMinify" type="button">压缩</button>
+          <button class="ljm_btn ljm_btn--ghost" id="ljm_btnError" type="button">填入错误示例</button>
+        </div>
+        <span class="ljm_status" id="ljm_status">等待操作</span>
+        <pre class="ljm_code ljm_output" id="ljm_parseOutput">解析结果会显示在这里</pre>
+      </div>
+
+      <div class="ljm_panel">
+        <p class="ljm_panelTitle"><i class="iconfont icon-changguichuzhi"></i>JavaScript 对象 → JSON 文本</p>
+        <pre class="ljm_code" id="ljm_objectSource">var ljm_object = {
+  ljm_name: "李佳明",
+  ljm_age: 20,
+  ljm_skills: ["HTML", "CSS", "JavaScript"],
+  ljm_sayHi: function () { return "hi"; },
+  ljm_extra: undefined
+};</pre>
+        <div class="ljm_btnRow">
+          <button class="ljm_btn" id="ljm_btnStringify" type="button">JSON.stringify()</button>
+        </div>
+        <span class="ljm_status" id="ljm_stringifyStatus">等待操作</span>
+        <pre class="ljm_code ljm_output" id="ljm_objectOutput">序列化结果会显示在这里</pre>
+        <p class="ljm_hint">函数和 undefined 不是合法 JSON 值，序列化时会被自动丢弃。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- fetch 演示 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-POSzhandian"></i>用 fetch 读取本地 JSON</h2>
+    <p class="ljm_desc">下面这段数据由原生 <code>fetch</code> 从服务器端的 <code>17-1-data.json</code> 读取，读取失败时使用页面内置的降级数据。</p>
+    <div class="ljm_fetchMeta" id="ljm_fetchMeta"></div>
+    <div class="ljm_statGrid" id="ljm_statGrid"></div>
+    <div class="ljm_pageList" id="ljm_pageList"></div>
+    <span class="ljm_status" id="ljm_fetchStatus">数据加载中…</span>
+    <pre class="ljm_code ljm_output" id="ljm_fetchRaw"></pre>
+  </section>
+
+</main>
+
+<footer class="ljm_footer">姓名：李佳明 · 2026-11-02 · 原生 HTML / CSS / JavaScript</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== parse / stringify 演示 ===== */
+  var ljm_jsonInput = document.getElementById('ljm_jsonInput');
+  var ljm_parseOutput = document.getElementById('ljm_parseOutput');
+  var ljm_status = document.getElementById('ljm_status');
+  var ljm_btnParse = document.getElementById('ljm_btnParse');
+  var ljm_btnFormat = document.getElementById('ljm_btnFormat');
+  var ljm_btnMinify = document.getElementById('ljm_btnMinify');
+  var ljm_btnError = document.getElementById('ljm_btnError');
+
+  var ljm_errorSample = '{\n  name: \'李佳明\',\n  "age": 20,\n}';
+
+  function ljm_showStatus(ljm_el, ljm_text, ljm_type) {
+    ljm_el.textContent = ljm_text;
+    ljm_el.className = 'ljm_status' + (ljm_type ? ' ljm_status--' + ljm_type : '');
+  }
+
+  function ljm_getValueType(ljm_value) {
+    if (ljm_value === null) { return 'null'; }
+    if (Array.isArray(ljm_value)) { return 'array'; }
+    return typeof ljm_value;
+  }
+
+  function ljm_parseJson() {
+    try {
+      var ljm_value = JSON.parse(ljm_jsonInput.value);
+      var ljm_type = ljm_getValueType(ljm_value);
+      var ljm_keys = '';
+
+      if (ljm_type === 'object') {
+        ljm_keys = Object.keys(ljm_value).join(', ');
+      } else if (ljm_type === 'array') {
+        ljm_keys = '数组长度 ' + ljm_value.length;
+      } else {
+        ljm_keys = '值：' + String(ljm_value);
+      }
+
+      ljm_parseOutput.textContent =
+        '顶层类型：' + ljm_type + '\n' +
+        '成员：' + ljm_keys + '\n\n' +
+        JSON.stringify(ljm_value, null, 2);
+      ljm_showStatus(ljm_status, '解析成功 ✓', 'ok');
+      return { ljm_ok: true, ljm_value: ljm_value };
+    } catch (ljm_error) {
+      ljm_parseOutput.textContent = '解析失败：\n' + ljm_error.message;
+      ljm_showStatus(ljm_status, '解析失败 ✗', 'error');
+      return { ljm_ok: false, ljm_value: null };
+    }
+  }
+
+  ljm_btnParse.addEventListener('click', function () {
+    ljm_parseJson();
+  });
+
+  ljm_btnFormat.addEventListener('click', function () {
+    var ljm_result = ljm_parseJson();
+    if (!ljm_result.ljm_ok) { return; }
+    ljm_jsonInput.value = JSON.stringify(ljm_result.ljm_value, null, 2);
+    ljm_showStatus(ljm_status, '已格式化为 2 空格缩进', 'ok');
+  });
+
+  ljm_btnMinify.addEventListener('click', function () {
+    var ljm_result = ljm_parseJson();
+    if (!ljm_result.ljm_ok) { return; }
+    ljm_jsonInput.value = JSON.stringify(ljm_result.ljm_value);
+    ljm_showStatus(ljm_status, '已压缩为单行', 'ok');
+  });
+
+  ljm_btnError.addEventListener('click', function () {
+    ljm_jsonInput.value = ljm_errorSample;
+    ljm_parseJson();
+  });
+
+  /* ===== 对象转 JSON 字符串演示 ===== */
+  var ljm_jsObject = {
+    ljm_name: '李佳明',
+    ljm_age: 20,
+    ljm_skills: ['HTML', 'CSS', 'JavaScript'],
+    ljm_sayHi: function () { return 'hi'; },
+    ljm_extra: undefined
+  };
+
+  var ljm_btnStringify = document.getElementById('ljm_btnStringify');
+  var ljm_objectOutput = document.getElementById('ljm_objectOutput');
+  var ljm_stringifyStatus = document.getElementById('ljm_stringifyStatus');
+
+  ljm_btnStringify.addEventListener('click', function () {
+    ljm_objectOutput.textContent = JSON.stringify(ljm_jsObject, null, 2);
+    ljm_showStatus(ljm_stringifyStatus, '序列化完成，函数与 undefined 已丢弃', 'ok');
+  });
+
+  /* ===== fetch 读取服务器端 JSON ===== */
+  var ljm_fetchMeta = document.getElementById('ljm_fetchMeta');
+  var ljm_statGrid = document.getElementById('ljm_statGrid');
+  var ljm_pageList = document.getElementById('ljm_pageList');
+  var ljm_fetchStatus = document.getElementById('ljm_fetchStatus');
+  var ljm_fetchRaw = document.getElementById('ljm_fetchRaw');
+
+  var ljm_fallbackData = {
+    title: '服务器返回的 JSON 数据',
+    version: '1.0',
+    owner: { name: '李佳明', github: 'Lijiaming-ark', isStudent: true },
+    pages: [
+      { id: '14-2', name: 'JavaScript 基本数据类型', type: 'html', fetch: true },
+      { id: '17-1', name: 'JSON 数据格式', type: 'html', fetch: true }
+    ],
+    stats: { totalPages: 2, withFetch: 2, tags: ['HTML', 'CSS', 'JavaScript', 'JSON'] },
+    note: null
+  };
+
+  function ljm_renderData(ljm_data, ljm_fromServer) {
+    ljm_fetchMeta.innerHTML =
+      '<span class="ljm_chip">' + ljm_data.title + '</span>' +
+      '<span class="ljm_chip">版本 ' + ljm_data.version + '</span>' +
+      '<span class="ljm_chip">数据来源：' + (ljm_fromServer ? '17-1-data.json' : '内置降级数据') + '</span>';
+
+    ljm_statGrid.innerHTML =
+      '<div class="ljm_stat"><span class="ljm_statNum">' + ljm_data.stats.totalPages + '</span>' +
+      '<span class="ljm_statLabel">课程页面</span></div>' +
+      '<div class="ljm_stat"><span class="ljm_statNum">' + ljm_data.stats.withFetch + '</span>' +
+      '<span class="ljm_statLabel">使用 fetch</span></div>' +
+      '<div class="ljm_stat"><span class="ljm_statNum">' + ljm_data.stats.tags.length + '</span>' +
+      '<span class="ljm_statLabel">技术标签</span></div>' +
+      '<div class="ljm_stat"><span class="ljm_statNum">' + String(ljm_data.note) + '</span>' +
+      '<span class="ljm_statLabel">note 字段</span></div>';
+
+    ljm_pageList.innerHTML = ljm_data.pages.map(function (ljm_page) {
+      return '<div class="ljm_pageItem">' +
+        '<i class="iconfont icon-diancai"></i>' +
+        '<span class="ljm_pageId">' + ljm_page.id + '</span>' +
+        '<span>' + ljm_page.name + '</span>' +
+        '<span class="ljm_pageType">' + ljm_page.type + '</span>' +
+        '</div>';
+    }).join('');
+
+    ljm_fetchRaw.textContent = JSON.stringify(ljm_data, null, 2);
+    ljm_showStatus(ljm_fetchStatus, ljm_fromServer ? '已从服务器读取 JSON ✓' : '服务器读取失败，已使用内置降级数据', ljm_fromServer ? 'ok' : 'error');
+  }
+
+  fetch('17-1-data.json')
+    .then(function (ljm_response) {
+      if (!ljm_response.ok) {
+        throw new Error('HTTP ' + ljm_response.status);
+      }
+      return ljm_response.json();
+    })
+    .then(function (ljm_data) {
+      ljm_renderData(ljm_data, true);
+    })
+    .catch(function () {
+      ljm_renderData(ljm_fallbackData, false);
+    });
+})();
+</script>
+</body>
+</html>

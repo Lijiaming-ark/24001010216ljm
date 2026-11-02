@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：JavaScript 两种定时器（setTimeout 与 setInterval）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript 定时器</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    background: #f5f7fb;
+    color: #2b3445;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 顶部 ===== */
+  .ljm_header {
+    position: relative;
+    padding: 56px 24px 84px;
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 48%, #db2777 100%);
+    overflow: hidden;
+  }
+
+  .ljm_header::before,
+  .ljm_header::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .1);
+  }
+
+  .ljm_header::before { width: 250px; height: 250px; top: -110px; left: -60px; }
+  .ljm_header::after { width: 310px; height: 310px; bottom: -170px; right: -80px; }
+
+  .ljm_kicker {
+    position: relative;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, .82);
+  }
+
+  .ljm_kicker .iconfont { margin-right: 6px; }
+
+  .ljm_title {
+    position: relative;
+    margin: 10px 0 8px;
+    font-size: 34px;
+    letter-spacing: 2px;
+  }
+
+  .ljm_subtitle {
+    position: relative;
+    font-size: 15px;
+    color: rgba(255, 255, 255, .9);
+  }
+
+  .ljm_tags {
+    position: relative;
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ljm_tag {
+    padding: 5px 14px;
+    font-size: 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .45);
+    background: rgba(255, 255, 255, .14);
+    font-family: Consolas, Monaco, monospace;
+  }
+
+  /* ===== 主体 ===== */
+  .ljm_main {
+    max-width: 1100px;
+    margin: -48px auto 0;
+    padding: 0 20px 44px;
+  }
+
+  .ljm_section {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 26px rgba(30, 27, 75, .08);
+    padding: 22px 24px 24px;
+    margin-bottom: 22px;
+  }
+
+  .ljm_sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    color: #312e81;
+    margin-bottom: 16px;
+  }
+
+  .ljm_sectionTitle .iconfont {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #4338ca, #db2777);
+  }
+
+  .ljm_desc { font-size: 14px; color: #5b6478; }
+  .ljm_desc code { padding: 2px 6px; border-radius: 5px; background: #eef2ff; color: #4338ca; font-family: Consolas, Monaco, monospace; font-size: 13px; }
+
+  /* ===== 两种 API 对比 ===== */
+  .ljm_apiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .ljm_apiCard {
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #fafbff, #ffffff);
+  }
+
+  .ljm_apiCard h3 { font-size: 15px; color: #312e81; margin-bottom: 4px; }
+  .ljm_apiCard p { font-size: 13px; color: #6b7280; margin-bottom: 8px; }
+  .ljm_apiCard code {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ljm_apiCard .ljm_highlight { color: #86efac; }
+
+  /* ===== 交互演示 ===== */
+  .ljm_demoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .ljm_panel {
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fafbff;
+  }
+
+  .ljm_panelTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: #312e81;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ljm_display {
+    min-height: 64px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    word-break: break-all;
+  }
+
+  .ljm_display--clock { font-size: 26px; letter-spacing: 2px; color: #fde68a; }
+  .ljm_display--countdown { font-size: 32px; color: #fda4af; }
+  .ljm_display--dot { font-size: 30px; color: #86efac; letter-spacing: 6px; }
+
+  .ljm_toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 6px; }
+
+  .ljm_btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #4338ca, #db2777);
+    cursor: pointer;
+    transition: opacity .2s, transform .2s;
+    font-family: inherit;
+  }
+
+  .ljm_btn:hover { opacity: .92; transform: translateY(-1px); }
+  .ljm_btn:active { transform: translateY(0); }
+  .ljm_btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .ljm_btn--ok { background: linear-gradient(135deg, #059669, #10b981); }
+  .ljm_btn--warn { background: linear-gradient(135deg, #b45309, #f59e0b); }
+  .ljm_btn--err { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+  .ljm_btn--ghost {
+    color: #4338ca;
+    background: #eef2ff;
+  }
+
+  .ljm_input {
+    width: 80px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid #d7dcef;
+    text-align: center;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+  }
+
+  .ljm_input:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(99, 102, 241, .14); }
+
+  .ljm_label { font-size: 12.5px; color: #6b7280; }
+
+  .ljm_log {
+    margin-top: 10px;
+    max-height: 140px;
+    overflow: auto;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #cbd5e1;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    padding: 10px 12px;
+    line-height: 1.7;
+  }
+
+  .ljm_logLine { display: block; }
+  .ljm_logLine .ljm_t { color: #fde68a; margin-right: 8px; }
+  .ljm_logLine .ljm_m { color: #a5f3fc; }
+
+  .ljm_status {
+    display: inline-block;
+    font-size: 11.5px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-family: Consolas, Monaco, monospace;
+    margin-left: auto;
+  }
+
+  .ljm_status--on { background: #dcfce7; color: #15803d; }
+  .ljm_status--off { background: #fee2e2; color: #b91c1c; }
+
+  /* ===== 原理区 ===== */
+  .ljm_noteList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .ljm_note {
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fafbff;
+    border-left: 4px solid #4338ca;
+  }
+
+  .ljm_note h4 { font-size: 13.5px; color: #312e81; margin-bottom: 3px; }
+  .ljm_note p { font-size: 12.5px; color: #5b6478; }
+
+  .ljm_footer {
+    text-align: center;
+    font-size: 12px;
+    color: #9aa3b6;
+    padding: 6px 0 34px;
+  }
+
+  @media (max-width: 720px) {
+    .ljm_title { font-size: 27px; }
+    .ljm_display--clock { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="ljm_header">
+  <p class="ljm_kicker"><i class="iconfont icon-canshushezhi"></i>第 17 章 · 定时器</p>
+  <h1 class="ljm_title">setTimeout &amp; setInterval</h1>
+  <p class="ljm_subtitle">两种定时器的用法、取消方法与常见误区</p>
+  <div class="ljm_tags">
+    <span class="ljm_tag">setTimeout</span>
+    <span class="ljm_tag">setInterval</span>
+    <span class="ljm_tag">clearTimeout</span>
+    <span class="ljm_tag">clearInterval</span>
+  </div>
+</header>
+
+<main class="ljm_main">
+
+  <!-- API 简介 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-diancai"></i>两种定时器</h2>
+    <p class="ljm_desc">
+      JavaScript 里有两种常用的定时器 API：<code>setTimeout</code> 延迟一段时间后执行一次，<code>setInterval</code> 每隔一段时间重复执行。
+      两者都会返回一个 ID，用对应的 <code>clearTimeout</code> / <code>clearInterval</code> 可以取消它们。
+    </p>
+    <div class="ljm_apiGrid">
+      <div class="ljm_apiCard">
+        <h3>setTimeout</h3>
+        <p>延时执行一次。常用于倒计时、提示框自动消失等场景。</p>
+        <code><span class="ljm_highlight">var</span> t = setTimeout(<span class="ljm_highlight">function</span> () {
+  <span class="ljm_highlight">console</span>.log('2 秒后执行');
+}, <span class="ljm_highlight">2000</span>);
+
+clearTimeout(t);</code>
+      </div>
+      <div class="ljm_apiCard">
+        <h3>setInterval</h3>
+        <p>每隔固定间隔重复执行。常用于实时时钟、轮询等场景。</p>
+        <code><span class="ljm_highlight">var</span> t = setInterval(<span class="ljm_highlight">function</span> () {
+  <span class="ljm_highlight">console</span>.log('每秒执行一次');
+}, <span class="ljm_highlight">1000</span>);
+
+clearInterval(t);</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- setInterval 演示：实时时钟 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-changguichuzhi"></i>演示 1：setInterval 实时时钟</h2>
+    <p class="ljm_desc">用 <code>setInterval(fn, 1000)</code> 每秒更新一次时间显示。</p>
+    <div class="ljm_demoGrid">
+      <div class="ljm_panel">
+        <div class="ljm_panelTitle">实时时钟 <span class="ljm_status" id="ljm_clockStatus">未启动</span></div>
+        <div class="ljm_display ljm_display--clock" id="ljm_clock">--:--:--</div>
+        <div class="ljm_toolbar">
+          <button class="ljm_btn ljm_btn--ok" id="ljm_btnClockStart" type="button"><i class="iconfont icon-diancai"></i>启动</button>
+          <button class="ljm_btn ljm_btn--err" id="ljm_btnClockStop" type="button" disabled><i class="iconfont icon-canshushezhi"></i>停止</button>
+        </div>
+      </div>
+      <div class="ljm_panel">
+        <div class="ljm_panelTitle">LED 闪烁 <span class="ljm_status" id="ljm_blinkStatus">未启动</span></div>
+        <div class="ljm_display ljm_display--dot" id="ljm_blink">●</div>
+        <div class="ljm_toolbar">
+          <span class="ljm_label">间隔</span>
+          <input class="ljm_input" id="ljm_blinkInterval" type="number" min="100" max="2000" step="100" value="500">
+          <span class="ljm_label">ms</span>
+        </div>
+        <div class="ljm_toolbar">
+          <button class="ljm_btn ljm_btn--ok" id="ljm_btnBlinkStart" type="button">启动</button>
+          <button class="ljm_btn ljm_btn--err" id="ljm_btnBlinkStop" type="button" disabled>停止</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- setTimeout 演示：倒计时 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-caipintiaomahong"></i>演示 2：setTimeout 倒计时</h2>
+    <p class="ljm_desc">使用 <code>setTimeout</code> 递归调用自身实现倒计时，比固定间隔的 <code>setInterval</code> 更精确。</p>
+    <div class="ljm_demoGrid">
+      <div class="ljm_panel">
+        <div class="ljm_panelTitle">10 秒倒计时 <span class="ljm_status" id="ljm_countStatus">未启动</span></div>
+        <div class="ljm_display ljm_display--countdown" id="ljm_count">10</div>
+        <div class="ljm_toolbar">
+          <button class="ljm_btn ljm_btn--warn" id="ljm_btnCountStart" type="button"><i class="iconfont icon-canshushezhi"></i>开始 10 秒倒计时</button>
+          <button class="ljm_btn ljm_btn--ghost" id="ljm_btnCountCancel" type="button">取消</button>
+        </div>
+      </div>
+      <div class="ljm_panel">
+        <div class="ljm_panelTitle">延时提示框</div>
+        <div class="ljm_display" id="ljm_toast">点击按钮试试 2 秒后消失的提示</div>
+        <div class="ljm_toolbar">
+          <span class="ljm_label">延迟</span>
+          <input class="ljm_input" id="ljm_toastDelay" type="number" min="200" max="5000" step="100" value="2000">
+          <span class="ljm_label">ms</span>
+        </div>
+        <div class="ljm_toolbar">
+          <button class="ljm_btn ljm_btn--ok" id="ljm_btnToast" type="button">显示提示</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 连续触发 + 日志 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-POSzhandian"></i>演示 3：连续点击的陷阱</h2>
+    <p class="ljm_desc">
+      连续点“加 1”按钮而不清理旧定时器，会启动多个定时器同时工作。下面这个演示会在每次启动新的定时器前调用 <code>clearInterval</code> 清理旧 ID，保证任何时刻只存在一个定时器。
+    </p>
+    <div class="ljm_demoGrid">
+      <div class="ljm_panel">
+        <div class="ljm_panelTitle">点击计数器 <span class="ljm_status" id="ljm_autoStatus">未启动</span></div>
+        <div class="ljm_display" id="ljm_auto">当前自动递增数字：<strong>0</strong></div>
+        <div class="ljm_toolbar">
+          <span class="ljm_label">间隔</span>
+          <input class="ljm_input" id="ljm_autoInterval" type="number" min="200" max="2000" step="100" value="800">
+          <span class="ljm_label">ms</span>
+        </div>
+        <div class="ljm_toolbar">
+          <button class="ljm_btn ljm_btn--ok" id="ljm_btnAutoStart" type="button">开始自动递增</button>
+          <button class="ljm_btn ljm_btn--err" id="ljm_btnAutoStop" type="button">停止并清零</button>
+        </div>
+      </div>
+      <div class="ljm_panel">
+        <div class="ljm_panelTitle">事件日志</div>
+        <div class="ljm_log" id="ljm_log"></div>
+        <div class="ljm_toolbar" style="justify-content:flex-end;">
+          <button class="ljm_btn ljm_btn--ghost" id="ljm_btnClearLog" type="button">清空日志</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 原理与误区 -->
+  <section class="ljm_section">
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-diancai"></i>注意事项</h2>
+    <div class="ljm_noteList">
+      <div class="ljm_note">
+        <h4>返回值是一个数字 ID</h4>
+        <p>浏览器里 setTimeout / setInterval 都返回整数，Node.js 中返回对象。保存下来才能 clear 掉。</p>
+      </div>
+      <div class="ljm_note">
+        <h4>setInterval 可能漂移</h4>
+        <p>如果回调内部耗时很长，下一次触发会被推迟。对时间要求严格的场景用 setTimeout 递归。</p>
+      </div>
+      <div class="ljm_note">
+        <h4>闭包陷阱</h4>
+        <p>循环里用 setTimeout 时，回调拿到的是循环结束后的变量值，需要 IIFE 或 let 来避免。</p>
+      </div>
+      <div class="ljm_note">
+        <h4>页面隐藏会被节流</h4>
+        <p>浏览器在标签页隐藏时会把 setInterval 降到约 1 次/分钟，这是性能策略，不是 bug。</p>
+      </div>
+      <div class="ljm_note">
+        <h4>先 clear 再启动</h4>
+        <p>重复点击“启动”按钮前先 clear 上一次的 ID，防止多个定时器同时跑。</p>
+      </div>
+      <div class="ljm_note">
+        <h4>内存泄漏</h4>
+        <p>组件销毁/页面跳转时记得 clear，否则回调一直持有 DOM 引用，内存不会被回收。</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="ljm_footer">姓名：李佳明 · 2026-11-02 · 原生 HTML / CSS / JavaScript</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 通用 ===== */
+  function ljm_formatTime() {
+    var ljm_now = new Date();
+    var ljm_h = String(ljm_now.getHours()).padStart(2, '0');
+    var ljm_m = String(ljm_now.getMinutes()).padStart(2, '0');
+    var ljm_s = String(ljm_now.getSeconds()).padStart(2, '0');
+    return ljm_h + ':' + ljm_m + ':' + ljm_s;
+  }
+
+  var ljm_log = document.getElementById('ljm_log');
+  function ljm_addLog(ljm_msg) {
+    var ljm_line = document.createElement('span');
+    ljm_line.className = 'ljm_logLine';
+    ljm_line.innerHTML = '<span class="ljm_t">[' + ljm_formatTime() + ']</span><span class="ljm_m">' + ljm_msg + '</span>';
+    ljm_log.appendChild(ljm_line);
+    ljm_log.scrollTop = ljm_log.scrollHeight;
+  }
+
+  document.getElementById('ljm_btnClearLog').addEventListener('click', function () {
+    ljm_log.innerHTML = '';
+  });
+
+  function ljm_setStatus(ljm_el, ljm_text, ljm_on) {
+    ljm_el.textContent = ljm_text;
+    ljm_el.className = 'ljm_status' + (ljm_on ? ' ljm_status--on' : ' ljm_status--off');
+  }
+
+  /* ===== 时钟 setInterval ===== */
+  var ljm_clockTimer = null;
+  var ljm_clock = document.getElementById('ljm_clock');
+  var ljm_clockStatus = document.getElementById('ljm_clockStatus');
+  var ljm_btnClockStart = document.getElementById('ljm_btnClockStart');
+  var ljm_btnClockStop = document.getElementById('ljm_btnClockStop');
+
+  ljm_btnClockStart.addEventListener('click', function () {
+    if (ljm_clockTimer !== null) { return; }
+    ljm_clock.textContent = ljm_formatTime();
+    ljm_clockTimer = setInterval(function () {
+      ljm_clock.textContent = ljm_formatTime();
+    }, 1000);
+    ljm_setStatus(ljm_clockStatus, '运行中', true);
+    ljm_btnClockStart.disabled = true;
+    ljm_btnClockStop.disabled = false;
+    ljm_addLog('setInterval 启动（时钟，1000ms）');
+  });
+
+  ljm_btnClockStop.addEventListener('click', function () {
+    if (ljm_clockTimer === null) { return; }
+    clearInterval(ljm_clockTimer);
+    ljm_clockTimer = null;
+    ljm_setStatus(ljm_clockStatus, '已停止', false);
+    ljm_btnClockStart.disabled = false;
+    ljm_btnClockStop.disabled = true;
+    ljm_addLog('clearInterval 清除时钟定时器');
+  });
+
+  /* ===== LED 闪烁 ===== */
+  var ljm_blinkTimer = null;
+  var ljm_blink = document.getElementById('ljm_blink');
+  var ljm_blinkStatus = document.getElementById('ljm_blinkStatus');
+  var ljm_btnBlinkStart = document.getElementById('ljm_btnBlinkStart');
+  var ljm_btnBlinkStop = document.getElementById('ljm_btnBlinkStop');
+  var ljm_blinkInterval = document.getElementById('ljm_blinkInterval');
+  var ljm_blinkOn = true;
+
+  function ljm_stopBlink() {
+    if (ljm_blinkTimer !== null) {
+      clearInterval(ljm_blinkTimer);
+      ljm_blinkTimer = null;
+    }
+    ljm_setStatus(ljm_blinkStatus, '已停止', false);
+    ljm_btnBlinkStart.disabled = false;
+    ljm_btnBlinkStop.disabled = true;
+  }
+
+  ljm_btnBlinkStart.addEventListener('click', function () {
+    ljm_stopBlink();
+    var ljm_ms = Math.max(100, Number(ljm_blinkInterval.value) || 500);
+    ljm_blinkTimer = setInterval(function () {
+      ljm_blinkOn = !ljm_blinkOn;
+      ljm_blink.style.opacity = ljm_blinkOn ? '1' : '0.15';
+    }, ljm_ms);
+    ljm_setStatus(ljm_blinkStatus, '运行中', true);
+    ljm_btnBlinkStart.disabled = true;
+    ljm_btnBlinkStop.disabled = false;
+    ljm_addLog('setInterval 启动（LED，' + ljm_ms + 'ms）');
+  });
+
+  ljm_btnBlinkStop.addEventListener('click', function () {
+    ljm_stopBlink();
+    ljm_blink.style.opacity = '1';
+    ljm_addLog('clearInterval 清除 LED 定时器');
+  });
+
+  /* ===== 倒计时 setTimeout 递归 ===== */
+  var ljm_countTimer = null;
+  var ljm_countNum = 10;
+  var ljm_count = document.getElementById('ljm_count');
+  var ljm_countStatus = document.getElementById('ljm_countStatus');
+  var ljm_btnCountStart = document.getElementById('ljm_btnCountStart');
+  var ljm_btnCountCancel = document.getElementById('ljm_btnCountCancel');
+
+  function ljm_runCountdown() {
+    ljm_count.textContent = ljm_countNum;
+    ljm_count.style.color = '#fda4af';
+    if (ljm_countNum <= 0) {
+      ljm_count.textContent = '⏰ 到点了';
+      ljm_count.style.color = '#86efac';
+      ljm_countTimer = null;
+      ljm_setStatus(ljm_countStatus, '已完成', false);
+      ljm_addLog('setTimeout 递归倒计时结束');
+      return;
+    }
+    ljm_countNum--;
+    ljm_countTimer = setTimeout(ljm_runCountdown, 1000);
+  }
+
+  ljm_btnCountStart.addEventListener('click', function () {
+    if (ljm_countTimer !== null) { clearTimeout(ljm_countTimer); }
+    ljm_countNum = 10;
+    ljm_setStatus(ljm_countStatus, '倒计时中', true);
+    ljm_addLog('setTimeout 递归启动倒计时');
+    ljm_runCountdown();
+  });
+
+  ljm_btnCountCancel.addEventListener('click', function () {
+    if (ljm_countTimer !== null) {
+      clearTimeout(ljm_countTimer);
+      ljm_countTimer = null;
+      ljm_setStatus(ljm_countStatus, '已取消', false);
+      ljm_count.textContent = '已取消';
+      ljm_count.style.color = '#94a3b8';
+      ljm_addLog('clearTimeout 取消倒计时');
+    }
+  });
+
+  /* ===== 延时提示框 ===== */
+  var ljm_toastTimer = null;
+  var ljm_toast = document.getElementById('ljm_toast');
+  var ljm_toastDelay = document.getElementById('ljm_toastDelay');
+  var ljm_btnToast = document.getElementById('ljm_btnToast');
+
+  ljm_btnToast.addEventListener('click', function () {
+    if (ljm_toastTimer !== null) { clearTimeout(ljm_toastTimer); }
+    var ljm_ms = Math.max(200, Number(ljm_toastDelay.value) || 2000);
+    ljm_toast.textContent = '提示显示中…';
+    ljm_toast.style.color = '#fde68a';
+    ljm_addLog('setTimeout 启动（提示框，' + ljm_ms + 'ms）');
+    ljm_toastTimer = setTimeout(function () {
+      ljm_toast.textContent = '提示消失了 ✓';
+      ljm_toast.style.color = '#86efac';
+      ljm_toastTimer = null;
+      ljm_addLog('setTimeout 触发，提示框已更新');
+    }, ljm_ms);
+  });
+
+  /* ===== 自动递增计数器 ===== */
+  var ljm_autoTimer = null;
+  var ljm_autoNum = 0;
+  var ljm_auto = document.getElementById('ljm_auto');
+  var ljm_autoStatus = document.getElementById('ljm_autoStatus');
+  var ljm_btnAutoStart = document.getElementById('ljm_btnAutoStart');
+  var ljm_btnAutoStop = document.getElementById('ljm_btnAutoStop');
+  var ljm_autoInterval = document.getElementById('ljm_autoInterval');
+
+  function ljm_stopAuto(ljm_silent) {
+    if (ljm_autoTimer !== null) {
+      clearInterval(ljm_autoTimer);
+      ljm_autoTimer = null;
+      if (!ljm_silent) { ljm_addLog('clearInterval 清除（自动递增）'); }
+    }
+    ljm_setStatus(ljm_autoStatus, '已停止', false);
+  }
+
+  ljm_btnAutoStart.addEventListener('click', function () {
+    /* 启动前先 clear 一次，防止连续点击导致多实例并存 */
+    ljm_stopAuto();
+    var ljm_ms = Math.max(200, Number(ljm_autoInterval.value) || 800);
+    ljm_autoTimer = setInterval(function () {
+      ljm_autoNum++;
+      ljm_auto.innerHTML = '当前自动递增数字：<strong>' + ljm_autoNum + '</strong>';
+    }, ljm_ms);
+    ljm_setStatus(ljm_autoStatus, '运行中', true);
+    ljm_addLog('setInterval 启动（自动递增，' + ljm_ms + 'ms）');
+  });
+
+  ljm_btnAutoStop.addEventListener('click', function () {
+    ljm_stopAuto();
+    ljm_autoNum = 0;
+    ljm_auto.innerHTML = '当前自动递增数字：<strong>0</strong>';
+    ljm_addLog('clearInterval 清除，数字已清零');
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "title": "服务器返回的 JSON 数据",
+  "version": "1.0",
+  "owner": {
+    "name": "李佳明",
+    "github": "Lijiaming-ark",
+    "isStudent": true
+  },
+  "pages": [
+    { "id": "14-2", "name": "JavaScript 基本数据类型", "type": "html", "fetch": true },
+    { "id": "16-1", "name": "JavaScript 数组主要方法", "type": "html", "fetch": true },
+    { "id": "16-2", "name": "JavaScript 对象", "type": "html", "fetch": true },
+    { "id": "16-3", "name": "微信网页版登录页复刻", "type": "html", "fetch": true },
+    { "id": "17-1", "name": "JSON 数据格式", "type": "html", "fetch": true }
+  ],
+  "stats": {
+    "totalPages": 5,
+    "withFetch": 5,
+    "tags": ["HTML", "CSS", "JavaScript", "JSON"]
+  },
+  "note": null
+}
