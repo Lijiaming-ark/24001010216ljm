@@ -1,0 +1,149 @@
+{
+  "id": "5244738",
+  "name": "李佳明",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "39318695",
+      "name": "常规储值",
+      "font_class": "changguichuzhi",
+      "unicode": "e649",
+      "unicode_decimal": 58953
+    },
+    {
+      "icon_id": "39318828",
+      "name": "POS站点",
+      "font_class": "POSzhandian",
+      "unicode": "e64b",
+      "unicode_decimal": 58955
+    },
+    {
+      "icon_id": "39318830",
+      "name": "菜类库红",
+      "font_class": "caileikuhong",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
+      "icon_id": "39318838",
+      "name": "菜品特价",
+      "font_class": "caipintejia",
+      "unicode": "e64e",
+      "unicode_decimal": 58958
+    },
+    {
+      "icon_id": "39318843",
+      "name": "菜品提成",
+      "font_class": "caipinticheng",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
+      "icon_id": "39318862",
+      "name": "菜品库红",
+      "font_class": "caipinkuhong",
+      "unicode": "e651",
+      "unicode_decimal": 58961
+    },
+    {
+      "icon_id": "39318868",
+      "name": "菜品条码红",
+      "font_class": "caipintiaomahong",
+      "unicode": "e653",
+      "unicode_decimal": 58963
+    },
+    {
+      "icon_id": "39318869",
+      "name": "菜品做法红",
+      "font_class": "caipinzuofahong",
+      "unicode": "e654",
+      "unicode_decimal": 58964
+    },
+    {
+      "icon_id": "39318926",
+      "name": "参数设置",
+      "font_class": "canshushezhi",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "39318928",
+      "name": "餐桌管理红",
+      "font_class": "canzhuoguanlihong",
+      "unicode": "e657",
+      "unicode_decimal": 58967
+    },
+    {
+      "icon_id": "39318931",
+      "name": "常规储值",
+      "font_class": "changguichuzhi1",
+      "unicode": "e658",
+      "unicode_decimal": 58968
+    },
+    {
+      "icon_id": "39318932",
+      "name": "出品部门红",
+      "font_class": "chupinbumenhong",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
+    {
+      "icon_id": "39318934",
+      "name": "储值清算",
+      "font_class": "chuzhiqingsuan",
+      "unicode": "e65a",
+      "unicode_decimal": 58970
+    },
+    {
+      "icon_id": "39318937",
+      "name": "储值推荐红",
+      "font_class": "chuzhituijianhong",
+      "unicode": "e65b",
+      "unicode_decimal": 58971
+    },
+    {
+      "icon_id": "39318938",
+      "name": "传菜管理红",
+      "font_class": "chuancaiguanlihong",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "39318954",
+      "name": "打印机管理红",
+      "font_class": "dayinjiguanlihong",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "39318957",
+      "name": "单据模板红",
+      "font_class": "danjumobanhong",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "39318971",
+      "name": "档口设置红",
+      "font_class": "dangkoushezhihong",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "39318973",
+      "name": "点菜",
+      "font_class": "diancai",
+      "unicode": "e661",
+      "unicode_decimal": 58977
+    },
+    {
+      "icon_id": "39318974",
+      "name": "点单样式",
+      "font_class": "diandanyangshi",
+      "unicode": "e662",
+      "unicode_decimal": 58978
+    }
+  ]
+}

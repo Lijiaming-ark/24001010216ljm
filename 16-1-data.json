@@ -1,0 +1,12 @@
+{
+  "source": "16-1-data.json",
+  "updated": "2026-11-02",
+  "items": [
+    { "name": "宫保鸡丁", "price": 38.5, "sales": 126, "onSale": true },
+    { "name": "麻婆豆腐", "price": 22, "sales": 98, "onSale": true },
+    { "name": "水煮鱼", "price": 68, "sales": 156, "onSale": false },
+    { "name": "回锅肉", "price": 42, "sales": 203, "onSale": true },
+    { "name": "酸辣土豆丝", "price": 16, "sales": 187, "onSale": true },
+    { "name": "西红柿炒蛋", "price": 18, "sales": 76, "onSale": false }
+  ]
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Font Awesome 字体图标</title>
+<link rel="stylesheet" href="cdn/all.min.css">
+<style>
+body { font-family: "Microsoft YaHei", sans-serif; margin: 0; padding: 24px; background: #f5f7fa; color: #333; }
+h1 { text-align: center; font-size: 26px; }
+p.tip { text-align: center; color: #888; margin-top: -6px; }
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; max-width: 900px; margin: 24px auto 0; }
+.icon-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.08); padding: 18px 8px; text-align: center; transition: transform .2s; }
+.icon-card:hover { transform: translateY(-4px); }
+.icon-card i { font-size: 32px; color: #2c6fbb; display: block; margin-bottom: 10px; }
+.icon-card span { font-size: 13px; color: #666; }
+.demo { max-width: 900px; margin: 28px auto 0; background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.08); padding: 20px 24px; line-height: 2.2; }
+.demo h2 { font-size: 18px; margin-top: 0; }
+.demo svg { color: #e67e22; vertical-align: -0.125em; }
+</style>
+</head>
+<body>
+<h1>Font Awesome 字体图标演示</h1>
+<p class="tip">通过 @font-face 字体 + class 引用图标（本地 cdn/all.min.css）</p>
+
+<div class="icon-grid">
+  <div class="icon-card"><i class="fas fa-house"></i><span>fa-house</span></div>
+  <div class="icon-card"><i class="fas fa-heart"></i><span>fa-heart</span></div>
+  <div class="icon-card"><i class="fas fa-user"></i><span>fa-user</span></div>
+  <div class="icon-card"><i class="fas fa-envelope"></i><span>fa-envelope</span></div>
+  <div class="icon-card"><i class="fas fa-gear"></i><span>fa-gear</span></div>
+  <div class="icon-card"><i class="fas fa-magnifying-glass"></i><span>fa-search</span></div>
+  <div class="icon-card"><i class="fas fa-bell"></i><span>fa-bell</span></div>
+  <div class="icon-card"><i class="fas fa-camera"></i><span>fa-camera</span></div>
+  <div class="icon-card"><i class="fas fa-trash"></i><span>fa-trash</span></div>
+  <div class="icon-card"><i class="far fa-star"></i><span>far fa-star</span></div>
+  <div class="icon-card"><i class="far fa-comment"></i><span>far fa-comment</span></div>
+  <div class="icon-card"><i class="fab fa-weixin"></i><span>fab fa-weixin</span></div>
+  <div class="icon-card"><i class="fab fa-github"></i><span>fab fa-github</span></div>
+  <div class="icon-card"><i class="fab fa-bilibili"></i><span>fab fa-bilibili</span></div>
+  <div class="icon-card"><i class="fas fa-cloud-arrow-down"></i><span>fa-download</span></div>
+  <div class="icon-card"><i class="fas fa-play"></i><span>fa-play</span></div>
+</div>
+
+<div class="demo">
+  <h2>字体图标特性</h2>
+  <p>
+    <i class="fas fa-circle-info"></i> 图标本质是字体，可用 CSS 控制大小、颜色：
+    <i class="fas fa-heart" style="font-size:28px;color:#e74c3c;"></i>
+    <i class="fas fa-heart" style="font-size:20px;color:#f39c12;"></i>
+    <i class="fas fa-heart" style="font-size:14px;color:#27ae60;"></i>
+  </p>
+  <p>
+    <i class="fas fa-palette"></i> 带图标列表：
+    <i class="fas fa-check" style="color:#27ae60;"></i> 完成
+    <i class="fas fa-xmark" style="color:#e74c3c;"></i> 取消
+    <i class="fas fa-spinner fa-spin"></i> 加载中
+    <i class="fas fa-triangle-exclamation" style="color:#e67e22;"></i> 警告
+  </p>
+</div>
+</body>
+</html>

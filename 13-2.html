@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucide SVG 图标</title>
+<script src="cdn/lucide/lucide.min.js"></script>
+<style>
+body { font-family: "Microsoft YaHei", sans-serif; margin: 0; padding: 24px; background: #f5f7fa; color: #333; }
+h1 { text-align: center; font-size: 26px; }
+p.tip { text-align: center; color: #888; margin-top: -6px; }
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; max-width: 900px; margin: 24px auto 0; }
+.icon-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.08); padding: 18px 8px; text-align: center; transition: transform .2s; }
+.icon-card:hover { transform: translateY(-4px); }
+.icon-card svg { width: 32px; height: 32px; color: #7c3aed; display: block; margin: 0 auto 10px; }
+.icon-card span { font-size: 13px; color: #666; }
+.demo { max-width: 900px; margin: 28px auto 0; background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.08); padding: 20px 24px; line-height: 2.2; }
+.demo h2 { font-size: 18px; margin-top: 0; }
+.demo svg { color: #e67e22; vertical-align: -0.125em; }
+</style>
+</head>
+<body>
+<h1>Lucide SVG 图标演示</h1>
+<p class="tip">通过 data-lucide 属性 + lucide.createIcons() 渲染为内联 SVG（本地 cdn/lucide/lucide.min.js）</p>
+
+<div class="icon-grid">
+  <div class="icon-card"><i data-lucide="house"></i><span>house</span></div>
+  <div class="icon-card"><i data-lucide="heart"></i><span>heart</span></div>
+  <div class="icon-card"><i data-lucide="user"></i><span>user</span></div>
+  <div class="icon-card"><i data-lucide="mail"></i><span>mail</span></div>
+  <div class="icon-card"><i data-lucide="settings"></i><span>settings</span></div>
+  <div class="icon-card"><i data-lucide="search"></i><span>search</span></div>
+  <div class="icon-card"><i data-lucide="bell"></i><span>bell</span></div>
+  <div class="icon-card"><i data-lucide="camera"></i><span>camera</span></div>
+  <div class="icon-card"><i data-lucide="trash-2"></i><span>trash-2</span></div>
+  <div class="icon-card"><i data-lucide="star"></i><span>star</span></div>
+  <div class="icon-card"><i data-lucide="message-circle"></i><span>message-circle</span></div>
+  <div class="icon-card"><i data-lucide="download"></i><span>download</span></div>
+  <div class="icon-card"><i data-lucide="play"></i><span>play</span></div>
+  <div class="icon-card"><i data-lucide="github"></i><span>github</span></div>
+  <div class="icon-card"><i data-lucide="palette"></i><span>palette</span></div>
+  <div class="icon-card"><i data-lucide="zap"></i><span>zap</span></div>
+</div>
+
+<div class="demo">
+  <h2>SVG 图标特性</h2>
+  <p>
+    <i data-lucide="info"></i> SVG 可直接用属性/样式调整大小、颜色、描边：
+    <i data-lucide="heart" width="28" height="28" stroke="#e74c3c"></i>
+    <i data-lucide="heart" width="20" height="20" stroke="#f39c12" stroke-width="1"></i>
+    <i data-lucide="heart" width="14" height="14" stroke="#27ae60" stroke-width="3"></i>
+  </p>
+  <p>
+    <i data-lucide="list"></i> 工具栏示例：
+    <i data-lucide="circle-check" stroke="#27ae60"></i> 完成
+    <i data-lucide="circle-x" stroke="#e74c3c"></i> 取消
+    <i data-lucide="loader-circle"></i> 加载中
+    <i data-lucide="triangle-alert" stroke="#e67e22"></i> 警告
+  </p>
+</div>
+
+<script>
+lucide.createIcons();
+</script>
+</body>
+</html>

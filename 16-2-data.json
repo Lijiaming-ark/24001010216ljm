@@ -1,0 +1,11 @@
+{
+  "source": "16-2-data.json",
+  "updated": "2026-11-02",
+  "course": {
+    "name": "Web 前端开发",
+    "teacher": "李佳明",
+    "duration": 64,
+    "modules": ["HTML", "CSS", "JavaScript"],
+    "detail": { "campus": "软件学院", "credit": 3 }
+  }
+}

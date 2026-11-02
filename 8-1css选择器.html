@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大盒子包含12个小盒子</title>
+    <style>
+        /* 外层大盒子 */
+        .big-box {
+            width: 800px;
+            margin: 50px auto; /* 水平居中 */
+            padding: 20px;
+            border: 3px solid #333;
+            display: flex;
+            flex-wrap: wrap; /* 自动换行 */
+            gap: 15px; /* 小盒子之间间距 */
+        }
+        /* 内层小盒子公共样式 */
+        .small-box {
+            width: 180px;
+            height: 180px;
+            background-color: #409eff;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            border-radius: 8px;
+            transition: all 0.3s ease; /* 过渡动画 */
+            /* 开启3D空间，Y轴旋转立体效果 */
+            transform-style: preserve-3d;
+            position: relative; /* 给伪元素定位用 */
+        }
+        /* 第一个盒子悬浮：放大、变色、改文字颜色 */
+        .box1:hover {
+            transform: scale(1.1);
+            background-color: #f56c6c;
+            color: #000;
+            font-weight: bold;
+        }
+        /* 第二个盒子悬浮：阴影效果 */
+        .box2:hover {
+            box-shadow: 0 0 25px #ffd700;
+        }
+        /* 第三个盒子：文字阴影 */
+        .box3:hover {
+            text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+        }
+        /* 第四个盒子：变成圆形 */
+        .box4:hover {
+            border-radius: 50%;
+        }
+        /* 第五个盒子：线性渐变背景 */
+        .box5:hover {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        }
+        /* 第六个盒子：径向渐变背景 */
+        .box6:hover {
+            background: radial-gradient(circle, #ffd700, #ff4757);
+        }
+        /* 相邻兄弟选择器 +：鼠标悬浮在box6，只改变紧跟其后的box7 */
+        .box6:hover + .box7 {
+            background-color: #27ae60;
+        }
+        /* 第七个盒子悬浮：缩小 */
+        .box7:hover {
+            transform: scale(0.7);
+        }
+        /* 第八个盒子悬浮：向左平移 */
+        .box8:hover {
+            transform: translateX(-30px);
+        }
+        /* 第九个盒子悬浮：rotateZ -180deg 平面翻转 */
+        .box9:hover {
+            transform: rotateZ(-180deg);
+        }
+        /* 第十个盒子：原来11号的效果 skewX(20deg) X轴倾斜 */
+        .box10:hover {
+            transform: skewX(20deg);
+        }
+        /* 第11盒子：新效果 skewY(-15deg) Y轴倾斜 */
+        .box11:hover {
+            transform: skewY(-15deg);
+        }
+        /* ========== 第12号盒子：伪元素黑底白字圆角【李佳明】 ========== */
+        .box12:hover::after {
+            content: "李佳明";
+            color: #ffffff;
+            background-color: #000000;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100px;
+            height: 40px;
+            border-radius: 8px;
+            position: absolute;
+            bottom: -50px;
+            z-index: 99;
+        }
+
+        /* 偶数盒子 2,4,6,8,10,12 额外变化：hover时增加边框 */
+        .box2:hover,
+        .box4:hover,
+        .box6:hover,
+        .box8:hover,
+        .box10:hover,
+        .box12:hover {
+            border: 4px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- 大盒子 -->
+    <div class="big-box">
+        <div class="small-box box1">1</div>
+        <div class="small-box box2">2</div>
+        <div class="small-box box3">3</div>
+        <div class="small-box box4">4</div>
+        <div class="small-box box5">5</div>
+        <div class="small-box box6">6</div>
+        <div class="small-box box7">7</div>
+        <div class="small-box box8">8</div>
+        <div class="small-box box9">9</div>
+        <div class="small-box box10">10</div>
+        <div class="small-box box11">11</div>
+        <div class="small-box box12">12</div>
+    </div>
+</body>
+</html>
+

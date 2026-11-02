@@ -1,0 +1,12 @@
+{
+  "source": "14-2-data.json",
+  "updated": "2026-10-22",
+  "items": [
+    { "field": "菜品名称", "value": "宫保鸡丁" },
+    { "field": "单价", "value": 38.5 },
+    { "field": "是否在售", "value": true },
+    { "field": "备注", "value": null },
+    { "field": "折扣" },
+    { "field": "菜单编号", "value": "Symbol(MENU_2026)" }
+  ]
+}

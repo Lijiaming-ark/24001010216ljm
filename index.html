@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>袁磊的《高级网页设计》课堂实践</title>
+    <style>
+      :root {
+        --bg-1: #f5efe8;
+        --bg-2: #e7d8c3;
+        --panel: rgba(255, 255, 255, 0.82);
+        --panel-strong: rgba(255, 248, 240, 0.96);
+        --line: rgba(126, 96, 70, 0.18);
+        --text: #2c201a;
+        --muted: #695548;
+        --primary: #8b5d36;
+        --primary-deep: #5b3822;
+        --secondary: #d98d5f;
+        --accent: #c44b3a;
+        --shadow: rgba(75, 45, 24, 0.16);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+        color: var(--text);
+        background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+        min-height: 100vh;
+      }
+
+      .container {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 38px 0 60px;
+      }
+
+      .hero {
+        position: relative;
+        background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,244,234,0.88));
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        box-shadow: 0 18px 40px var(--shadow);
+        padding: 36px 32px 28px;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(139,93,54,0.08), rgba(196,75,58,0.07), transparent 62%);
+      }
+
+      .hero > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .badge {
+        display: inline-block;
+        background: rgba(217, 141, 95, 0.18);
+        border: 1px solid rgba(139,93,54,0.2);
+        color: var(--primary-deep);
+        border-radius: 999px;
+        padding: 9px 18px;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.1rem, 4vw, 4rem);
+        line-height: 1.2;
+        letter-spacing: 1px;
+      }
+
+      .subtitle {
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 1.04rem;
+        line-height: 1.9;
+        max-width: 820px;
+      }
+
+      .meta {
+        margin-top: 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .meta-item {
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--panel-strong);
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+
+      .section {
+        margin-top: 28px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.74);
+        box-shadow: 0 14px 24px rgba(75,45,24,0.06);
+        border-radius: 24px;
+        padding: 28px 22px 20px;
+      }
+
+      .section h2 {
+        margin: 0 0 18px;
+        color: var(--primary-deep);
+        font-size: clamp(1.5rem, 2vw, 2.1rem);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        background: linear-gradient(180deg, #fff, #fffaf5);
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        box-shadow: 0 10px 18px rgba(75,45,24,0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 28px rgba(75,45,24,0.12);
+      }
+
+      .card a {
+        display: block;
+        padding: 18px 18px 16px;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 18px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+      }
+
+      .card h3 {
+        margin: 0 0 10px;
+        font-size: 1.12rem;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.8;
+        font-size: 0.92rem;
+      }
+
+      .prompt-box {
+        background: linear-gradient(135deg, #fffaf4, #fff);
+        border-left: 5px solid var(--primary);
+        border-radius: 16px;
+        border: 1px solid rgba(139,93,54,0.18);
+        padding: 20px 18px;
+      }
+
+      .prompt-box h3 {
+        margin: 0 0 12px;
+        color: var(--primary-deep);
+        font-size: 1.06rem;
+      }
+
+      .prompt-box p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.9;
+        font-size: 0.96rem;
+      }
+
+      footer {
+        margin-top: 28px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+      }
+
+      @media (max-width: 640px) {
+        .hero, .section {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+
+        .meta {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="hero">
+        <div class="badge">高级网页设计</div>
+        <h1>袁磊的《高级网页设计》课堂实践</h1>
+        <p class="subtitle">
+          本目录汇总了所有课程实践页面，覆盖基础 HTML、表单设计、CSS 样式、盒模型、层叠继承与页面排版等知识点。
+          本首页使用原生 HTML + CSS 构建，未引用任何 CDN 资源，适合直接在浏览器中打开查看。
+        </p>
+        <div class="meta">
+          <div class="meta-item">主题：袁磊</div>
+          <div class="meta-item">课程：高级网页设计</div>
+          <div class="meta-item">技术：原生代码</div>
+        </div>
+      </header>
+
+      <section class="section">
+        <h2>网页作品索引</h2>
+        <div class="grid">
+          <article class="card">
+            <a href="./index.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>首页</span><span class="dot"></span></div>
+              <h3>index.html</h3>
+              <p>当前作品索引页，汇总本目录中全部网页链接与课程实践说明。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./2.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 01</span><span class="dot"></span></div>
+              <h3>2.html</h3>
+              <p>HTML 基础结构与常见元素展示：标题、段落、列表等课程练习。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./2-2html.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 02</span><span class="dot"></span></div>
+              <h3>2-2html.html</h3>
+              <p>超链接、图像引用、表格构建与页面中图片链接综合实践。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./3-1.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 03</span><span class="dot"></span></div>
+              <h3>3-1.html</h3>
+              <p>表单元素训练：文本框、单选、多选、下拉和文件上传实践。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./3-2html.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 04</span><span class="dot"></span></div>
+              <h3>3-2html.html</h3>
+              <p>CSS 样式设计与选择器应用，组合文本和布局表现效果。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./4-1css2html.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 05</span><span class="dot"></span></div>
+              <h3>4-1css2html.html</h3>
+              <p>CSS 结合 HTML 结构进行页面美化与内容布局的进一步实践。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./5-1层叠与继承.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 06</span><span class="dot"></span></div>
+              <h3>5-1层叠与继承.html</h3>
+              <p>深入理解 CSS 层叠顺序与继承机制，体验样式优先级作用。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./5-2盒子模型.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 07</span><span class="dot"></span></div>
+              <h3>5-2盒子模型.html</h3>
+              <p>盒模型基础练习，包括边距、边框、内边距与元素空间控制。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./7-1上图下文.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 08</span><span class="dot"></span></div>
+              <h3>7-1上图下文.html</h3>
+              <p>上图下文排版设计，强调图片与正文的视觉层次和组合关系。</p>
+            </a>
+          </article>
+
+          <article class="card">
+            <a href="./7-2左图右文.html" target="_blank" rel="noopener noreferrer">
+              <div class="card-top"><span>作品 09</span><span class="dot"></span></div>
+              <h3>7-2左图右文.html</h3>
+              <p>左图右文布局练习，常用于图文展示类页面的内容结构设计。</p>
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>本提示词</h2>
+        <div class="prompt-box">
+          <h3>提示词原文</h3>
+          <p>创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为袁磊的《高级网页设计》课堂实践，美化页面，页面中包括本提示词。</p>
+        </div>
+      </section>
+
+      <footer>袁磊 · 高级网页设计课堂实践 · 原生 HTML + CSS</footer>
+    </div>
+  </body>
+</html>

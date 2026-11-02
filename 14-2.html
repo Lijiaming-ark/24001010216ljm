@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-10-22
+  功能名称：JavaScript 基本数据类型演示
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript 基本数据类型</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #eef2f8;
+    color: #243044;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+  }
+
+  .ljm_page { max-width: 1080px; margin: 0 auto; }
+
+  /* ===== 头部 ===== */
+  .ljm_header {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 26px 28px;
+    background: linear-gradient(135deg, #2f6bff, #7a5cff);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(47, 107, 255, .25);
+  }
+
+  .ljm_header::after {
+    content: "";
+    position: absolute;
+    top: -90px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .12);
+  }
+
+  .ljm_headerIcon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  .ljm_headerIcon .iconfont { font-size: 26px; }
+
+  .ljm_title { font-size: 24px; font-weight: 700; letter-spacing: .5px; }
+
+  .ljm_subtitle {
+    margin-top: 8px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, .85);
+    line-height: 1.6;
+  }
+
+  .ljm_meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 18px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, .9);
+  }
+
+  .ljm_metaItem {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .14);
+  }
+
+  /* ===== 小标题 ===== */
+  .ljm_sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 26px 0 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #243044;
+  }
+
+  .ljm_sectionTitle .iconfont { font-size: 20px; color: #2f6bff; }
+
+  /* ===== 数据类型卡片 ===== */
+  .ljm_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .ljm_card {
+    background: #fff;
+    border-radius: 16px;
+    border-top: 4px solid #2f6bff;
+    padding: 18px;
+    box-shadow: 0 6px 18px rgba(30, 50, 90, .07);
+    transition: transform .2s, box-shadow .2s;
+  }
+
+  .ljm_card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(30, 50, 90, .12);
+  }
+
+  .ljm_card--orange { border-top-color: #ff7a45; }
+  .ljm_card--green { border-top-color: #2fbf71; }
+  .ljm_card--gold { border-top-color: #f6a623; }
+  .ljm_card--gray { border-top-color: #8a94a6; }
+  .ljm_card--purple { border-top-color: #8b5cf6; }
+
+  .ljm_cardHead {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .ljm_iconBox {
+    flex: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef4ff;
+    color: #2f6bff;
+  }
+
+  .ljm_iconBox .iconfont { font-size: 22px; }
+
+  .ljm_card--orange .ljm_iconBox { background: #fff2ea; color: #ff7a45; }
+  .ljm_card--green .ljm_iconBox { background: #eafaf1; color: #2fbf71; }
+  .ljm_card--gold .ljm_iconBox { background: #fef6e7; color: #f6a623; }
+  .ljm_card--gray .ljm_iconBox { background: #f2f4f8; color: #8a94a6; }
+  .ljm_card--purple .ljm_iconBox { background: #f3edff; color: #8b5cf6; }
+
+  .ljm_typeName { font-size: 16px; font-weight: 600; }
+
+  .ljm_typeHint {
+    margin-top: 2px;
+    font-size: 12px;
+    color: #8a94a6;
+  }
+
+  .ljm_value {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #f6f8fc;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    color: #1f2d45;
+    word-break: break-all;
+  }
+
+  .ljm_typeofRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #5f6b80;
+  }
+
+  .ljm_typeofTag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #e8f0ff;
+    color: #2f6bff;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+  }
+
+  .ljm_card--orange .ljm_typeofTag { background: #fff0e6; color: #ff7a45; }
+  .ljm_card--green .ljm_typeofTag { background: #e6f9ef; color: #2fbf71; }
+  .ljm_card--gold .ljm_typeofTag { background: #fdf3df; color: #d18e0a; }
+  .ljm_card--gray .ljm_typeofTag { background: #eef1f6; color: #6b7688; }
+  .ljm_card--purple .ljm_typeofTag { background: #f0eaff; color: #8b5cf6; }
+
+  .ljm_desc {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #5f6b80;
+  }
+
+  .ljm_extra {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #f7f5ff;
+    color: #6f5bd6;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    word-break: break-all;
+  }
+
+  /* ===== 服务器数据 ===== */
+  .ljm_server {
+    margin-top: 26px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(30, 50, 90, .07);
+  }
+
+  .ljm_serverHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ljm_serverHead .ljm_sectionTitle { margin: 0; }
+
+  .ljm_btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2f6bff, #7a5cff);
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .ljm_btn:active { opacity: .85; }
+  .ljm_btn .iconfont { font-size: 15px; }
+
+  .ljm_status {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-left: 4px solid #2f6bff;
+    border-radius: 10px;
+    background: #f4f7fc;
+    color: #5f6b80;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .ljm_status--ok {
+    border-left-color: #2fbf71;
+    background: #f0fbf5;
+    color: #1d7a4a;
+  }
+
+  .ljm_status--err {
+    border-left-color: #ff4d4f;
+    background: #fff3f3;
+    color: #b42318;
+  }
+
+  .ljm_serverList {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .ljm_serverRow {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid #eef1f7;
+    border-radius: 12px;
+  }
+
+  .ljm_field { font-size: 14px; font-weight: 600; }
+
+  .ljm_serverValue {
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #f6f8fc;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    color: #2f3a4f;
+    word-break: break-all;
+  }
+
+  .ljm_serverType { font-size: 12px; color: #5f6b80; white-space: nowrap; }
+  .ljm_serverType b { color: #2f6bff; }
+
+  .ljm_note {
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #8a94a6;
+  }
+
+  .ljm_footer {
+    margin-top: 26px;
+    text-align: center;
+    font-size: 12px;
+    color: #9aa4b5;
+  }
+
+  @media (max-width: 560px) {
+    .ljm_header { padding: 22px 20px; }
+    .ljm_serverRow { grid-template-columns: 1fr; gap: 6px; }
+    .ljm_serverType { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<div class="ljm_page">
+
+  <!-- 页面头部 -->
+  <header class="ljm_header">
+    <div class="ljm_headerIcon"><i class="iconfont icon-canshushezhi"></i></div>
+    <h1 class="ljm_title">JavaScript 基本数据类型</h1>
+    <p class="ljm_subtitle">6 种原始类型：String · Number · Boolean · Null · Undefined · Symbol</p>
+    <div class="ljm_meta">
+      <span class="ljm_metaItem">姓名：李佳明</span>
+      <span class="ljm_metaItem">日期：2026-10-22</span>
+      <span class="ljm_metaItem">功能名称：基本数据类型演示</span>
+    </div>
+  </header>
+
+  <!-- 六种基本数据类型卡片 -->
+  <section>
+    <h2 class="ljm_sectionTitle"><i class="iconfont icon-caipinkuhong"></i>六种基本数据类型</h2>
+    <div class="ljm_grid" id="ljm_typeGrid"></div>
+  </section>
+
+  <!-- fetch 获取服务器数据 -->
+  <section class="ljm_server">
+    <div class="ljm_serverHead">
+      <h2 class="ljm_sectionTitle"><i class="iconfont icon-POSzhandian"></i>fetch 获取服务器端数据</h2>
+      <button class="ljm_btn" id="ljm_reloadBtn" type="button">
+        <i class="iconfont icon-canshushezhi"></i>重新获取
+      </button>
+    </div>
+    <div class="ljm_status" id="ljm_fetchStatus">正在通过 fetch 获取服务器数据…</div>
+    <div class="ljm_serverList" id="ljm_serverList"></div>
+    <p class="ljm_note">说明：JSON 只支持 string、number、boolean、null、object/array；undefined 与 symbol 无法直接序列化传输，因此从服务器读取时的 typeof 结果会与本地示例存在差异。</p>
+  </section>
+
+  <p class="ljm_footer">姓名：李佳明 · 日期：2026-10-22 · 功能名称：JavaScript 基本数据类型演示</p>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 六种基本数据类型的示例变量 ===== */
+  var ljm_stringValue = '李佳明';
+  var ljm_numberValue = 2026;
+  var ljm_booleanValue = true;
+  var ljm_nullValue = null;
+  var ljm_undefinedValue;
+  var ljm_symbolValue = Symbol('ljm');
+
+  var ljm_typeList = [
+    {
+      name: 'String（字符串）',
+      hint: '文本数据，使用引号包裹',
+      icon: 'icon-danjumobanhong',
+      theme: 'blue',
+      value: ljm_stringValue,
+      desc: '用于表示文本，如姓名、菜品名称。typeof 的结果为 "string"。'
+    },
+    {
+      name: 'Number（数字）',
+      hint: '整数、小数、NaN、Infinity',
+      icon: 'icon-caipintiaomahong',
+      theme: 'orange',
+      value: ljm_numberValue,
+      desc: '所有数字统一为 number 类型，不分整型与浮点型；NaN 与 Infinity 也属于 number。'
+    },
+    {
+      name: 'Boolean（布尔）',
+      hint: '只有 true 和 false',
+      icon: 'icon-diancai',
+      theme: 'green',
+      value: ljm_booleanValue,
+      desc: '表示真或假，常用于条件判断，typeof 的结果为 "boolean"。'
+    },
+    {
+      name: 'Null（空值）',
+      hint: '表示空值，需要主动赋值',
+      icon: 'icon-dangkoushezhihong',
+      theme: 'gray',
+      value: ljm_nullValue,
+      desc: '表示一个“空”的引用，必须主动赋值。注意 typeof null 返回 "object"，这是历史遗留问题，null 本身属于基本数据类型。'
+    },
+    {
+      name: 'Undefined（未定义）',
+      hint: '声明变量但未赋值',
+      icon: 'icon-chuzhiqingsuan',
+      theme: 'gold',
+      value: ljm_undefinedValue,
+      desc: '声明变量却没有赋值时，它的值就是 undefined，typeof 的结果为 "undefined"。'
+    },
+    {
+      name: 'Symbol（符号）',
+      hint: 'ES6 新增，每个值都唯一',
+      icon: 'icon-caipinzuofahong',
+      theme: 'purple',
+      value: ljm_symbolValue,
+      desc: 'Symbol 用于创建唯一标识，常作为对象属性名以避免命名冲突。',
+      extra: 'Symbol("ljm") === Symbol("ljm") → ' + (Symbol('ljm') === Symbol('ljm'))
+    }
+  ];
+
+  /* ===== 工具函数：格式化值与显示类型 ===== */
+  function ljm_formatValue(ljm_value) {
+    var ljm_type = typeof ljm_value;
+    if (ljm_type === 'string') { return '"' + ljm_value + '"'; }
+    if (ljm_type === 'symbol') { return ljm_value.toString(); }
+    if (ljm_type === 'undefined') { return 'undefined'; }
+    return String(ljm_value);
+  }
+
+  /* ===== 渲染类型卡片 ===== */
+  var ljm_typeGrid = document.getElementById('ljm_typeGrid');
+  var ljm_cardsHtml = ljm_typeList.map(function (ljm_item) {
+    var ljm_type = typeof ljm_item.value;
+    return '<article class="ljm_card ljm_card--' + ljm_item.theme + '">' +
+             '<div class="ljm_cardHead">' +
+               '<span class="ljm_iconBox"><i class="iconfont ' + ljm_item.icon + '"></i></span>' +
+               '<div>' +
+                 '<div class="ljm_typeName">' + ljm_item.name + '</div>' +
+                 '<div class="ljm_typeHint">' + ljm_item.hint + '</div>' +
+               '</div>' +
+             '</div>' +
+             '<code class="ljm_value">' + ljm_formatValue(ljm_item.value) + '</code>' +
+             '<div class="ljm_typeofRow">typeof 结果<span class="ljm_typeofTag">' + ljm_type + '</span></div>' +
+             '<p class="ljm_desc">' + ljm_item.desc + '</p>' +
+             (ljm_item.extra ? '<p class="ljm_extra">' + ljm_item.extra + '</p>' : '') +
+           '</article>';
+  }).join('');
+  ljm_typeGrid.innerHTML = ljm_cardsHtml;
+
+  /* ===== fetch 获取服务器端数据 ===== */
+  var ljm_serverUrl = '14-2-data.json';
+  var ljm_fetchStatus = document.getElementById('ljm_fetchStatus');
+  var ljm_serverList = document.getElementById('ljm_serverList');
+  var ljm_reloadBtn = document.getElementById('ljm_reloadBtn');
+
+  var ljm_fallbackItems = [
+    { field: '菜品名称', value: '宫保鸡丁' },
+    { field: '单价', value: 38.5 },
+    { field: '是否在售', value: true },
+    { field: '备注', value: null },
+    { field: '折扣' },
+    { field: '菜单编号', value: 'Symbol(MENU_2026)' }
+  ];
+
+  function ljm_setStatus(ljm_text, ljm_state) {
+    ljm_fetchStatus.textContent = ljm_text;
+    ljm_fetchStatus.className = 'ljm_status' + (ljm_state ? ' ljm_status--' + ljm_state : '');
+  }
+
+  function ljm_renderServerList(ljm_items) {
+    ljm_serverList.innerHTML = '';
+    ljm_items.forEach(function (ljm_item) {
+      var ljm_row = document.createElement('div');
+      ljm_row.className = 'ljm_serverRow';
+
+      var ljm_fieldEl = document.createElement('span');
+      ljm_fieldEl.className = 'ljm_field';
+      ljm_fieldEl.textContent = ljm_item.field;
+
+      var ljm_valueEl = document.createElement('code');
+      ljm_valueEl.className = 'ljm_serverValue';
+      ljm_valueEl.textContent = ljm_formatValue(ljm_item.value);
+
+      var ljm_typeEl = document.createElement('span');
+      ljm_typeEl.className = 'ljm_serverType';
+      ljm_typeEl.innerHTML = 'typeof → <b>' + typeof ljm_item.value + '</b>';
+
+      ljm_row.appendChild(ljm_fieldEl);
+      ljm_row.appendChild(ljm_valueEl);
+      ljm_row.appendChild(ljm_typeEl);
+      ljm_serverList.appendChild(ljm_row);
+    });
+  }
+
+  function ljm_loadServerData() {
+    ljm_setStatus('正在通过 fetch 获取服务器数据…', '');
+    ljm_serverList.innerHTML = '';
+
+    fetch(ljm_serverUrl)
+      .then(function (ljm_response) {
+        if (!ljm_response.ok) {
+          throw new Error('HTTP ' + ljm_response.status);
+        }
+        return ljm_response.json();
+      })
+      .then(function (ljm_data) {
+        ljm_renderServerList(ljm_data.items);
+        ljm_setStatus('fetch 成功：已从服务器获取 ' + ljm_data.items.length + ' 条数据（更新日期 ' + ljm_data.updated + '）', 'ok');
+      })
+      .catch(function (ljm_error) {
+        ljm_renderServerList(ljm_fallbackItems);
+        ljm_setStatus('fetch 失败：' + ljm_error.message + '。若以 file:// 方式打开页面会因跨域限制失败，已启用内置演示数据；请通过本地服务器（如 Live Server）访问以获取 JSON 数据。', 'err');
+      });
+  }
+
+  ljm_reloadBtn.addEventListener('click', ljm_loadServerData);
+  ljm_loadServerData();
+})();
+</script>
+</body>
+</html>

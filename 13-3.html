@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>餐饮管理 · 首页</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #eef1f5;
+  display: flex;
+  justify-content: center;
+}
+.phone {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  background: #f5f6fa;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 24px rgba(0,0,0,.08);
+}
+.iconfont { font-size: 16px; font-style: normal; }
+
+/* ===== 顶部导航栏 ===== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+  background: linear-gradient(135deg, #ff6a3d, #ff2e63);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topbar .brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 600; }
+.topbar .brand .iconfont { font-size: 22px; }
+.top-actions { display: flex; align-items: center; gap: 18px; }
+.top-actions .act { position: relative; display: flex; }
+.top-actions .iconfont { font-size: 22px; }
+/* 红点 */
+.dot {
+  position: absolute;
+  top: -2px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  background: #ff1744;
+  border: 1.5px solid #ff5a3d;
+  border-radius: 50%;
+}
+/* 数字徽章 */
+.badge {
+  position: absolute;
+  top: -7px;
+  right: -10px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: #ff1744;
+  border: 1.5px solid #ff5a3d;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 13px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* ===== 欢迎区 ===== */
+.welcome {
+  margin: 12px;
+  padding: 18px 16px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #fff7f2, #ffe8de);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.welcome h2 { font-size: 17px; color: #333; margin-bottom: 4px; }
+.welcome p { font-size: 12px; color: #999; }
+.welcome .stat { text-align: center; color: #ff5a3d; }
+.welcome .stat b { display: block; font-size: 20px; }
+.welcome .stat span { font-size: 11px; color: #999; }
+
+/* ===== 功能宫格 ===== */
+.panel {
+  margin: 0 12px 12px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 8px 6px;
+}
+.panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px 10px;
+}
+.panel-title h3 { font-size: 15px; color: #222; }
+.panel-title a { font-size: 12px; color: #999; text-decoration: none; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 4px;
+}
+.grid .item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  padding: 6px 0;
+  border-radius: 10px;
+  transition: background .2s;
+}
+.grid .item:active { background: #f2f3f7; }
+.grid .item .iconfont { font-size: 28px; }
+.grid .item span { font-size: 12px; color: #555; }
+.c-orange .iconfont { color: #ff7a45; }
+.c-red .iconfont { color: #ff4d4f; }
+.c-blue .iconfont { color: #3d7eff; }
+.c-green .iconfont { color: #2fbf71; }
+.c-purple .iconfont { color: #8b5cf6; }
+.c-gold .iconfont { color: #f6a623; }
+
+/* ===== 自适应：宽屏平板宫格列数增加 ===== */
+@media (min-width: 380px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 768px) {
+  .grid { grid-template-columns: repeat(5, 1fr); }
+  .panel { padding: 18px 14px 10px; }
+}
+
+/* ===== 底部 Tab 导航 ===== */
+.tabbar {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabbar a {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 0 6px;
+  text-decoration: none;
+  color: #999;
+  font-size: 11px;
+}
+.tabbar a .iconfont { font-size: 22px; }
+.tabbar a.active { color: #ff5a3d; }
+.tabbar a .dot { top: 4px; right: calc(50% - 18px); }
+.tabbar a .badge { top: 0; right: calc(50% - 22px); }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- 顶部导航栏：消息红点 + 数字徽章 -->
+  <header class="topbar">
+    <div class="brand">
+      <i class="iconfont icon-diancai"></i>悦来餐饮管理
+    </div>
+    <div class="top-actions">
+      <span class="act">
+        <i class="iconfont icon-chuancaiguanlihong"></i>
+        <i class="dot"></i>
+      </span>
+      <span class="act">
+        <i class="iconfont icon-danjumobanhong"></i>
+        <i class="badge">9+</i>
+      </span>
+      <span class="act">
+        <i class="iconfont icon-diandanyangshi"></i>
+        <i class="badge">5</i>
+      </span>
+    </div>
+  </header>
+
+  <!-- 欢迎区 -->
+  <section class="welcome">
+    <div>
+      <h2>下午好，店长 👋</h2>
+      <p>今日营业状态良好，继续保持～</p>
+    </div>
+    <div class="stat"><b>3,286</b><span>今日营业额(元)</span></div>
+  </section>
+
+  <!-- 功能宫格：菜品管理 / 储值会员 / 门店运维 / 系统设置 -->
+  <section class="panel">
+    <div class="panel-title">
+      <h3>全部功能</h3>
+      <a href="13-4.html">管理 →</a>
+    </div>
+    <div class="grid">
+      <!-- 菜品管理 -->
+      <a class="item c-red" href="#"><i class="iconfont icon-caipinkuhong"></i><span>菜品库</span></a>
+      <a class="item c-orange" href="#"><i class="iconfont icon-diancai"></i><span>菜品管理</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-caileikuhong"></i><span>菜类库</span></a>
+      <a class="item c-orange" href="#"><i class="iconfont icon-caipintejia"></i><span>菜品特价</span></a>
+      <a class="item c-orange" href="#"><i class="iconfont icon-caipinticheng"></i><span>菜品提成</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-caipintiaomahong"></i><span>菜品条码</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-caipinzuofahong"></i><span>菜品做法</span></a>
+      <!-- 储值会员 -->
+      <a class="item c-purple" href="#"><i class="iconfont icon-changguichuzhi"></i><span>储值会员</span></a>
+      <a class="item c-purple" href="#"><i class="iconfont icon-changguichuzhi1"></i><span>常规储值</span></a>
+      <a class="item c-purple" href="#"><i class="iconfont icon-chuzhiqingsuan"></i><span>储值清算</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-chuzhituijianhong"></i><span>储值推荐</span></a>
+      <!-- 门店运维 -->
+      <a class="item c-blue" href="#"><i class="iconfont icon-POSzhandian"></i><span>门店运维</span></a>
+      <a class="item c-blue" href="#"><i class="iconfont icon-POSzhandian"></i><span>POS站点</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-canzhuoguanlihong"></i><span>餐桌管理</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-chuancaiguanlihong"></i><span>传菜管理</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-dayinjiguanlihong"></i><span>打印管理</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-chupinbumenhong"></i><span>出品部门</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-danjumobanhong"></i><span>单据模板</span></a>
+      <!-- 系统设置 -->
+      <a class="item c-green" href="#"><i class="iconfont icon-canshushezhi"></i><span>系统设置</span></a>
+      <a class="item c-red" href="#"><i class="iconfont icon-dangkoushezhihong"></i><span>档口设置</span></a>
+      <a class="item c-gold" href="#"><i class="iconfont icon-diandanyangshi"></i><span>点单样式</span></a>
+    </div>
+  </section>
+
+  <!-- 底部 Tab 导航（4 项） -->
+  <nav class="tabbar">
+    <a href="13-3.html" class="active">
+      <i class="iconfont icon-diancai"></i>
+      <span>首页</span>
+    </a>
+    <a href="#">
+      <i class="iconfont icon-diandanyangshi"></i>
+      <span>点餐</span>
+      <i class="dot"></i>
+    </a>
+    <a href="#">
+      <i class="iconfont icon-changguichuzhi"></i>
+      <span>会员</span>
+      <i class="badge">3</i>
+    </a>
+    <a href="#">
+      <i class="iconfont icon-canshushezhi"></i>
+      <span>设置</span>
+    </a>
+  </nav>
+
+</div>
+</body>
+</html>

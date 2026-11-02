@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：JavaScript 数组常用方法演示
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript 数组常用方法</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #eef2f8;
+    color: #243044;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+  }
+
+  .ljm_page { max-width: 1120px; margin: 0 auto; }
+
+  /* ===== 头部 ===== */
+  .ljm_hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    padding: 30px 32px;
+    background:
+      radial-gradient(circle at 88% 8%, rgba(122, 92, 255, .55), transparent 42%),
+      linear-gradient(135deg, #182449, #253b78 55%, #4d3a99);
+    color: #fff;
+    box-shadow: 0 18px 40px rgba(24, 36, 73, .28);
+  }
+
+  .ljm_hero::before {
+    content: "";
+    position: absolute;
+    top: -120px;
+    left: -80px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(47, 107, 255, .18);
+  }
+
+  .ljm_heroChips {
+    position: absolute;
+    top: 26px;
+    right: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    opacity: .5;
+    pointer-events: none;
+  }
+
+  .ljm_heroChip {
+    padding: 5px 12px;
+    border: 1px solid rgba(255, 255, 255, .28);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .08);
+    transform: rotate(-3deg);
+  }
+
+  .ljm_heroChip:nth-child(2) { transform: rotate(2deg) translateX(-16px); }
+  .ljm_heroChip:nth-child(3) { transform: rotate(-1deg) translateX(8px); }
+  .ljm_heroChip:nth-child(4) { transform: rotate(3deg) translateX(-8px); }
+
+  .ljm_heroIcon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .16);
+    border: 1px solid rgba(255, 255, 255, .22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .ljm_heroIcon .iconfont { font-size: 28px; }
+
+  .ljm_heroTitle {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: .5px;
+  }
+
+  .ljm_heroSub {
+    margin-top: 10px;
+    max-width: 560px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, .78);
+  }
+
+  .ljm_meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .ljm_metaItem {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .14);
+    font-size: 12px;
+    color: rgba(255, 255, 255, .9);
+  }
+
+  .ljm_stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .ljm_stat {
+    min-width: 108px;
+    padding: 10px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .16);
+  }
+
+  .ljm_stat b { display: block; font-size: 21px; font-weight: 700; }
+
+  .ljm_stat span {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, .68);
+  }
+
+  /* ===== 分类筛选 ===== */
+  .ljm_tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .ljm_tab {
+    padding: 8px 18px;
+    border: 1px solid #dfe5f0;
+    border-radius: 999px;
+    background: #fff;
+    color: #5f6b80;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color .2s, border-color .2s, box-shadow .2s, background .2s;
+  }
+
+  .ljm_tab:hover { border-color: #b9c8ff; color: #2f6bff; }
+
+  .ljm_tab--active {
+    border-color: transparent;
+    background: linear-gradient(135deg, #2f6bff, #7a5cff);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(47, 107, 255, .25);
+  }
+
+  .ljm_tab--active:hover { color: #fff; }
+
+  /* ===== 方法卡片 ===== */
+  .ljm_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .ljm_card {
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border-radius: 18px;
+    border-top: 4px solid #2f6bff;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 50, 90, .07);
+    transition: transform .2s, box-shadow .2s;
+  }
+
+  .ljm_card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(30, 50, 90, .12);
+  }
+
+  .ljm_card--mutate { border-top-color: #ff7a45; }
+  .ljm_card--extract { border-top-color: #2f6bff; }
+  .ljm_card--iterate { border-top-color: #2fbf71; }
+  .ljm_card--search { border-top-color: #8b5cf6; }
+
+  .ljm_cardHead {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .ljm_iconBox {
+    flex: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef4ff;
+    color: #2f6bff;
+  }
+
+  .ljm_iconBox .iconfont { font-size: 22px; }
+
+  .ljm_card--mutate .ljm_iconBox { background: #fff2ea; color: #ff7a45; }
+  .ljm_card--extract .ljm_iconBox { background: #eef4ff; color: #2f6bff; }
+  .ljm_card--iterate .ljm_iconBox { background: #eafaf1; color: #2fbf71; }
+  .ljm_card--search .ljm_iconBox { background: #f3edff; color: #8b5cf6; }
+
+  .ljm_methodName { font-size: 17px; font-weight: 700; letter-spacing: .3px; }
+
+  .ljm_catTag {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #f2f4f8;
+    color: #6b7688;
+    font-size: 11px;
+  }
+
+  .ljm_card--mutate .ljm_catTag { background: #fff0e6; color: #e0602a; }
+  .ljm_card--extract .ljm_catTag { background: #e8f0ff; color: #2f6bff; }
+  .ljm_card--iterate .ljm_catTag { background: #e6f9ef; color: #1d9d5c; }
+  .ljm_card--search .ljm_catTag { background: #f0eaff; color: #7a4ee0; }
+
+  .ljm_syntax {
+    display: block;
+    margin-top: 14px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #f5f7fc;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+    color: #3b4a66;
+    word-break: break-all;
+  }
+
+  .ljm_desc {
+    margin-top: 10px;
+    min-height: 44px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #5f6b80;
+  }
+
+  .ljm_baseRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #8a94a6;
+  }
+
+  .ljm_baseArray {
+    font-family: Consolas, "Courier New", monospace;
+    color: #3b4a66;
+  }
+
+  .ljm_runBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 9px 14px;
+    border: none;
+    border-radius: 10px;
+    background: #2f6bff;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+  }
+
+  .ljm_runBtn:hover { opacity: .9; }
+  .ljm_runBtn:active { transform: scale(.97); }
+  .ljm_runBtn .iconfont { font-size: 15px; }
+
+  .ljm_card--mutate .ljm_runBtn { background: linear-gradient(135deg, #ff7a45, #ff9a6b); }
+  .ljm_card--extract .ljm_runBtn { background: linear-gradient(135deg, #2f6bff, #5b8cff); }
+  .ljm_card--iterate .ljm_runBtn { background: linear-gradient(135deg, #2fbf71, #45d489); }
+  .ljm_card--search .ljm_runBtn { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+
+  .ljm_output {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #1d2333;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #c9d4ff;
+    animation: ljm_fade .25s ease;
+  }
+
+  .ljm_output[hidden] { display: none; }
+  .ljm_outputLabel { color: #7f8bb5; }
+  .ljm_outputValue { color: #7ee2a8; word-break: break-all; }
+  .ljm_outputArray { color: #ffd479; word-break: break-all; }
+  .ljm_outputNote { margin-top: 4px; font-size: 11px; }
+  .ljm_outputNote--mutate { color: #ff9a6b; }
+  .ljm_outputNote--keep { color: #6f9bff; }
+
+  @keyframes ljm_fade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== 小标题 ===== */
+  .ljm_sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #243044;
+  }
+
+  .ljm_sectionTitle .iconfont { font-size: 20px; color: #2f6bff; }
+
+  /* ===== fetch 服务器数组 ===== */
+  .ljm_fetch {
+    margin-top: 28px;
+    padding: 22px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 50, 90, .07);
+  }
+
+  .ljm_fetchHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ljm_reloadBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #182449, #334e9e);
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .ljm_reloadBtn:active { opacity: .85; }
+  .ljm_reloadBtn .iconfont { font-size: 15px; }
+
+  .ljm_status {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-left: 4px solid #2f6bff;
+    border-radius: 10px;
+    background: #f4f7fc;
+    color: #5f6b80;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .ljm_status--ok {
+    border-left-color: #2fbf71;
+    background: #f0fbf5;
+    color: #1d7a4a;
+  }
+
+  .ljm_status--err {
+    border-left-color: #ff4d4f;
+    background: #fff3f3;
+    color: #b42318;
+  }
+
+  .ljm_sourceWrap { margin-top: 16px; }
+
+  .ljm_label { font-size: 12px; color: #8a94a6; }
+
+  .ljm_sourceChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .ljm_chip {
+    padding: 5px 11px;
+    border: 1px solid #dde6ff;
+    border-radius: 999px;
+    background: #f0f4ff;
+    color: #3b5bb5;
+    font-size: 12px;
+  }
+
+  .ljm_resultGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .ljm_resultCard {
+    padding: 14px;
+    border: 1px solid #e8eeff;
+    border-radius: 14px;
+    background: #f8faff;
+  }
+
+  .ljm_codeTag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: #1d2333;
+    color: #9fb0ff;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+  }
+
+  .ljm_resultText {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #3b4a66;
+    word-break: break-all;
+  }
+
+  .ljm_note {
+    margin-top: 14px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #8a94a6;
+  }
+
+  .ljm_footer {
+    margin-top: 26px;
+    text-align: center;
+    font-size: 12px;
+    color: #9aa4b5;
+  }
+
+  @media (max-width: 760px) {
+    .ljm_heroChips { display: none; }
+  }
+
+  @media (max-width: 560px) {
+    .ljm_hero { padding: 24px 20px; }
+    .ljm_fetch { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="ljm_page">
+
+  <!-- 页面头部 -->
+  <header class="ljm_hero">
+    <div class="ljm_heroChips">
+      <span class="ljm_heroChip">arr.push()</span>
+      <span class="ljm_heroChip">arr.map()</span>
+      <span class="ljm_heroChip">arr.filter()</span>
+      <span class="ljm_heroChip">arr.reduce()</span>
+    </div>
+
+    <div class="ljm_heroIcon"><i class="iconfont icon-caipinkuhong"></i></div>
+    <h1 class="ljm_heroTitle">JavaScript 数组常用方法</h1>
+    <p class="ljm_heroSub">覆盖增删改、提取拼接、迭代处理与查找判断四大类方法，点击“运行示例”即可查看返回结果以及原数组是否被修改。</p>
+
+    <div class="ljm_meta">
+      <span class="ljm_metaItem">姓名：李佳明</span>
+      <span class="ljm_metaItem">日期：2026-11-02</span>
+      <span class="ljm_metaItem">功能名称：数组常用方法演示</span>
+    </div>
+
+    <div class="ljm_stats">
+      <div class="ljm_stat"><b>16</b><span>常用方法</span></div>
+      <div class="ljm_stat"><b>4</b><span>方法分类</span></div>
+      <div class="ljm_stat"><b>0</b><span>第三方依赖</span></div>
+      <div class="ljm_stat"><b>100%</b><span>原生实现</span></div>
+    </div>
+  </header>
+
+  <!-- 分类筛选 -->
+  <nav class="ljm_tabs" id="ljm_tabs">
+    <button class="ljm_tab ljm_tab--active" type="button" data-cat="all">全部方法</button>
+    <button class="ljm_tab" type="button" data-cat="mutate">修改原数组</button>
+    <button class="ljm_tab" type="button" data-cat="extract">提取与拼接</button>
+    <button class="ljm_tab" type="button" data-cat="iterate">迭代处理</button>
+    <button class="ljm_tab" type="button" data-cat="search">查找判断</button>
+  </nav>
+
+  <!-- 方法卡片列表 -->
+  <section>
+    <div class="ljm_grid" id="ljm_methodGrid"></div>
+  </section>
+
+  <!-- fetch 获取服务器数组并处理方法 -->
+  <section class="ljm_fetch">
+    <div class="ljm_fetchHead">
+      <h2 class="ljm_sectionTitle"><i class="iconfont icon-POSzhandian"></i>服务器数组实战</h2>
+      <button class="ljm_reloadBtn" id="ljm_reloadBtn" type="button">
+        <i class="iconfont icon-canshushezhi"></i>重新 fetch
+      </button>
+    </div>
+
+    <div class="ljm_status" id="ljm_fetchStatus">正在通过 fetch 获取服务器端数组…</div>
+
+    <div class="ljm_sourceWrap">
+      <span class="ljm_label">服务器返回数组</span>
+      <div class="ljm_sourceChips" id="ljm_sourceChips"></div>
+    </div>
+
+    <div class="ljm_resultGrid" id="ljm_fetchResults"></div>
+
+    <p class="ljm_note">数据文件：16-1-data.json · 使用 fetch 获取 JSON 数组后，依次调用 filter()、map()、reduce()、sort() 处理方法。</p>
+  </section>
+
+  <p class="ljm_footer">姓名：李佳明 · 日期：2026-11-02 · 功能名称：JavaScript 数组常用方法演示</p>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 分类配置 ===== */
+  var ljm_categoryMap = {
+    mutate: { name: '修改原数组' },
+    extract: { name: '提取与拼接' },
+    iterate: { name: '迭代处理' },
+    search: { name: '查找判断' }
+  };
+
+  /* ===== 16 个数组方法及演示逻辑 ===== */
+  var ljm_methodList = [
+    {
+      name: 'push()',
+      cat: 'mutate',
+      icon: 'icon-caipintejia',
+      syntax: 'arr.push(6, 7)',
+      desc: '向数组末尾添加一个或多个元素，返回数组的新长度。',
+      base: [3, 1, 4, 1, 5],
+      mutates: true,
+      run: function (ljm_arr) {
+        var ljm_newLength = ljm_arr.push(6, 7);
+        return { result: '新长度 ' + ljm_newLength };
+      }
+    },
+    {
+      name: 'pop()',
+      cat: 'mutate',
+      icon: 'icon-caipintiaomahong',
+      syntax: 'arr.pop()',
+      desc: '删除数组的最后一个元素，并返回被删除的元素。',
+      base: [3, 1, 4, 1, 5],
+      mutates: true,
+      run: function (ljm_arr) {
+        var ljm_removed = ljm_arr.pop();
+        return { result: '被删除的元素 ' + ljm_removed };
+      }
+    },
+    {
+      name: 'unshift()',
+      cat: 'mutate',
+      icon: 'icon-caipinzuofahong',
+      syntax: 'arr.unshift(0, 2)',
+      desc: '向数组开头添加一个或多个元素，返回数组的新长度。',
+      base: [3, 1, 4, 1, 5],
+      mutates: true,
+      run: function (ljm_arr) {
+        var ljm_newLength = ljm_arr.unshift(0, 2);
+        return { result: '新长度 ' + ljm_newLength };
+      }
+    },
+    {
+      name: 'shift()',
+      cat: 'mutate',
+      icon: 'icon-chuzhiqingsuan',
+      syntax: 'arr.shift()',
+      desc: '删除数组的第一个元素，并返回被删除的元素。',
+      base: [3, 1, 4, 1, 5],
+      mutates: true,
+      run: function (ljm_arr) {
+        var ljm_removed = ljm_arr.shift();
+        return { result: '被删除的元素 ' + ljm_removed };
+      }
+    },
+    {
+      name: 'splice()',
+      cat: 'mutate',
+      icon: 'icon-danjumobanhong',
+      syntax: 'arr.splice(1, 2, 9, 9)',
+      desc: '从指定位置删除若干元素，可同时插入新元素，返回被删除元素组成的新数组。',
+      base: [3, 1, 4, 1, 5],
+      mutates: true,
+      run: function (ljm_arr) {
+        var ljm_removed = ljm_arr.splice(1, 2, 9, 9);
+        return { result: '被删除的元素 ' + JSON.stringify(ljm_removed) };
+      }
+    },
+    {
+      name: 'sort()',
+      cat: 'mutate',
+      icon: 'icon-caipinticheng',
+      syntax: 'arr.sort((a, b) => a - b)',
+      desc: '对数组元素排序，默认按字符串规则；传入比较函数可实现数字升序或降序。',
+      base: [10, 2, 33, 4],
+      mutates: true,
+      run: function (ljm_arr) {
+        ljm_arr.sort(function (ljm_a, ljm_b) {
+          return ljm_a - ljm_b;
+        });
+        return { result: '已按数字升序排列' };
+      }
+    },
+    {
+      name: 'reverse()',
+      cat: 'mutate',
+      icon: 'icon-chuancaiguanlihong',
+      syntax: 'arr.reverse()',
+      desc: '将数组中元素的顺序首尾反转，原数组会被修改。',
+      base: [1, 2, 3, 4, 5],
+      mutates: true,
+      run: function (ljm_arr) {
+        ljm_arr.reverse();
+        return { result: '已首尾反转' };
+      }
+    },
+    {
+      name: 'slice()',
+      cat: 'extract',
+      icon: 'icon-caipinkuhong',
+      syntax: 'arr.slice(1, 3)',
+      desc: '按索引截取一段元素，返回新数组，包含开始位置、不包含结束位置。',
+      base: [3, 1, 4, 1, 5],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_result = ljm_arr.slice(1, 3);
+        return { result: JSON.stringify(ljm_result) };
+      }
+    },
+    {
+      name: 'concat()',
+      cat: 'extract',
+      icon: 'icon-caileikuhong',
+      syntax: 'arr.concat([1, 5], 9)',
+      desc: '拼接数组或值，返回新数组，不会改变原数组。',
+      base: [3, 1, 4],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_result = ljm_arr.concat([1, 5], 9);
+        return { result: JSON.stringify(ljm_result) };
+      }
+    },
+    {
+      name: 'join()',
+      cat: 'extract',
+      icon: 'icon-changguichuzhi',
+      syntax: "arr.join(' - ')",
+      desc: '用指定分隔符把数组元素拼接成字符串，返回字符串。',
+      base: [3, 1, 4, 1, 5],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_result = ljm_arr.join(' - ');
+        return { result: '"' + ljm_result + '"' };
+      }
+    },
+    {
+      name: 'map()',
+      cat: 'iterate',
+      icon: 'icon-diancai',
+      syntax: 'arr.map(x => x * 2)',
+      desc: '遍历数组并对每个元素执行回调，把返回值组成新数组。',
+      base: [3, 1, 4, 1, 5],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_result = ljm_arr.map(function (ljm_item) {
+          return ljm_item * 2;
+        });
+        return { result: JSON.stringify(ljm_result) };
+      }
+    },
+    {
+      name: 'filter()',
+      cat: 'iterate',
+      icon: 'icon-chupinbumenhong',
+      syntax: 'arr.filter(x => x > 2)',
+      desc: '筛选出满足条件的元素，返回由这些元素组成的新数组。',
+      base: [3, 1, 4, 1, 5],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_result = ljm_arr.filter(function (ljm_item) {
+          return ljm_item > 2;
+        });
+        return { result: JSON.stringify(ljm_result) };
+      }
+    },
+    {
+      name: 'reduce()',
+      cat: 'iterate',
+      icon: 'icon-chuzhituijianhong',
+      syntax: 'arr.reduce((sum, x) => sum + x, 0)',
+      desc: '从左到右累计计算结果，把数组归并成一个值。',
+      base: [3, 1, 4, 1, 5],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_result = ljm_arr.reduce(function (ljm_sum, ljm_item) {
+          return ljm_sum + ljm_item;
+        }, 0);
+        return { result: '累计结果 ' + ljm_result };
+      }
+    },
+    {
+      name: 'forEach()',
+      cat: 'iterate',
+      icon: 'icon-diandanyangshi',
+      syntax: 'arr.forEach(x => ...)',
+      desc: '遍历数组执行回调，没有返回值，常用于遍历输出或累加操作。',
+      base: [3, 1, 4, 1, 5],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_parts = [];
+        ljm_arr.forEach(function (ljm_item) {
+          ljm_parts.push(String(ljm_item));
+        });
+        return { result: '依次访问 ' + ljm_parts.join(' → ') };
+      }
+    },
+    {
+      name: 'find()',
+      cat: 'search',
+      icon: 'icon-POSzhandian',
+      syntax: 'arr.find(x => x > 3)',
+      desc: '返回第一个满足条件的元素；若都不满足，则返回 undefined。',
+      base: [3, 1, 4, 1, 5],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_result = ljm_arr.find(function (ljm_item) {
+          return ljm_item > 3;
+        });
+        return { result: '找到元素 ' + ljm_result };
+      }
+    },
+    {
+      name: 'includes()',
+      cat: 'search',
+      icon: 'icon-dangkoushezhihong',
+      syntax: 'arr.includes(4)',
+      desc: '判断数组是否包含指定元素，返回 true 或 false。',
+      base: [3, 1, 4, 1, 5],
+      mutates: false,
+      run: function (ljm_arr) {
+        var ljm_result = ljm_arr.includes(4);
+        return { result: String(ljm_result) };
+      }
+    }
+  ];
+
+  /* ===== 渲染方法卡片 ===== */
+  var ljm_methodGrid = document.getElementById('ljm_methodGrid');
+  var ljm_cardsHtml = ljm_methodList.map(function (ljm_method, ljm_index) {
+    var ljm_catName = ljm_categoryMap[ljm_method.cat].name;
+    return '<article class="ljm_card ljm_card--' + ljm_method.cat + '" data-cat="' + ljm_method.cat + '">' +
+             '<div class="ljm_cardHead">' +
+               '<span class="ljm_iconBox"><i class="iconfont ' + ljm_method.icon + '"></i></span>' +
+               '<div>' +
+                 '<h3 class="ljm_methodName">' + ljm_method.name + '</h3>' +
+                 '<span class="ljm_catTag">' + ljm_catName + '</span>' +
+               '</div>' +
+             '</div>' +
+             '<code class="ljm_syntax">' + ljm_method.syntax + '</code>' +
+             '<p class="ljm_desc">' + ljm_method.desc + '</p>' +
+             '<div class="ljm_baseRow"><span class="ljm_label">示例数组</span>' +
+               '<code class="ljm_baseArray">' + JSON.stringify(ljm_method.base) + '</code></div>' +
+             '<button class="ljm_runBtn" type="button" data-index="' + ljm_index + '">' +
+               '<i class="iconfont icon-diancai"></i>运行示例</button>' +
+             '<div class="ljm_output" hidden></div>' +
+           '</article>';
+  }).join('');
+  ljm_methodGrid.innerHTML = ljm_cardsHtml;
+
+  /* ===== 运行示例 ===== */
+  ljm_methodGrid.addEventListener('click', function (ljm_event) {
+    var ljm_btn = ljm_event.target.closest('.ljm_runBtn');
+    if (!ljm_btn) { return; }
+
+    var ljm_index = Number(ljm_btn.dataset.index);
+    var ljm_method = ljm_methodList[ljm_index];
+    var ljm_card = ljm_btn.closest('.ljm_card');
+    var ljm_output = ljm_card.querySelector('.ljm_output');
+    var ljm_arr = ljm_method.base.slice();
+    var ljm_demo = ljm_method.run(ljm_arr);
+
+    ljm_output.innerHTML =
+      '<div><span class="ljm_outputLabel">返回</span> <span class="ljm_outputValue">' + ljm_demo.result + '</span></div>' +
+      '<div><span class="ljm_outputLabel">数组</span> <span class="ljm_outputArray">' + JSON.stringify(ljm_arr) + '</span></div>' +
+      '<div class="ljm_outputNote ' + (ljm_method.mutates ? 'ljm_outputNote--mutate' : 'ljm_outputNote--keep') + '">' +
+        (ljm_method.mutates ? '原数组已被修改' : '原数组保持不变') +
+      '</div>';
+    ljm_output.removeAttribute('hidden');
+  });
+
+  /* ===== 分类筛选 ===== */
+  var ljm_tabs = document.getElementById('ljm_tabs');
+  ljm_tabs.addEventListener('click', function (ljm_event) {
+    var ljm_tab = ljm_event.target.closest('.ljm_tab');
+    if (!ljm_tab) { return; }
+
+    var ljm_cat = ljm_tab.dataset.cat;
+    ljm_tabs.querySelectorAll('.ljm_tab').forEach(function (ljm_item) {
+      ljm_item.classList.remove('ljm_tab--active');
+    });
+    ljm_tab.classList.add('ljm_tab--active');
+
+    ljm_methodGrid.querySelectorAll('.ljm_card').forEach(function (ljm_card) {
+      var ljm_show = ljm_cat === 'all' || ljm_card.dataset.cat === ljm_cat;
+      ljm_card.style.display = ljm_show ? '' : 'none';
+    });
+  });
+
+  /* ===== fetch 获取服务器数组 ===== */
+  var ljm_serverUrl = '16-1-data.json';
+  var ljm_fetchStatus = document.getElementById('ljm_fetchStatus');
+  var ljm_sourceChips = document.getElementById('ljm_sourceChips');
+  var ljm_fetchResults = document.getElementById('ljm_fetchResults');
+  var ljm_reloadBtn = document.getElementById('ljm_reloadBtn');
+
+  var ljm_fallbackItems = [
+    { name: '宫保鸡丁', price: 38.5, sales: 126, onSale: true },
+    { name: '麻婆豆腐', price: 22, sales: 98, onSale: true },
+    { name: '水煮鱼', price: 68, sales: 156, onSale: false },
+    { name: '回锅肉', price: 42, sales: 203, onSale: true },
+    { name: '酸辣土豆丝', price: 16, sales: 187, onSale: true },
+    { name: '西红柿炒蛋', price: 18, sales: 76, onSale: false }
+  ];
+
+  function ljm_setStatus(ljm_text, ljm_state) {
+    ljm_fetchStatus.textContent = ljm_text;
+    ljm_fetchStatus.className = 'ljm_status' + (ljm_state ? ' ljm_status--' + ljm_state : '');
+  }
+
+  function ljm_renderFetchData(ljm_items) {
+    ljm_sourceChips.innerHTML = '';
+    ljm_items.forEach(function (ljm_item) {
+      var ljm_chip = document.createElement('span');
+      ljm_chip.className = 'ljm_chip';
+      ljm_chip.textContent = ljm_item.name;
+      ljm_sourceChips.appendChild(ljm_chip);
+    });
+
+    var ljm_onSale = ljm_items.filter(function (ljm_item) {
+      return ljm_item.onSale;
+    });
+    var ljm_prices = ljm_items.map(function (ljm_item) {
+      return ljm_item.name + ' ¥' + ljm_item.price;
+    });
+    var ljm_totalSales = ljm_items.reduce(function (ljm_sum, ljm_item) {
+      return ljm_sum + ljm_item.sales;
+    }, 0);
+    var ljm_topThree = ljm_items.slice().sort(function (ljm_a, ljm_b) {
+      return ljm_b.sales - ljm_a.sales;
+    }).slice(0, 3);
+
+    var ljm_results = [
+      {
+        method: 'filter()',
+        text: '在售商品：' + ljm_onSale.map(function (ljm_item) {
+          return ljm_item.name;
+        }).join('、')
+      },
+      {
+        method: 'map()',
+        text: ljm_prices.join('；')
+      },
+      {
+        method: 'reduce()',
+        text: '全部商品总销量：' + ljm_totalSales + ' 份'
+      },
+      {
+        method: 'sort()',
+        text: '销量前三：' + ljm_topThree.map(function (ljm_item) {
+          return ljm_item.name + '（' + ljm_item.sales + '）';
+        }).join('、')
+      }
+    ];
+
+    ljm_fetchResults.innerHTML = ljm_results.map(function (ljm_result) {
+      return '<article class="ljm_resultCard">' +
+               '<span class="ljm_codeTag">' + ljm_result.method + '</span>' +
+               '<p class="ljm_resultText">' + ljm_result.text + '</p>' +
+             '</article>';
+    }).join('');
+  }
+
+  function ljm_loadServerData() {
+    ljm_setStatus('正在通过 fetch 获取服务器端数组…', '');
+    ljm_sourceChips.innerHTML = '';
+    ljm_fetchResults.innerHTML = '';
+
+    fetch(ljm_serverUrl)
+      .then(function (ljm_response) {
+        if (!ljm_response.ok) {
+          throw new Error('HTTP ' + ljm_response.status);
+        }
+        return ljm_response.json();
+      })
+      .then(function (ljm_data) {
+        ljm_renderFetchData(ljm_data.items);
+        ljm_setStatus('fetch 成功：已获取服务器数组，共 ' + ljm_data.items.length + ' 条商品数据（更新日期 ' + ljm_data.updated + '）', 'ok');
+      })
+      .catch(function (ljm_error) {
+        ljm_renderFetchData(ljm_fallbackItems);
+        ljm_setStatus('fetch 失败：' + ljm_error.message + '。若以 file:// 方式打开会受跨域限制，已启用内置演示数组；请通过本地服务器（如 Live Server）访问以获取 JSON 数据。', 'err');
+      });
+  }
+
+  ljm_reloadBtn.addEventListener('click', ljm_loadServerData);
+  ljm_loadServerData();
+})();
+</script>
+</body>
+</html>

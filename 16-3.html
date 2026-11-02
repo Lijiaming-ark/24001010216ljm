@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：微信网页版登录页复刻
+-->
+<html lang="zh_CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>微信网页版</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    background: #7d8a96 url("img/16-3-bg.jpg") no-repeat 50%;
+    background-size: cover;
+  }
+
+  /* ===== 登录页容器 ===== */
+  .ljm_login {
+    position: relative;
+    height: 100%;
+    min-width: 860px;
+    min-height: 700px;
+    overflow: auto;
+  }
+
+  /* ===== 左上角 Logo ===== */
+  .ljm_logo {
+    position: absolute;
+    top: 60px;
+    left: 60px;
+  }
+
+  .ljm_logoIcon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 36px;
+    height: 28px;
+    background: url("img/16-3-logo.png") no-repeat;
+    background-size: 150px 2489px;
+    background-position: 0 -1107px;
+  }
+
+  /* ===== 中央二维码登录框 ===== */
+  .ljm_loginBox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -190px;
+    margin-top: -270px;
+    width: 380px;
+    height: 540px;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px #999;
+  }
+
+  .ljm_qrcode {
+    position: relative;
+    text-align: center;
+  }
+
+  .ljm_qrImg {
+    display: block;
+    width: 270px;
+    height: 270px;
+    margin: 42px auto 12px;
+  }
+
+  .ljm_subTitle {
+    text-align: center;
+    font-size: 20px;
+    color: #353535;
+    margin-bottom: 23px;
+  }
+
+  .ljm_subDesc {
+    text-align: center;
+    color: #a3a3a3;
+    font-size: 15px;
+    padding: 0 40px;
+    line-height: 1.8;
+  }
+
+  /* ===== 底部语言与版权 ===== */
+  .ljm_lang {
+    position: absolute;
+    left: 60px;
+    bottom: 60px;
+  }
+
+  .ljm_langItem {
+    text-decoration: none;
+    font-size: 12px;
+    color: #d3d3d3;
+  }
+
+  .ljm_sep {
+    display: inline-block;
+    height: 12px;
+    vertical-align: middle;
+    margin: 0 10px;
+    border-right: 1px solid #d3d3d3;
+  }
+
+  .ljm_copyright {
+    position: absolute;
+    right: 60px;
+    bottom: 60px;
+    color: #d3d3d3;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="ljm_login">
+
+  <!-- 左上角微信 Logo -->
+  <div class="ljm_logo">
+    <i class="ljm_logoIcon"></i>
+  </div>
+
+  <!-- 扫码登录框 -->
+  <div class="ljm_loginBox">
+    <div class="ljm_qrcode">
+      <canvas class="ljm_qrImg" id="ljm_qrCanvas" width="540" height="540"></canvas>
+      <div class="ljm_refreshMask" id="ljm_refreshMask">
+        <i class="iconfont icon-canshushezhi ljm_refreshIcon" id="ljm_refreshIcon" title="点击刷新二维码"></i>
+      </div>
+      <p class="ljm_subTitle" id="ljm_subTitle">使用手机微信扫码登录</p>
+      <p class="ljm_subDesc" id="ljm_subDesc">网页版微信需要配合手机使用</p>
+      <p class="ljm_refreshTips" id="ljm_refreshTips" hidden>二维码失效，点击刷新</p>
+    </div>
+  </div>
+
+  <!-- 底部语言链接 -->
+  <div class="ljm_lang">
+    <a class="ljm_langItem" href="#">微信PC版</a>
+    <span class="ljm_sep"></span>
+    <a class="ljm_langItem" href="#">中文</a>
+    <span class="ljm_sep"></span>
+    <a class="ljm_langItem" href="#">繁体</a>
+    <span class="ljm_sep"></span>
+    <a class="ljm_langItem" href="#">English</a>
+    <span class="ljm_sep"></span>
+    <a class="ljm_langItem" href="#">微信隐私保护指引</a>
+    <span class="ljm_sep"></span>
+    <a class="ljm_langItem" href="#">腾讯微信软件许可及服务协议</a>
+  </div>
+
+  <!-- 版权信息 -->
+  <div class="ljm_copyright">
+    <p id="ljm_copyDesc">© 1998 - 2026 Tencent Inc. All Rights Reserved</p>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 绘制二维码（无外部图片，使用 Canvas 原生绘制） ===== */
+  var ljm_qrCanvas = document.getElementById('ljm_qrCanvas');
+
+  if (ljm_qrCanvas && ljm_qrCanvas.getContext) {
+    var ljm_qrCtx = ljm_qrCanvas.getContext('2d');
+    var ljm_qrModules = 25;
+    var ljm_qrQuiet = 4;
+    var ljm_qrTotal = ljm_qrModules + ljm_qrQuiet * 2;
+    var ljm_qrPixel = ljm_qrCanvas.width;
+    var ljm_qrCell = ljm_qrPixel / ljm_qrTotal;
+    var ljm_qrSeed = 20261102;
+
+    /* 简单伪随机数，保证每次打开图案一致 */
+    function ljm_nextRandom() {
+      ljm_qrSeed ^= ljm_qrSeed << 13;
+      ljm_qrSeed ^= ljm_qrSeed >>> 17;
+      ljm_qrSeed ^= ljm_qrSeed << 5;
+      ljm_qrSeed >>>= 0;
+      return ljm_qrSeed / 4294967296;
+    }
+
+    function ljm_fillCell(ljm_row, ljm_col, ljm_dark) {
+      ljm_qrCtx.fillStyle = ljm_dark ? '#000' : '#fff';
+      var ljm_x = (ljm_col + ljm_qrQuiet) * ljm_qrCell;
+      var ljm_y = (ljm_row + ljm_qrQuiet) * ljm_qrCell;
+      ljm_qrCtx.fillRect(Math.floor(ljm_x), Math.floor(ljm_y), Math.ceil(ljm_qrCell), Math.ceil(ljm_qrCell));
+    }
+
+    function ljm_isReserved(ljm_row, ljm_col) {
+      var ljm_inFinder = (ljm_row < 8 && ljm_col < 8) ||
+                         (ljm_row < 8 && ljm_col >= 17) ||
+                         (ljm_row >= 17 && ljm_col < 8);
+      var ljm_inTiming = ljm_row === 6 || ljm_col === 6;
+      var ljm_inAlign = ljm_row >= 16 && ljm_row <= 20 && ljm_col >= 16 && ljm_col <= 20;
+      return ljm_inFinder || ljm_inTiming || ljm_inAlign;
+    }
+
+    function ljm_drawFinder(ljm_row, ljm_col) {
+      for (var ljm_r = 0; ljm_r < 7; ljm_r++) {
+        for (var ljm_c = 0; ljm_c < 7; ljm_c++) {
+          var ljm_border = ljm_r === 0 || ljm_r === 6 || ljm_c === 0 || ljm_c === 6;
+          var ljm_core = ljm_r >= 2 && ljm_r <= 4 && ljm_c >= 2 && ljm_c <= 4;
+          ljm_fillCell(ljm_row + ljm_r, ljm_col + ljm_c, ljm_border || ljm_core);
+        }
+      }
+    }
+
+    ljm_qrCtx.fillStyle = '#fff';
+    ljm_qrCtx.fillRect(0, 0, ljm_qrPixel, ljm_qrPixel);
+
+    /* 随机数据模块 */
+    for (var ljm_row = 0; ljm_row < ljm_qrModules; ljm_row++) {
+      for (var ljm_col = 0; ljm_col < ljm_qrModules; ljm_col++) {
+        if (ljm_isReserved(ljm_row, ljm_col)) { continue; }
+        if (ljm_nextRandom() > 0.5) { ljm_fillCell(ljm_row, ljm_col, true); }
+      }
+    }
+
+    /* 三个定位角 */
+    ljm_drawFinder(0, 0);
+    ljm_drawFinder(0, 18);
+    ljm_drawFinder(18, 0);
+
+    /* 定时图案 */
+    for (var ljm_i = 8; ljm_i < 17; ljm_i++) {
+      ljm_fillCell(6, ljm_i, ljm_i % 2 === 0);
+      ljm_fillCell(ljm_i, 6, ljm_i % 2 === 0);
+    }
+
+    /* 对齐图案 */
+    for (var ljm_ar = 0; ljm_ar < 5; ljm_ar++) {
+      for (var ljm_ac = 0; ljm_ac < 5; ljm_ac++) {
+        var ljm_alignDark = ljm_ar === 0 || ljm_ar === 4 || ljm_ac === 0 || ljm_ac === 4 ||
+                            (ljm_ar === 2 && ljm_ac === 2);
+        ljm_fillCell(16 + ljm_ar, 16 + ljm_ac, ljm_alignDark);
+      }
+    }
+  }
+
+  /* ===== fetch 获取服务器端文案数据 ===== */
+  var ljm_dataUrl = '16-3-data.json';
+  var ljm_subTitleEl = document.getElementById('ljm_subTitle');
+  var ljm_subDescEl = document.getElementById('ljm_subDesc');
+  var ljm_copyDescEl = document.getElementById('ljm_copyDesc');
+
+  /* ===== iconfont 图标：二维码失效刷新交互 ===== */
+  var ljm_refreshMask = document.getElementById('ljm_refreshMask');
+  var ljm_refreshIcon = document.getElementById('ljm_refreshIcon');
+  var ljm_refreshTips = document.getElementById('ljm_refreshTips');
+
+  function ljm_setQrExpired(ljm_expired) {
+    ljm_refreshMask.classList.toggle('ljm_refreshMask--show', ljm_expired);
+    ljm_qrCanvas.classList.toggle('ljm_qrImg--expired', ljm_expired);
+    ljm_subTitleEl.hidden = ljm_expired;
+    ljm_subDescEl.hidden = ljm_expired;
+    ljm_refreshTips.hidden = !ljm_expired;
+  }
+
+  ljm_qrCanvas.addEventListener('click', function () {
+    ljm_setQrExpired(true);
+  });
+
+  ljm_refreshIcon.addEventListener('click', function () {
+    ljm_setQrExpired(false);
+  });
+
+  fetch(ljm_dataUrl)
+    .then(function (ljm_response) {
+      if (!ljm_response.ok) {
+        throw new Error('HTTP ' + ljm_response.status);
+      }
+      return ljm_response.json();
+    })
+    .then(function (ljm_data) {
+      if (ljm_data.title) { document.title = ljm_data.title; }
+      if (ljm_data.subTitle) { ljm_subTitleEl.textContent = ljm_data.subTitle; }
+      if (ljm_data.subDesc) { ljm_subDescEl.textContent = ljm_data.subDesc; }
+      if (ljm_data.copyright) { ljm_copyDescEl.textContent = ljm_data.copyright; }
+    })
+    .catch(function () {
+      /* 以 file:// 打开时 fetch 会失败，保留页面内置文案 */
+    });
+})();
+</script>
+</body>
+</html>

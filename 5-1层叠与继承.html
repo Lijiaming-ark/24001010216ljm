@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+      p {
+          color: #f00;
+          font-size: 100px;
+      }
+      .text{
+        color: green;
+      }
+      #text{
+          /*优先级 id > class > 标签*/
+          color:purple;
+      }
+      .box p{
+          color: orange;
+      }
+      #box #text{
+          color: silver;
+      }
+      .text{
+          color: yellow !important;
+          /* hack，可覆盖内嵌css */
+      }
+      #box{
+        /* 宽1400px 高400px 灰色背景 距离 字间距25px */
+        width: 1400px;
+        height: 400px;
+        background-color: gray;
+        margin: 10px;
+        padding: 10px;
+        letter-spacing: 25px;
+        /* 圆角矩形10px */
+        border-radius: 10px;
+      }
+    </style>
+<link rel="stylesheet" href="css.css">
+</head>
+<body>
+    <h2>层叠与继承</h2>
+    <div id="box" class="box">
+        <p id="text" class="text" >216 李佳明</p>
+        <p>层叠与继承的优先级</p>
+    </div>
+</body>
+</html>

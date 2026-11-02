@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：JavaScript 对象演示
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript 对象</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #edf3f1;
+    color: #1f3330;
+    min-height: 100vh;
+    padding: 24px 16px 40px;
+  }
+
+  .ljm_page { max-width: 1120px; margin: 0 auto; }
+
+  /* ===== 头部 ===== */
+  .ljm_hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    padding: 30px 32px;
+    background:
+      radial-gradient(circle at 86% 8%, rgba(70, 209, 166, .4), transparent 45%),
+      linear-gradient(135deg, #0b2f30, #0f5d55 55%, #1f8a6d);
+    color: #fff;
+    box-shadow: 0 18px 40px rgba(11, 47, 48, .28);
+  }
+
+  .ljm_hero::after {
+    content: "{ }";
+    position: absolute;
+    right: 18px;
+    bottom: -48px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 180px;
+    color: rgba(255, 255, 255, .08);
+    pointer-events: none;
+  }
+
+  .ljm_heroDecor {
+    position: absolute;
+    top: 26px;
+    right: 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 9px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    opacity: .55;
+    pointer-events: none;
+  }
+
+  .ljm_decoChip {
+    padding: 5px 11px;
+    border: 1px solid rgba(255, 255, 255, .3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .08);
+    transform: rotate(2deg);
+  }
+
+  .ljm_decoChip:nth-child(2) { transform: rotate(-2deg) translateX(-10px); }
+
+  .ljm_heroIcon {
+    position: relative;
+    z-index: 1;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .16);
+    border: 1px solid rgba(255, 255, 255, .22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .ljm_heroIcon .iconfont { font-size: 28px; }
+
+  .ljm_heroTitle {
+    position: relative;
+    z-index: 1;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: .5px;
+  }
+
+  .ljm_heroSub {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, .78);
+  }
+
+  .ljm_meta {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .ljm_metaItem {
+    padding: 4px 12px;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .12);
+    font-size: 12px;
+    color: rgba(255, 255, 255, .9);
+  }
+
+  .ljm_stats {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .ljm_stat {
+    min-width: 108px;
+    padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .1);
+  }
+
+  .ljm_stat b { display: block; font-size: 21px; font-weight: 700; }
+
+  .ljm_stat span {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, .68);
+  }
+
+  /* ===== 通用区块 ===== */
+  .ljm_section { margin-top: 28px; }
+
+  .ljm_sectionHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ljm_step {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #0f9b8e;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ljm_sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f3330;
+  }
+
+  .ljm_sectionTitle .iconfont { font-size: 20px; color: #0f9b8e; }
+
+  .ljm_sectionTip {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #7b8c87;
+  }
+
+  /* ===== 创建对象卡片 ===== */
+  .ljm_createGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .ljm_createCard {
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border-radius: 18px;
+    border-top: 4px solid #0f9b8e;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 50, 90, .06);
+    transition: transform .2s, box-shadow .2s;
+  }
+
+  .ljm_createCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(30, 50, 90, .11);
+  }
+
+  .ljm_createCard--blue { border-top-color: #2f6bff; }
+  .ljm_createCard--orange { border-top-color: #ff7a45; }
+  .ljm_createCard--purple { border-top-color: #8b5cf6; }
+  .ljm_createCard--green { border-top-color: #2fbf71; }
+  .ljm_createCard--teal { border-top-color: #0f9b8e; }
+
+  .ljm_createTop {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ljm_createIcon {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f8f3;
+    color: #0f9b8e;
+  }
+
+  .ljm_createIcon .iconfont { font-size: 21px; }
+
+  .ljm_createCard--blue .ljm_createIcon { background: #eef4ff; color: #2f6bff; }
+  .ljm_createCard--orange .ljm_createIcon { background: #fff2ea; color: #ff7a45; }
+  .ljm_createCard--purple .ljm_createIcon { background: #f3edff; color: #8b5cf6; }
+  .ljm_createCard--green .ljm_createIcon { background: #eafaf1; color: #2fbf71; }
+
+  .ljm_createName { font-size: 15px; font-weight: 600; }
+
+  .ljm_createTag {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #f1f5f4;
+    color: #7b8c87;
+    font-size: 11px;
+  }
+
+  .ljm_codeBlock {
+    margin-top: 14px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    background: #132b2a;
+    color: #b8e6d9;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.75;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .ljm_createDesc {
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #5f6b80;
+  }
+
+  /* ===== 交互演示 ===== */
+  .ljm_playground {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .ljm_objectPanel {
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 50, 90, .06);
+  }
+
+  .ljm_panelHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .ljm_label { font-size: 12px; color: #7b8c87; }
+
+  .ljm_count {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #e8f8f3;
+    color: #0f9b8e;
+    font-size: 12px;
+  }
+
+  .ljm_objectCode {
+    flex: 1;
+    min-height: 300px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #132b2a;
+    color: #c9e8de;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.95;
+  }
+
+  .ljm_objectLine { white-space: pre-wrap; color: #8fb8ae; }
+  .ljm_kw { color: #7fd1ff; }
+  .ljm_objName { color: #ffd479; }
+  .ljm_punc { color: #8fb8ae; }
+
+  .ljm_propList { padding-left: 18px; }
+
+  .ljm_propRow {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .ljm_propKey { color: #9fd6ff; }
+  .ljm_propColon { color: #8fb8ae; }
+  .ljm_propValue { word-break: break-all; }
+  .ljm_propValue--string { color: #7ee2a8; }
+  .ljm_propValue--number { color: #ffd479; }
+  .ljm_propValue--boolean { color: #ff9a6b; }
+  .ljm_propValue--undefined { color: #b0b8d0; }
+
+  .ljm_propType {
+    padding: 0 4px;
+    border: 1px solid #2c4a45;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #5d7f77;
+  }
+
+  .ljm_controlPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .ljm_actionGroup {
+    padding: 14px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 50, 90, .06);
+  }
+
+  .ljm_actionTitle {
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #7b8c87;
+  }
+
+  .ljm_actionBtns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ljm_actionBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid #dcebe6;
+    border-radius: 10px;
+    background: #f7fbf9;
+    color: #2f5a50;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: color .2s, border-color .2s, background .2s, transform .1s;
+  }
+
+  .ljm_actionBtn:hover {
+    border-color: #0f9b8e;
+    background: #fff;
+    color: #0f9b8e;
+  }
+
+  .ljm_actionBtn:active { transform: scale(.97); }
+  .ljm_actionBtn .iconfont { font-size: 14px; color: #0f9b8e; }
+  .ljm_actionBtn--danger .iconfont { color: #ff4d4f; }
+  .ljm_actionBtn--warn .iconfont { color: #ff7a45; }
+  .ljm_actionBtn--reset .iconfont { color: #8b5cf6; }
+
+  .ljm_consoleBox {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 14px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 50, 90, .06);
+  }
+
+  .ljm_console {
+    flex: 1;
+    min-height: 130px;
+    max-height: 220px;
+    margin-top: 8px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #132b2a;
+    color: #c9e8de;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.85;
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow: auto;
+  }
+
+  /* ===== 常用 API ===== */
+  .ljm_apiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .ljm_apiCard {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 50, 90, .06);
+    transition: transform .2s, box-shadow .2s;
+  }
+
+  .ljm_apiCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(30, 50, 90, .1);
+  }
+
+  .ljm_apiIcon {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f8f3;
+    color: #0f9b8e;
+  }
+
+  .ljm_apiIcon .iconfont { font-size: 20px; }
+
+  .ljm_apiIcon--blue { background: #eef4ff; color: #2f6bff; }
+  .ljm_apiIcon--orange { background: #fff2ea; color: #ff7a45; }
+  .ljm_apiIcon--purple { background: #f3edff; color: #8b5cf6; }
+  .ljm_apiIcon--green { background: #eafaf1; color: #2fbf71; }
+  .ljm_apiIcon--gold { background: #fef6e7; color: #d18e0a; }
+
+  .ljm_apiName {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #1f3330;
+    word-break: break-all;
+  }
+
+  .ljm_apiDesc {
+    margin-top: 6px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #5f6b80;
+  }
+
+  /* ===== fetch 服务器对象 ===== */
+  .ljm_fetch {
+    margin-top: 28px;
+    padding: 22px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(30, 50, 90, .06);
+  }
+
+  .ljm_fetchHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ljm_reloadBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0f5d55, #1f8a6d);
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .ljm_reloadBtn:active { opacity: .85; }
+  .ljm_reloadBtn .iconfont { font-size: 15px; }
+
+  .ljm_status {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-left: 4px solid #0f9b8e;
+    border-radius: 10px;
+    background: #f2faf7;
+    color: #5f6b80;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .ljm_status--ok {
+    border-left-color: #2fbf71;
+    background: #f0fbf5;
+    color: #1d7a4a;
+  }
+
+  .ljm_status--err {
+    border-left-color: #ff4d4f;
+    background: #fff3f3;
+    color: #b42318;
+  }
+
+  .ljm_kvGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .ljm_kvCard {
+    padding: 12px 14px;
+    border: 1px solid #e2f1ec;
+    border-radius: 12px;
+    background: #f5fbf9;
+  }
+
+  .ljm_kvKey {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    color: #7b8c87;
+  }
+
+  .ljm_kvValue {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #1f3330;
+    word-break: break-all;
+  }
+
+  .ljm_resultGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .ljm_resultCard {
+    padding: 14px;
+    border: 1px solid #e2f1ec;
+    border-radius: 14px;
+    background: #f5fbf9;
+  }
+
+  .ljm_codeTag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: #132b2a;
+    color: #9fe8d2;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+  }
+
+  .ljm_resultText {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #3b4a66;
+    word-break: break-all;
+  }
+
+  .ljm_note {
+    margin-top: 14px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #8a94a6;
+  }
+
+  .ljm_footer {
+    margin-top: 26px;
+    text-align: center;
+    font-size: 12px;
+    color: #9aa4b5;
+  }
+
+  @media (max-width: 900px) {
+    .ljm_heroDecor { display: none; }
+    .ljm_playground { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 560px) {
+    .ljm_hero { padding: 24px 20px; }
+    .ljm_fetch { padding: 18px; }
+    .ljm_objectCode { min-height: 240px; }
+  }
+</style>
+</head>
+<body>
+<div class="ljm_page">
+
+  <!-- 页面头部 -->
+  <header class="ljm_hero">
+    <div class="ljm_heroDecor">
+      <span class="ljm_decoChip">{ name: '李佳明' }</span>
+      <span class="ljm_decoChip">{ age: 20 }</span>
+      <span class="ljm_decoChip">Object.keys(obj)</span>
+    </div>
+
+    <div class="ljm_heroIcon"><i class="iconfont icon-danjumobanhong"></i></div>
+    <h1 class="ljm_heroTitle">JavaScript 对象</h1>
+    <p class="ljm_heroSub">从创建方式、属性访问到内置 API，配合可操作的交互演示与 fetch 服务器对象，掌握对象这一核心引用类型。</p>
+
+    <div class="ljm_meta">
+      <span class="ljm_metaItem">姓名：李佳明</span>
+      <span class="ljm_metaItem">日期：2026-11-02</span>
+      <span class="ljm_metaItem">功能名称：对象演示</span>
+    </div>
+
+    <div class="ljm_stats">
+      <div class="ljm_stat"><b>5</b><span>创建方式</span></div>
+      <div class="ljm_stat"><b>8</b><span>常用 API</span></div>
+      <div class="ljm_stat"><b>9</b><span>交互操作</span></div>
+      <div class="ljm_stat"><b>100%</b><span>原生实现</span></div>
+    </div>
+  </header>
+
+  <!-- 01 创建对象 -->
+  <section class="ljm_section">
+    <div class="ljm_sectionHead">
+      <span class="ljm_step">01</span>
+      <h2 class="ljm_sectionTitle"><i class="iconfont icon-caipintejia"></i>创建对象的 5 种方式</h2>
+    </div>
+    <p class="ljm_sectionTip">对象由一组键值对组成，键是字符串或 Symbol，值可以是任意数据类型。以下是最常见的五种创建方式。</p>
+
+    <div class="ljm_createGrid">
+      <article class="ljm_createCard ljm_createCard--blue">
+        <div class="ljm_createTop">
+          <span class="ljm_createIcon"><i class="iconfont icon-danjumobanhong"></i></span>
+          <div>
+            <h3 class="ljm_createName">对象字面量</h3>
+            <span class="ljm_createTag">最常用</span>
+          </div>
+        </div>
+        <pre class="ljm_codeBlock"><code>const ljm_obj = {
+  name: '李佳明',
+  age: 20
+};</code></pre>
+        <p class="ljm_createDesc">用花括号直接书写键值对，键值之间用冒号分隔，多个属性用逗号分隔。</p>
+      </article>
+
+      <article class="ljm_createCard ljm_createCard--orange">
+        <div class="ljm_createTop">
+          <span class="ljm_createIcon"><i class="iconfont icon-caipinzuofahong"></i></span>
+          <div>
+            <h3 class="ljm_createName">new Object()</h3>
+            <span class="ljm_createTag">基础</span>
+          </div>
+        </div>
+        <pre class="ljm_codeBlock"><code>const ljm_obj = new Object();
+ljm_obj.name = '李佳明';
+ljm_obj.age = 20;</code></pre>
+        <p class="ljm_createDesc">先创建一个空对象，再通过点语法逐个添加属性，效果等同于对象字面量。</p>
+      </article>
+
+      <article class="ljm_createCard ljm_createCard--purple">
+        <div class="ljm_createTop">
+          <span class="ljm_createIcon"><i class="iconfont icon-caipinzuofahong"></i></span>
+          <div>
+            <h3 class="ljm_createName">构造函数</h3>
+            <span class="ljm_createTag">进阶</span>
+          </div>
+        </div>
+        <pre class="ljm_codeBlock"><code>function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+const ljm_p = new Person('李佳明', 20);</code></pre>
+        <p class="ljm_createDesc">通过构造函数批量创建结构相同的对象，this 指向新创建的实例。</p>
+      </article>
+
+      <article class="ljm_createCard ljm_createCard--green">
+        <div class="ljm_createTop">
+          <span class="ljm_createIcon"><i class="iconfont icon-caileikuhong"></i></span>
+          <div>
+            <h3 class="ljm_createName">Object.create()</h3>
+            <span class="ljm_createTag">原型</span>
+          </div>
+        </div>
+        <pre class="ljm_codeBlock"><code>const ljm_proto = { type: '学生' };
+const ljm_obj = Object.create(ljm_proto);
+ljm_obj.name = '李佳明';</code></pre>
+        <p class="ljm_createDesc">以指定对象作为原型创建新对象，新对象可继承原型上的属性与方法。</p>
+      </article>
+
+      <article class="ljm_createCard ljm_createCard--teal">
+        <div class="ljm_createTop">
+          <span class="ljm_createIcon"><i class="iconfont icon-diancai"></i></span>
+          <div>
+            <h3 class="ljm_createName">class 类</h3>
+            <span class="ljm_createTag">ES6</span>
+          </div>
+        </div>
+        <pre class="ljm_codeBlock"><code>class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+}
+const ljm_p = new Person('李佳明', 20);</code></pre>
+        <p class="ljm_createDesc">ES6 提供的类语法，本质是构造函数的语法糖，写法更直观清晰。</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 02 属性操作交互演示 -->
+  <section class="ljm_section">
+    <div class="ljm_sectionHead">
+      <span class="ljm_step">02</span>
+      <h2 class="ljm_sectionTitle"><i class="iconfont icon-POSzhandian"></i>对象属性操作</h2>
+    </div>
+    <p class="ljm_sectionTip">点击右侧按钮对 <code>ljm_student</code> 对象执行操作，左侧对象结构和下方执行输出会实时更新。</p>
+
+    <div class="ljm_playground">
+      <!-- 当前对象 -->
+      <div class="ljm_objectPanel">
+        <div class="ljm_panelHead">
+          <span class="ljm_label">当前对象</span>
+          <span class="ljm_count" id="ljm_propCount">3 个属性</span>
+        </div>
+        <div class="ljm_objectCode">
+          <div class="ljm_objectLine"><span class="ljm_kw">const</span> <span class="ljm_objName">ljm_student</span> <span class="ljm_punc">= {</span></div>
+          <div class="ljm_propList" id="ljm_objectPreview"></div>
+          <div class="ljm_objectLine"><span class="ljm_punc">};</span></div>
+        </div>
+      </div>
+
+      <!-- 操作按钮与输出 -->
+      <div class="ljm_controlPanel">
+        <div class="ljm_actionGroup" id="ljm_actionsPanel">
+          <div class="ljm_actionTitle">属性访问与修改</div>
+          <div class="ljm_actionBtns">
+            <button class="ljm_actionBtn" type="button" data-action="read-dot"><i class="iconfont icon-diancai"></i>点语法读取</button>
+            <button class="ljm_actionBtn" type="button" data-action="read-bracket"><i class="iconfont icon-caipintiaomahong"></i>方括号读取</button>
+            <button class="ljm_actionBtn ljm_actionBtn--warn" type="button" data-action="add"><i class="iconfont icon-caipintejia"></i>添加属性</button>
+            <button class="ljm_actionBtn ljm_actionBtn--danger" type="button" data-action="remove"><i class="iconfont icon-chuzhiqingsuan"></i>删除属性</button>
+          </div>
+        </div>
+
+        <div class="ljm_actionGroup">
+          <div class="ljm_actionTitle">对象结构查看</div>
+          <div class="ljm_actionBtns">
+            <button class="ljm_actionBtn" type="button" data-action="keys"><i class="iconfont icon-danjumobanhong"></i>Object.keys()</button>
+            <button class="ljm_actionBtn" type="button" data-action="values"><i class="iconfont icon-caipinkuhong"></i>Object.values()</button>
+            <button class="ljm_actionBtn" type="button" data-action="entries"><i class="iconfont icon-caileikuhong"></i>Object.entries()</button>
+            <button class="ljm_actionBtn" type="button" data-action="stringify"><i class="iconfont icon-chuzhiqingsuan"></i>JSON.stringify()</button>
+          </div>
+        </div>
+
+        <div class="ljm_consoleBox">
+          <div class="ljm_panelHead">
+            <span class="ljm_label">执行输出</span>
+            <button class="ljm_actionBtn ljm_actionBtn--reset" type="button" data-action="reset" id="ljm_resetBtn"><i class="iconfont icon-canshushezhi"></i>重置对象</button>
+          </div>
+          <pre class="ljm_console" id="ljm_console"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 常用对象 API -->
+  <section class="ljm_section">
+    <div class="ljm_sectionHead">
+      <span class="ljm_step">03</span>
+      <h2 class="ljm_sectionTitle"><i class="iconfont icon-canshushezhi"></i>常用对象 API</h2>
+    </div>
+    <p class="ljm_sectionTip">这些方法都挂载在 Object 构造函数上，用于读取、合并、冻结或序列化对象。</p>
+
+    <div class="ljm_apiGrid">
+      <article class="ljm_apiCard">
+        <span class="ljm_apiIcon ljm_apiIcon--blue"><i class="iconfont icon-danjumobanhong"></i></span>
+        <div>
+          <h3 class="ljm_apiName">Object.keys(obj)</h3>
+          <p class="ljm_apiDesc">返回对象自身可枚举属性名组成的数组。</p>
+        </div>
+      </article>
+
+      <article class="ljm_apiCard">
+        <span class="ljm_apiIcon ljm_apiIcon--green"><i class="iconfont icon-caipinkuhong"></i></span>
+        <div>
+          <h3 class="ljm_apiName">Object.values(obj)</h3>
+          <p class="ljm_apiDesc">返回对象自身可枚举属性值组成的数组。</p>
+        </div>
+      </article>
+
+      <article class="ljm_apiCard">
+        <span class="ljm_apiIcon ljm_apiIcon--purple"><i class="iconfont icon-caileikuhong"></i></span>
+        <div>
+          <h3 class="ljm_apiName">Object.entries(obj)</h3>
+          <p class="ljm_apiDesc">返回由 [键, 值] 数组成的新数组，可直接用于遍历。</p>
+        </div>
+      </article>
+
+      <article class="ljm_apiCard">
+        <span class="ljm_apiIcon ljm_apiIcon--orange"><i class="iconfont icon-caipintejia"></i></span>
+        <div>
+          <h3 class="ljm_apiName">Object.assign(target, source)</h3>
+          <p class="ljm_apiDesc">将源对象的属性复制到目标对象，返回目标对象，属于浅拷贝。</p>
+        </div>
+      </article>
+
+      <article class="ljm_apiCard">
+        <span class="ljm_apiIcon"><i class="iconfont icon-dangkoushezhihong"></i></span>
+        <div>
+          <h3 class="ljm_apiName">Object.freeze(obj)</h3>
+          <p class="ljm_apiDesc">冻结对象，之后不能添加、删除或修改属性。</p>
+        </div>
+      </article>
+
+      <article class="ljm_apiCard">
+        <span class="ljm_apiIcon ljm_apiIcon--gold"><i class="iconfont icon-POSzhandian"></i></span>
+        <div>
+          <h3 class="ljm_apiName">obj.hasOwnProperty(key)</h3>
+          <p class="ljm_apiDesc">判断属性是否为对象自身属性，不会沿原型链查找。</p>
+        </div>
+      </article>
+
+      <article class="ljm_apiCard">
+        <span class="ljm_apiIcon ljm_apiIcon--purple"><i class="iconfont icon-caipinzuofahong"></i></span>
+        <div>
+          <h3 class="ljm_apiName">'key' in obj</h3>
+          <p class="ljm_apiDesc">判断属性是否存在，包括原型链上继承来的属性。</p>
+        </div>
+      </article>
+
+      <article class="ljm_apiCard">
+        <span class="ljm_apiIcon ljm_apiIcon--blue"><i class="iconfont icon-chuzhiqingsuan"></i></span>
+        <div>
+          <h3 class="ljm_apiName">JSON.stringify(obj)</h3>
+          <p class="ljm_apiDesc">把对象序列化为 JSON 字符串，常用于存储或网络传输。</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 04 fetch 服务器对象 -->
+  <section class="ljm_fetch">
+    <div class="ljm_fetchHead">
+      <div class="ljm_sectionHead">
+        <span class="ljm_step">04</span>
+        <h2 class="ljm_sectionTitle"><i class="iconfont icon-POSzhandian"></i>fetch 获取服务器对象</h2>
+      </div>
+      <button class="ljm_reloadBtn" id="ljm_reloadBtn" type="button">
+        <i class="iconfont icon-canshushezhi"></i>重新 fetch
+      </button>
+    </div>
+
+    <div class="ljm_status" id="ljm_fetchStatus">正在通过 fetch 获取服务器端对象…</div>
+
+    <div class="ljm_kvGrid" id="ljm_kvGrid"></div>
+    <div class="ljm_resultGrid" id="ljm_fetchResults"></div>
+
+    <p class="ljm_note">数据文件：16-2-data.json · 通过 fetch 获取 JSON 对象后，使用 Object.keys()、Object.values()、Object.entries() 读取结构，并通过点语法访问嵌套属性。</p>
+  </section>
+
+  <p class="ljm_footer">姓名：李佳明 · 日期：2026-11-02 · 功能名称：JavaScript 对象演示</p>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===== 交互演示：初始对象 ===== */
+  var ljm_student = {
+    name: '李佳明',
+    age: 20,
+    major: '计算机科学与技术'
+  };
+
+  var ljm_objectPreview = document.getElementById('ljm_objectPreview');
+  var ljm_propCount = document.getElementById('ljm_propCount');
+  var ljm_console = document.getElementById('ljm_console');
+  var ljm_actionsPanel = document.getElementById('ljm_actionsPanel');
+  var ljm_resetBtn = document.getElementById('ljm_resetBtn');
+
+  var ljm_consoleLines = ['// 点击操作按钮，查看执行结果'];
+  ljm_console.textContent = ljm_consoleLines[0];
+
+  function ljm_formatValue(ljm_value) {
+    if (typeof ljm_value === 'string') { return '"' + ljm_value + '"'; }
+    if (ljm_value === null) { return 'null'; }
+    if (typeof ljm_value === 'undefined') { return 'undefined'; }
+    if (typeof ljm_value === 'object') { return JSON.stringify(ljm_value); }
+    return String(ljm_value);
+  }
+
+  function ljm_log(ljm_code, ljm_value) {
+    ljm_consoleLines.push('> ' + ljm_code + '\n' + ljm_value);
+    ljm_console.textContent = ljm_consoleLines.join('\n\n');
+    ljm_console.scrollTop = ljm_console.scrollHeight;
+  }
+
+  function ljm_renderObject() {
+    var ljm_keys = Object.keys(ljm_student);
+    ljm_propCount.textContent = ljm_keys.length + ' 个属性';
+
+    if (ljm_keys.length === 0) {
+      ljm_objectPreview.innerHTML = '<div class="ljm_propRow"><span class="ljm_propType">// 空对象</span></div>';
+      return;
+    }
+
+    ljm_objectPreview.innerHTML = ljm_keys.map(function (ljm_key) {
+      var ljm_value = ljm_student[ljm_key];
+      var ljm_type = typeof ljm_value;
+      return '<div class="ljm_propRow">' +
+               '<span class="ljm_propKey">' + ljm_key + '</span>' +
+               '<span class="ljm_propColon">:</span>' +
+               '<span class="ljm_propValue ljm_propValue--' + ljm_type + '">' + ljm_formatValue(ljm_value) + '</span>' +
+               '<span class="ljm_propType">' + ljm_type + '</span>' +
+             '</div>';
+    }).join('');
+  }
+
+  function ljm_handleAction(ljm_action) {
+    if (ljm_action === 'read-dot') {
+      ljm_log('ljm_student.name', ljm_formatValue(ljm_student.name));
+      return;
+    }
+
+    if (ljm_action === 'read-bracket') {
+      ljm_log("ljm_student['age']", ljm_formatValue(ljm_student.age));
+      return;
+    }
+
+    if (ljm_action === 'add') {
+      ljm_student.email = 'ljm@example.com';
+      ljm_renderObject();
+      ljm_log("ljm_student.email = 'ljm@example.com'", ljm_formatValue(ljm_student.email));
+      return;
+    }
+
+    if (ljm_action === 'remove') {
+      var ljm_deleted = delete ljm_student.major;
+      ljm_renderObject();
+      ljm_log('delete ljm_student.major', String(ljm_deleted) + '（major 已删除）');
+      return;
+    }
+
+    if (ljm_action === 'keys') {
+      ljm_log('Object.keys(ljm_student)', JSON.stringify(Object.keys(ljm_student)));
+      return;
+    }
+
+    if (ljm_action === 'values') {
+      ljm_log('Object.values(ljm_student)', JSON.stringify(Object.values(ljm_student)));
+      return;
+    }
+
+    if (ljm_action === 'entries') {
+      ljm_log('Object.entries(ljm_student)', JSON.stringify(Object.entries(ljm_student)));
+      return;
+    }
+
+    if (ljm_action === 'stringify') {
+      ljm_log('JSON.stringify(ljm_student)', JSON.stringify(ljm_student));
+      return;
+    }
+
+    if (ljm_action === 'reset') {
+      ljm_student = {
+        name: '李佳明',
+        age: 20,
+        major: '计算机科学与技术'
+      };
+      ljm_consoleLines = ['// 对象已重置为初始状态'];
+      ljm_console.textContent = ljm_consoleLines[0];
+      ljm_renderObject();
+    }
+  }
+
+  ljm_actionsPanel.addEventListener('click', function (ljm_event) {
+    var ljm_btn = ljm_event.target.closest('.ljm_actionBtn');
+    if (!ljm_btn) { return; }
+    ljm_handleAction(ljm_btn.dataset.action);
+  });
+
+  ljm_resetBtn.addEventListener('click', function () {
+    ljm_handleAction('reset');
+  });
+
+  ljm_renderObject();
+
+  /* ===== fetch 获取服务器对象 ===== */
+  var ljm_serverUrl = '16-2-data.json';
+  var ljm_fetchStatus = document.getElementById('ljm_fetchStatus');
+  var ljm_kvGrid = document.getElementById('ljm_kvGrid');
+  var ljm_fetchResults = document.getElementById('ljm_fetchResults');
+  var ljm_reloadBtn = document.getElementById('ljm_reloadBtn');
+
+  var ljm_fallbackCourse = {
+    name: 'Web 前端开发',
+    teacher: '李佳明',
+    duration: 64,
+    modules: ['HTML', 'CSS', 'JavaScript'],
+    detail: { campus: '软件学院', credit: 3 }
+  };
+
+  function ljm_setStatus(ljm_text, ljm_state) {
+    ljm_fetchStatus.textContent = ljm_text;
+    ljm_fetchStatus.className = 'ljm_status' + (ljm_state ? ' ljm_status--' + ljm_state : '');
+  }
+
+  function ljm_renderCourse(ljm_course) {
+    var ljm_keys = Object.keys(ljm_course);
+
+    ljm_kvGrid.innerHTML = ljm_keys.map(function (ljm_key) {
+      var ljm_value = ljm_course[ljm_key];
+      var ljm_text;
+      if (Array.isArray(ljm_value)) {
+        ljm_text = ljm_value.join('、');
+      } else if (typeof ljm_value === 'object' && ljm_value !== null) {
+        ljm_text = JSON.stringify(ljm_value);
+      } else {
+        ljm_text = String(ljm_value);
+      }
+      return '<article class="ljm_kvCard">' +
+               '<div class="ljm_kvKey">' + ljm_key + '</div>' +
+               '<div class="ljm_kvValue">' + ljm_text + '</div>' +
+             '</article>';
+    }).join('');
+
+    var ljm_values = Object.values(ljm_course);
+    var ljm_entries = Object.entries(ljm_course);
+    var ljm_results = [
+      {
+        method: 'Object.keys()',
+        text: ljm_keys.length + ' 个键：' + ljm_keys.join('、')
+      },
+      {
+        method: 'Object.values()',
+        text: ljm_values.length + ' 个值，其中 modules 是数组、detail 是嵌套对象'
+      },
+      {
+        method: 'Object.entries()',
+        text: ljm_entries.length + ' 组键值对，例如 ' + ljm_entries[0][0] + ' → ' + ljm_entries[0][1]
+      },
+      {
+        method: 'course.detail.campus',
+        text: String(ljm_course.detail.campus) + '（通过点语法访问嵌套属性）'
+      }
+    ];
+
+    ljm_fetchResults.innerHTML = ljm_results.map(function (ljm_result) {
+      return '<article class="ljm_resultCard">' +
+               '<span class="ljm_codeTag">' + ljm_result.method + '</span>' +
+               '<p class="ljm_resultText">' + ljm_result.text + '</p>' +
+             '</article>';
+    }).join('');
+  }
+
+  function ljm_loadServerObject() {
+    ljm_setStatus('正在通过 fetch 获取服务器端对象…', '');
+    ljm_kvGrid.innerHTML = '';
+    ljm_fetchResults.innerHTML = '';
+
+    fetch(ljm_serverUrl)
+      .then(function (ljm_response) {
+        if (!ljm_response.ok) {
+          throw new Error('HTTP ' + ljm_response.status);
+        }
+        return ljm_response.json();
+      })
+      .then(function (ljm_data) {
+        ljm_renderCourse(ljm_data.course);
+        ljm_setStatus('fetch 成功：已获取服务器端对象，共 ' + Object.keys(ljm_data.course).length + ' 个属性（更新日期 ' + ljm_data.updated + '）', 'ok');
+      })
+      .catch(function (ljm_error) {
+        ljm_renderCourse(ljm_fallbackCourse);
+        ljm_setStatus('fetch 失败：' + ljm_error.message + '。若以 file:// 方式打开会受跨域限制，已启用内置演示对象；请通过本地服务器（如 Live Server）访问以获取 JSON 数据。', 'err');
+      });
+  }
+
+  ljm_reloadBtn.addEventListener('click', ljm_loadServerObject);
+  ljm_loadServerObject();
+})();
+</script>
+</body>
+</html>

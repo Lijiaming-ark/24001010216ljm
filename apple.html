@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apple 官网首页仿写 - 练习项目</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>">
+<style>
+/* ============================================================
+   重置与基础
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+               "Helvetica Neue", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  background: #fff;
+  color: #1d1d1f;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+a { text-decoration: none; color: #0066cc; }
+a:hover { text-decoration: underline; }
+
+img { max-width: 100%; display: block; }
+
+/* ============================================================
+   顶部导航栏
+   ============================================================ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-inner {
+  width: 100%;
+  max-width: 1024px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  color: #f5f5f7;
+}
+
+.nav-logo svg { width: 16px; height: 16px; fill: currentColor; }
+
+.nav-links {
+  display: none;
+  list-style: none;
+  gap: 32px;
+}
+
+.nav-links a {
+  color: #f5f5f7;
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.nav-links a:hover { opacity: 1; text-decoration: none; }
+
+.nav-icons {
+  display: flex;
+  gap: 24px;
+  color: #f5f5f7;
+}
+
+.nav-icons svg { width: 15px; height: 15px; fill: currentColor; cursor: pointer; }
+
+/* ============================================================
+   Hero 区块（大横幅）
+   ============================================================ */
+.hero {
+  padding-top: 48px; /* 避开固定导航栏 */
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero-dark {
+  background: #000;
+  color: #f5f5f7;
+}
+
+.hero-light {
+  background: #fbfbfd;
+  color: #1d1d1f;
+}
+
+.hero-content {
+  padding: 52px 22px 0;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.hero-sub {
+  font-size: 17px;
+  font-weight: 400;
+  margin-bottom: 16px;
+  color: inherit;
+}
+
+.hero-dark .hero-sub { color: #86868b; }
+.hero-light .hero-sub { color: #1d1d1f; }
+
+.hero-links {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-size: 17px;
+}
+
+.hero-links a { font-size: 17px; }
+
+/* 产品视觉占位（用渐变色块模拟产品图） */
+.hero-visual {
+  margin-top: 30px;
+  height: 380px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.hero-dark .hero-visual {
+  background: linear-gradient(180deg, transparent 0%, #1a1a2e 100%);
+}
+
+.hero-light .hero-visual {
+  background: linear-gradient(180deg, transparent 0%, #e8e8ed 100%);
+}
+
+.hero-visual .device-mock {
+  width: 220px;
+  height: 320px;
+  border-radius: 40px;
+  margin-bottom: -40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-dark .device-mock {
+  background: linear-gradient(135deg, #2c3e50 0%, #4a6378 50%, #1a1a2e 100%);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+.hero-light .device-mock {
+  background: linear-gradient(135deg, #c0c0c8 0%, #e8e8ed 50%, #a0a0a8 100%);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+}
+
+.device-mock::after {
+  content: '';
+  position: absolute;
+  top: 20px; left: 50%;
+  transform: translateX(-50%);
+  width: 80px; height: 24px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+}
+
+/* ============================================================
+   产品卡片网格
+   ============================================================ */
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.card {
+  border-radius: 18px;
+  padding: 40px 22px 0;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-white { background: #fbfbfd; color: #1d1d1f; }
+.card-black { background: #000; color: #f5f5f7; }
+
+.card-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+
+.card-sub {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.card-black .card-sub { color: #86868b; }
+.card-white .card-sub { color: #1d1d1f; }
+
+.card-links {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+}
+
+.card-visual {
+  flex: 1;
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.card-white .card-visual {
+  background: linear-gradient(180deg, transparent 0%, #e8e8ed 100%);
+  border-radius: 18px 18px 0 0;
+}
+
+.card-black .card-visual {
+  background: linear-gradient(180deg, transparent 0%, #1a1a2e 100%);
+  border-radius: 18px 18px 0 0;
+}
+
+.card-visual .mock {
+  width: 160px;
+  height: 200px;
+  border-radius: 24px;
+  margin-bottom: -20px;
+}
+
+.card-white .mock {
+  background: linear-gradient(135deg, #c0c0c8, #e8e8ed, #a0a0a8);
+}
+
+.card-black .mock {
+  background: linear-gradient(135deg, #2c3e50, #4a6378, #1a1a2e);
+}
+
+/* 特殊卡片：Apple Watch 圆形表盘 */
+.card-visual .watch-mock {
+  width: 140px;
+  height: 160px;
+  margin-bottom: -10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.watch-face {
+  width: 120px;
+  height: 140px;
+  border-radius: 40px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24, #c0392b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.watch-band-top, .watch-band-bottom {
+  width: 50px;
+  height: 20px;
+  background: #333;
+}
+
+/* ============================================================
+   页脚
+   ============================================================ */
+.footer {
+  background: #f5f5f7;
+  padding: 20px 22px;
+  font-size: 12px;
+  color: #6e6e73;
+  line-height: 1.6;
+}
+
+.footer-inner {
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.footer-disclaimer {
+  padding: 12px 0;
+  border-bottom: 1px solid #d2d2d7;
+  margin-bottom: 12px;
+}
+
+.footer-disclaimer p { margin-bottom: 8px; }
+
+.footer-columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #d2d2d7;
+}
+
+.footer-col h4 {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 8px;
+}
+
+.footer-col ul {
+  list-style: none;
+}
+
+.footer-col li {
+  margin-bottom: 5px;
+}
+
+.footer-col a {
+  color: #424245;
+  font-size: 12px;
+}
+
+.footer-col a:hover { color: #1d1d1f; }
+
+.footer-bottom {
+  padding-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.footer-bottom a { color: #424245; }
+
+.footer-copy { margin-top: 8px; width: 100%; }
+
+/* ============================================================
+   Toast 提示（替代僵尸按钮）
+   ============================================================ */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================================
+   桌面端适配（≥ 768px）
+   ============================================================ */
+@media (min-width: 768px) {
+  .nav-links { display: flex; }
+
+  .hero-title { font-size: 48px; }
+  .hero-sub { font-size: 21px; }
+  .hero-content { padding: 80px 22px 0; }
+  .hero-visual { height: 540px; }
+  .device-mock { width: 320px; height: 440px; border-radius: 50px; }
+
+  .bento-grid {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 22px;
+    gap: 12px;
+  }
+
+  .card-title { font-size: 28px; }
+  .card-sub { font-size: 16px; }
+
+  .footer-columns {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-title { font-size: 56px; }
+  .hero-content { padding: 100px 22px 0; }
+  .hero-visual { height: 620px; }
+  .device-mock { width: 380px; height: 520px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部导航栏 ===== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <!-- Apple Logo -->
+    <a href="#" class="nav-logo" onclick="showToast('返回首页'); return false;">
+      <svg viewBox="0 0 14 44" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.073 19.543c-.023-2.893 2.362-4.283 2.472-4.345-1.348-1.967-3.441-2.233-4.184-2.265-1.782-.18-3.474 1.047-4.378 1.047-.903 0-2.294-1.022-3.775-.994-1.942.03-3.733 1.13-4.735 2.873-2.018 3.492-.515 8.65 1.453 11.493.962 1.389 2.101 2.943 3.603 2.886 1.452-.058 2.003-.931 3.758-.931 1.754 0 2.255.931 3.787.913 1.555-.027 2.542-1.411 3.498-2.804 1.099-1.6 1.55-3.146 1.575-3.225-.035-.015-3.027-1.163-3.054-4.605zM10.189 11.1c.8-1.017 1.345-2.436 1.197-3.856-1.157.047-2.559.771-3.394 1.728-.743.86-1.396 2.23-1.226 3.55 1.298.099 2.626-.661 3.423-1.422z"/>
+      </svg>
+    </a>
+
+    <!-- 导航链接（桌面端显示） -->
+    <ul class="nav-links">
+      <li><a href="#" onclick="showToast('Store'); return false;">商店</a></li>
+      <li><a href="#" onclick="showToast('Mac'); return false;">Mac</a></li>
+      <li><a href="#" onclick="showToast('iPad'); return false;">iPad</a></li>
+      <li><a href="#" onclick="showToast('iPhone'); return false;">iPhone</a></li>
+      <li><a href="#" onclick="showToast('Watch'); return false;">Watch</a></li>
+      <li><a href="#" onclick="showToast('AirPods'); return false;">AirPods</a></li>
+      <li><a href="#" onclick="showToast('TV &amp; 家居'); return false;">TV 和家居</a></li>
+      <li><a href="#" onclick="showToast('配件'); return false;">配件</a></li>
+      <li><a href="#" onclick="showToast('技术支持'); return false;">技术支持</a></li>
+    </ul>
+
+    <!-- 右侧图标：搜索 + 购物袋 -->
+    <div class="nav-icons">
+      <svg viewBox="0 0 15 44" onclick="showToast('搜索')" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14.298 27.202l-3.87-3.87a6.08 6.08 0 0 0 .652-2.744A6.1 6.1 0 1 0 4.98 26.69a6.08 6.08 0 0 0 2.744-.652l3.87 3.87a.866.866 0 0 0 1.225 0l1.48-1.48a.866.866 0 0 0 0-1.226zM6.1 24.9a4.293 4.293 0 1 1 0-8.586 4.293 4.293 0 0 1 0 8.586z"/>
+      </svg>
+      <svg viewBox="0 0 14 44" onclick="showToast('购物袋')" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11.353 16.03h-1.446V14.56a2.907 2.907 0 0 0-2.906-2.906H6.999a2.907 2.907 0 0 0-2.906 2.906v1.47H2.646V14.56a4.358 4.358 0 0 1 4.353-4.353h.002a4.358 4.358 0 0 1 4.353 4.353v1.47zM3.184 18.16h7.632l.762 7.632a.866.866 0 0 1-.866.951H3.288a.866.866 0 0 1-.866-.95l.762-7.633zM2.5 16.03l-1.148 7.632a2.6 2.6 0 0 0 2.587 2.856h6.922a2.6 2.6 0 0 0 2.587-2.856L12.3 16.03H2.5z"/>
+      </svg>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== Hero 1: iPhone（深色背景） ===== -->
+<section class="hero hero-dark">
+  <div class="hero-content">
+    <h1 class="hero-title">iPhone 16 Pro</h1>
+    <p class="hero-sub">你好，黄金尺寸。</p>
+    <div class="hero-links">
+      <a href="#" onclick="showToast('了解更多 iPhone 16 Pro'); return false;">了解更多 &gt;</a>
+      <a href="#" onclick="showToast('购买 iPhone 16 Pro'); return false;">购买 &gt;</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="device-mock"></div>
+  </div>
+</section>
+
+<!-- ===== Hero 2: MacBook Air（浅色背景） ===== -->
+<section class="hero hero-light">
+  <div class="hero-content">
+    <h2 class="hero-title">MacBook Air</h2>
+    <p class="hero-sub">轻巧本色，实力登场。</p>
+    <div class="hero-links">
+      <a href="#" onclick="showToast('了解更多 MacBook Air'); return false;">了解更多 &gt;</a>
+      <a href="#" onclick="showToast('购买 MacBook Air'); return false;">购买 &gt;</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="device-mock" style="width:340px;height:220px;border-radius:16px;"></div>
+  </div>
+</section>
+
+<!-- ===== 产品卡片网格（2列） ===== -->
+<section class="bento-grid">
+
+  <!-- iPad Pro -->
+  <div class="card card-white">
+    <h3 class="card-title">iPad Pro</h3>
+    <p class="card-sub">极致性能，轻薄随行。</p>
+    <div class="card-links">
+      <a href="#" onclick="showToast('了解更多 iPad Pro'); return false;">了解更多 &gt;</a>
+      <a href="#" onclick="showToast('购买 iPad Pro'); return false;">购买 &gt;</a>
+    </div>
+    <div class="card-visual">
+      <div class="mock"></div>
+    </div>
+  </div>
+
+  <!-- Apple Watch（黑色背景） -->
+  <div class="card card-black">
+    <h3 class="card-title">Apple Watch Series 10</h3>
+    <p class="card-sub">更大屏幕，更健康陪伴。</p>
+    <div class="card-links">
+      <a href="#" onclick="showToast('了解更多 Apple Watch'); return false;">了解更多 &gt;</a>
+      <a href="#" onclick="showToast('购买 Apple Watch'); return false;">购买 &gt;</a>
+    </div>
+    <div class="card-visual">
+      <div class="watch-mock">
+        <div class="watch-band-top"></div>
+        <div class="watch-face">10:09</div>
+        <div class="watch-band-bottom"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AirPods Pro -->
+  <div class="card card-white">
+    <h3 class="card-title">AirPods Pro 2</h3>
+    <p class="card-sub">自适应音频，静享沉浸。</p>
+    <div class="card-links">
+      <a href="#" onclick="showToast('了解更多 AirPods Pro'); return false;">了解更多 &gt;</a>
+      <a href="#" onclick="showToast('购买 AirPods Pro'); return false;">购买 &gt;</a>
+    </div>
+    <div class="card-visual">
+      <div class="mock" style="width:180px;height:120px;border-radius:60px;"></div>
+    </div>
+  </div>
+
+  <!-- iPhone 16（黑色背景） -->
+  <div class="card card-black">
+    <h3 class="card-title">iPhone 16</h3>
+    <p class="card-sub">精彩，一拍即合。</p>
+    <div class="card-links">
+      <a href="#" onclick="showToast('了解更多 iPhone 16'); return false;">了解更多 &gt;</a>
+      <a href="#" onclick="showToast('购买 iPhone 16'); return false;">购买 &gt;</a>
+    </div>
+    <div class="card-visual">
+      <div class="mock" style="width:140px;height:220px;border-radius:32px;"></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===== 页脚 ===== -->
+<footer class="footer">
+  <div class="footer-inner">
+
+    <!-- 免责声明 -->
+    <div class="footer-disclaimer">
+      <p>* 本页面为学习仿写练习项目，与 Apple Inc. 无关，所有产品名称和商标归其各自所有者。</p>
+      <p>1. 显示部在弯曲边缘处采用圆角设计。按矩形测量，显示屏对角线长度为 6.27 英寸（iPhone 16 Pro）或 6.12 英寸（iPhone 16）。实际可视区域略小。</p>
+    </div>
+
+    <!-- 多列链接 -->
+    <div class="footer-columns">
+      <div class="footer-col">
+        <h4>选购和了解</h4>
+        <ul>
+          <li><a href="#" onclick="showToast('商店'); return false;">商店</a></li>
+          <li><a href="#" onclick="showToast('Mac'); return false;">Mac</a></li>
+          <li><a href="#" onclick="showToast('iPad'); return false;">iPad</a></li>
+          <li><a href="#" onclick="showToast('iPhone'); return false;">iPhone</a></li>
+          <li><a href="#" onclick="showToast('Watch'); return false;">Watch</a></li>
+          <li><a href="#" onclick="showToast('AirPods'); return false;">AirPods</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>账户</h4>
+        <ul>
+          <li><a href="#" onclick="showToast('管理你的 Apple 账户'); return false;">管理你的 Apple 账户</a></li>
+          <li><a href="#" onclick="showToast('Apple Store 账户'); return false;">Apple Store 账户</a></li>
+          <li><a href="#" onclick="showToast('iCloud.com'); return false;">iCloud.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Apple 商店</h4>
+        <ul>
+          <li><a href="#" onclick="showToast('查找零售店'); return false;">查找零售店</a></li>
+          <li><a href="#" onclick="showToast('Genius Bar 天才吧'); return false;">Genius Bar 天才吧</a></li>
+          <li><a href="#" onclick="showToast('Today at Apple'); return false;">Today at Apple</a></li>
+          <li><a href="#" onclick="showToast('Apple 夏令营'); return false;">Apple 夏令营</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>关于 Apple</h4>
+        <ul>
+          <li><a href="#" onclick="showToast('Apple 新闻中心'); return false;">Apple 新闻中心</a></li>
+          <li><a href="#" onclick="showToast('Apple 管理层'); return false;">Apple 管理层</a></li>
+          <li><a href="#" onclick="showToast('工作机会'); return false;">工作机会</a></li>
+          <li><a href="#" onclick="showToast('投资者关系'); return false;">投资者关系</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>品牌专区</h4>
+        <ul>
+          <li><a href="#" onclick="showToast('Accessories'); return false;">配件</a></li>
+          <li><a href="#" onclick="showToast('Gift Cards'); return false;">礼品卡</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 底部法律信息 -->
+    <div class="footer-bottom">
+      <span>更多选购方式：</span>
+      <a href="#" onclick="showToast('查找你附近的 Apple 零售店'); return false;">查找你附近的 Apple 零售店</a>
+      <span>，或致电 400-666-8800。</span>
+      <div class="footer-copy">
+        <p>Copyright © 2026 Apple Inc. 保留所有权利。本页面仅用于学习练习。</p>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<!-- ===== Toast 提示组件 ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Toast 提示：所有导航/按钮点击都触发这里，避免僵尸按钮
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = '【练习演示】' + msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 1800);
+}
+</script>
