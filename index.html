@@ -1,68 +1,56 @@
 <!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-02
+  功能名称：项目首页（汇总本目录全部 HTML 页面链接）
+-->
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>袁磊的《高级网页设计》课堂实践</title>
+    <title>李佳明的网页作品索引</title>
     <style>
-      :root {
-        --bg-1: #f5efe8;
-        --bg-2: #e7d8c3;
-        --panel: rgba(255, 255, 255, 0.82);
-        --panel-strong: rgba(255, 248, 240, 0.96);
-        --line: rgba(126, 96, 70, 0.18);
-        --text: #2c201a;
-        --muted: #695548;
-        --primary: #8b5d36;
-        --primary-deep: #5b3822;
-        --secondary: #d98d5f;
-        --accent: #c44b3a;
-        --shadow: rgba(75, 45, 24, 0.16);
-      }
-
       * { box-sizing: border-box; }
 
       body {
         margin: 0;
         font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
-        color: var(--text);
-        background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+        color: #2c201a;
+        background: linear-gradient(135deg, #f5efe8, #e7d8c3);
         min-height: 100vh;
       }
 
-      .container {
+      .ljm_container {
         width: min(1180px, calc(100% - 32px));
         margin: 0 auto;
         padding: 38px 0 60px;
       }
 
-      .hero {
+      /* ===== Hero ===== */
+      .ljm_hero {
         position: relative;
         background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,244,234,0.88));
-        border: 1px solid var(--line);
+        border: 1px solid rgba(126,96,70,0.18);
         border-radius: 28px;
-        box-shadow: 0 18px 40px var(--shadow);
+        box-shadow: 0 18px 40px rgba(75, 45, 24, 0.16);
         padding: 36px 32px 28px;
         overflow: hidden;
       }
 
-      .hero::before {
+      .ljm_hero::before {
         content: "";
         position: absolute;
         inset: 0;
         background: linear-gradient(120deg, rgba(139,93,54,0.08), rgba(196,75,58,0.07), transparent 62%);
       }
 
-      .hero > * {
-        position: relative;
-        z-index: 1;
-      }
+      .ljm_hero > * { position: relative; z-index: 1; }
 
-      .badge {
+      .ljm_badge {
         display: inline-block;
         background: rgba(217, 141, 95, 0.18);
         border: 1px solid rgba(139,93,54,0.2);
-        color: var(--primary-deep);
+        color: #5b3822;
         border-radius: 999px;
         padding: 9px 18px;
         font-size: 12px;
@@ -74,124 +62,146 @@
 
       h1 {
         margin: 0;
-        font-size: clamp(2.1rem, 4vw, 4rem);
+        font-size: clamp(2.1rem, 4vw, 3.4rem);
         line-height: 1.2;
         letter-spacing: 1px;
       }
 
-      .subtitle {
+      .ljm_subtitle {
         margin: 18px 0 0;
-        color: var(--muted);
+        color: #695548;
         font-size: 1.04rem;
         line-height: 1.9;
-        max-width: 820px;
+        max-width: 860px;
       }
 
-      .meta {
+      .ljm_meta {
         margin-top: 22px;
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
       }
 
-      .meta-item {
+      .ljm_metaItem {
         padding: 10px 16px;
         border-radius: 12px;
-        border: 1px solid var(--line);
-        background: var(--panel-strong);
-        color: var(--text);
+        border: 1px solid rgba(126,96,70,0.18);
+        background: rgba(255,248,240,0.96);
         font-size: 0.95rem;
       }
 
-      .section {
+      /* ===== Section ===== */
+      .ljm_section {
         margin-top: 28px;
-        border: 1px solid var(--line);
+        border: 1px solid rgba(126,96,70,0.18);
         background: rgba(255,255,255,0.74);
         box-shadow: 0 14px 24px rgba(75,45,24,0.06);
         border-radius: 24px;
         padding: 28px 22px 20px;
       }
 
-      .section h2 {
+      .ljm_section h2 {
         margin: 0 0 18px;
-        color: var(--primary-deep);
+        color: #5b3822;
         font-size: clamp(1.5rem, 2vw, 2.1rem);
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
 
-      .grid {
+      .ljm_section h2 .ljm_secDot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8b5d36, #d98d5f);
+      }
+
+      /* ===== Grid ===== */
+      .ljm_grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 18px;
       }
 
-      .card {
+      .ljm_card {
         background: linear-gradient(180deg, #fff, #fffaf5);
         border-radius: 18px;
-        border: 1px solid var(--line);
+        border: 1px solid rgba(126,96,70,0.18);
         box-shadow: 0 10px 18px rgba(75,45,24,0.04);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
 
-      .card:hover {
+      .ljm_card:hover {
         transform: translateY(-4px);
         box-shadow: 0 18px 28px rgba(75,45,24,0.12);
       }
 
-      .card a {
+      .ljm_card a {
         display: block;
         padding: 18px 18px 16px;
-        color: var(--text);
+        color: #2c201a;
         text-decoration: none;
       }
 
-      .card-top {
+      .ljm_cardTop {
         display: flex;
         justify-content: space-between;
         align-items: center;
         font-size: 12px;
         letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: var(--accent);
+        color: #c44b3a;
         font-weight: 700;
         margin-bottom: 18px;
       }
 
-      .dot {
+      .ljm_dot {
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        background: linear-gradient(135deg, #8b5d36, #d98d5f);
       }
 
-      .card h3 {
+      .ljm_card h3 {
         margin: 0 0 10px;
-        font-size: 1.12rem;
+        font-size: 1.08rem;
       }
 
-      .card p {
+      .ljm_card p {
         margin: 0;
-        color: var(--muted);
+        color: #695548;
         line-height: 1.8;
         font-size: 0.92rem;
       }
 
-      .prompt-box {
+      .ljm_tag {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        background: rgba(217, 141, 95, 0.18);
+        color: #8b5d36;
+      }
+
+      /* ===== Prompt ===== */
+      .ljm_prompt {
         background: linear-gradient(135deg, #fffaf4, #fff);
-        border-left: 5px solid var(--primary);
+        border-left: 5px solid #8b5d36;
         border-radius: 16px;
         border: 1px solid rgba(139,93,54,0.18);
         padding: 20px 18px;
       }
 
-      .prompt-box h3 {
+      .ljm_prompt h3 {
         margin: 0 0 12px;
-        color: var(--primary-deep);
+        color: #5b3822;
         font-size: 1.06rem;
       }
 
-      .prompt-box p {
+      .ljm_prompt p {
         margin: 0;
-        color: var(--muted);
+        color: #695548;
         line-height: 1.9;
         font-size: 0.96rem;
       }
@@ -199,133 +209,224 @@
       footer {
         margin-top: 28px;
         text-align: center;
-        color: var(--muted);
+        color: #695548;
         font-size: 0.9rem;
         letter-spacing: 0.08em;
       }
 
       @media (max-width: 640px) {
-        .hero, .section {
-          padding-left: 18px;
-          padding-right: 18px;
-        }
-
-        .meta {
-          flex-direction: column;
-        }
+        .ljm_hero, .ljm_section { padding-left: 18px; padding-right: 18px; }
+        .ljm_meta { flex-direction: column; }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <header class="hero">
-        <div class="badge">高级网页设计</div>
-        <h1>袁磊的《高级网页设计》课堂实践</h1>
-        <p class="subtitle">
-          本目录汇总了所有课程实践页面，覆盖基础 HTML、表单设计、CSS 样式、盒模型、层叠继承与页面排版等知识点。
-          本首页使用原生 HTML + CSS 构建，未引用任何 CDN 资源，适合直接在浏览器中打开查看。
+    <div class="ljm_container">
+
+      <!-- Hero -->
+      <header class="ljm_hero">
+        <div class="ljm_badge">Li Jiaming · Web Practice</div>
+        <h1>李佳明的网页作品索引</h1>
+        <p class="ljm_subtitle">
+          本页面汇总了项目目录中的全部 HTML 课程实践，覆盖 HTML 基础结构、CSS 样式、盒模型与排版、JavaScript 数据类型、数组与对象、
+          JSON 解析、跨域接口调用、列表与列表详情、定时器以及 Promise / async-await 异步流程等知识点。
+          全部使用原生 HTML + CSS + JavaScript 实现，无 CDN 依赖。
         </p>
-        <div class="meta">
-          <div class="meta-item">主题：袁磊</div>
-          <div class="meta-item">课程：高级网页设计</div>
-          <div class="meta-item">技术：原生代码</div>
+        <div class="ljm_meta">
+          <div class="ljm_metaItem">姓名：李佳明</div>
+          <div class="ljm_metaItem">技术栈：原生代码</div>
+          <div class="ljm_metaItem">页面总数：27</div>
         </div>
       </header>
 
-      <section class="section">
-        <h2>网页作品索引</h2>
-        <div class="grid">
-          <article class="card">
-            <a href="./index.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>首页</span><span class="dot"></span></div>
-              <h3>index.html</h3>
-              <p>当前作品索引页，汇总本目录中全部网页链接与课程实践说明。</p>
-            </a>
-          </article>
+      <!-- HTML / CSS 基础 -->
+      <section class="ljm_section">
+        <h2><span class="ljm_secDot"></span>HTML / CSS 基础</h2>
+        <div class="ljm_grid">
+          <article class="ljm_card"><a href="./2.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>HTML 01</span><span class="ljm_dot"></span></div>
+            <h3>2.html</h3><p>HTML 基础结构与常见元素展示：标题、段落、列表等课程练习。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./2.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 01</span><span class="dot"></span></div>
-              <h3>2.html</h3>
-              <p>HTML 基础结构与常见元素展示：标题、段落、列表等课程练习。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./2-2html.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>HTML 02</span><span class="ljm_dot"></span></div>
+            <h3>2-2html.html</h3><p>超链接、图像引用、表格构建与页面中图片链接综合实践。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./2-2html.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 02</span><span class="dot"></span></div>
-              <h3>2-2html.html</h3>
-              <p>超链接、图像引用、表格构建与页面中图片链接综合实践。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./3-1.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>HTML 03</span><span class="ljm_dot"></span></div>
+            <h3>3-1.html</h3><p>表单元素训练：文本框、单选、多选、下拉和文件上传实践。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./3-1.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 03</span><span class="dot"></span></div>
-              <h3>3-1.html</h3>
-              <p>表单元素训练：文本框、单选、多选、下拉和文件上传实践。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./3-2html.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>CSS 01</span><span class="ljm_dot"></span></div>
+            <h3>3-2html.html</h3><p>CSS 样式设计与选择器应用，组合文本和布局表现效果。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./3-2html.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 04</span><span class="dot"></span></div>
-              <h3>3-2html.html</h3>
-              <p>CSS 样式设计与选择器应用，组合文本和布局表现效果。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./4-1css2html.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>CSS 02</span><span class="ljm_dot"></span></div>
+            <h3>4-1css2html.html</h3><p>CSS 结合 HTML 结构进行页面美化与内容布局的进一步实践。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./4-1css2html.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 05</span><span class="dot"></span></div>
-              <h3>4-1css2html.html</h3>
-              <p>CSS 结合 HTML 结构进行页面美化与内容布局的进一步实践。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./5-1层叠与继承.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>CSS 03</span><span class="ljm_dot"></span></div>
+            <h3>5-1层叠与继承.html</h3><p>深入理解 CSS 层叠顺序与继承机制，体验样式优先级作用。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./5-1层叠与继承.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 06</span><span class="dot"></span></div>
-              <h3>5-1层叠与继承.html</h3>
-              <p>深入理解 CSS 层叠顺序与继承机制，体验样式优先级作用。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./5-2盒子模型.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>CSS 04</span><span class="ljm_dot"></span></div>
+            <h3>5-2盒子模型.html</h3><p>盒模型基础练习：边距、边框、内边距与元素空间控制。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./5-2盒子模型.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 07</span><span class="dot"></span></div>
-              <h3>5-2盒子模型.html</h3>
-              <p>盒模型基础练习，包括边距、边框、内边距与元素空间控制。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./7-1上图下文.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>排版 01</span><span class="ljm_dot"></span></div>
+            <h3>7-1上图下文.html</h3><p>上图下文排版设计，强调图片与正文的视觉层次和组合关系。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./7-1上图下文.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 08</span><span class="dot"></span></div>
-              <h3>7-1上图下文.html</h3>
-              <p>上图下文排版设计，强调图片与正文的视觉层次和组合关系。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./7-2左图右文.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>排版 02</span><span class="ljm_dot"></span></div>
+            <h3>7-2左图右文.html</h3><p>左图右文布局练习，常用于图文展示类页面的内容结构设计。</p>
+          </a></article>
 
-          <article class="card">
-            <a href="./7-2左图右文.html" target="_blank" rel="noopener noreferrer">
-              <div class="card-top"><span>作品 09</span><span class="dot"></span></div>
-              <h3>7-2左图右文.html</h3>
-              <p>左图右文布局练习，常用于图文展示类页面的内容结构设计。</p>
-            </a>
-          </article>
+          <article class="ljm_card"><a href="./8-1css选择器.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>CSS 05</span><span class="ljm_dot"></span></div>
+            <h3>8-1css选择器.html</h3><p>CSS 选择器综合练习：后代、子元素、伪类、伪元素等。</p>
+          </a></article>
         </div>
       </section>
 
-      <section class="section">
-        <h2>本提示词</h2>
-        <div class="prompt-box">
-          <h3>提示词原文</h3>
-          <p>创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为袁磊的《高级网页设计》课堂实践，美化页面，页面中包括本提示词。</p>
+      <!-- JavaScript 基础 -->
+      <section class="ljm_section">
+        <h2><span class="ljm_secDot"></span>JavaScript 基础</h2>
+        <div class="ljm_grid">
+          <article class="ljm_card"><a href="./13-1.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch13</span><span class="ljm_dot"></span></div>
+            <h3>13-1.html</h3><p>Font Awesome 字体图标演示。</p>
+          </a></article>
+
+          <article class="ljm_card"><a href="./13-2.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch13</span><span class="ljm_dot"></span></div>
+            <h3>13-2.html</h3><p>字体图标样式与交互练习。</p>
+          </a></article>
+
+          <article class="ljm_card"><a href="./13-3.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch13</span><span class="ljm_dot"></span></div>
+            <h3>13-3.html</h3><p>字体图标综合应用页面。</p>
+          </a></article>
+
+          <article class="ljm_card"><a href="./13-4.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch13</span><span class="ljm_dot"></span></div>
+            <h3>13-4.html</h3><p>图标与页面布局结合练习。</p>
+          </a></article>
+
+          <article class="ljm_card"><a href="./14-1.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch14</span><span class="ljm_dot"></span></div>
+            <h3>14-1.html</h3><p>JavaScript 基础语法入口页。</p>
+          </a></article>
+
+          <article class="ljm_card"><a href="./14-2.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch14 · 数据类型</span><span class="ljm_dot"></span></div>
+            <h3>14-2.html</h3><p>演示 JavaScript 六种基本数据类型：number、string、boolean、undefined、null、symbol。</p>
+            <span class="ljm_tag">fetch · JSON</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./16-1.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch16 · 数组</span><span class="ljm_dot"></span></div>
+            <h3>16-1.html</h3><p>展示 JavaScript 数组的 16 种常用方法，带分类筛选与交互示例。</p>
+            <span class="ljm_tag">fetch · JSON</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./16-2.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch16 · 对象</span><span class="ljm_dot"></span></div>
+            <h3>16-2.html</h3><p>展示 JavaScript 对象：5 种创建方式、8 个 Object API、属性增删交互。</p>
+            <span class="ljm_tag">fetch · JSON</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./16-3.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch16 · 复刻</span><span class="ljm_dot"></span></div>
+            <h3>16-3.html</h3><p>复刻微信网页版登录页，Canvas 绘制二维码，iconfont 刷新遮罩。</p>
+            <span class="ljm_tag">fetch · JSON · iconfont</span>
+          </a></article>
         </div>
       </section>
 
-      <footer>袁磊 · 高级网页设计课堂实践 · 原生 HTML + CSS</footer>
+      <!-- JSON / 接口 / 异步 -->
+      <section class="ljm_section">
+        <h2><span class="ljm_secDot"></span>JSON · 接口 · 异步</h2>
+        <div class="ljm_grid">
+          <article class="ljm_card"><a href="./17-1.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch17 · JSON</span><span class="ljm_dot"></span></div>
+            <h3>17-1.html</h3><p>展示 JSON 数据格式：语法规则、6 种值、合法与非法对比、parse / stringify 交互。</p>
+            <span class="ljm_tag">fetch · JSON</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./17-2.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch17 · 接口</span><span class="ljm_dot"></span></div>
+            <h3>17-2.html</h3><p>fetch 请求 DummyJSON 跨域接口，渲染商品卡片并展示状态与耗时。</p>
+            <span class="ljm_tag">fetch · CORS</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./17-3.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch17 · 列表</span><span class="ljm_dot"></span></div>
+            <h3>17-3.html</h3><p>商品列表页，请求 /products?limit=8 并用 a 标签链接到详情页。</p>
+            <span class="ljm_tag">fetch · 列表跳转</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./17-3-detail.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch17 · 详情</span><span class="ljm_dot"></span></div>
+            <h3>17-3-detail.html</h3><p>列表详情页，从 URL 读取 id，请求 /products/{id}，含缩略图切换与原始 JSON 折叠面板。</p>
+            <span class="ljm_tag">URLSearchParams</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./17-4.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch17 · 接口测试</span><span class="ljm_dot"></span></div>
+            <h3>17-4.html</h3><p>通用接口测试控制台：支持 GET / POST / PUT / PATCH / DELETE / HEAD，Body / Headers / Raw 三标签切换，历史记录。</p>
+            <span class="ljm_tag">fetch · Promise</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./17-5.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch17 · 定时器</span><span class="ljm_dot"></span></div>
+            <h3>17-5.html</h3><p>两种定时器演示：时钟、LED 闪烁、setTimeout 递归倒计时、延时提示、自动递增（带先 clear 再启动防重入）。</p>
+            <span class="ljm_tag">setInterval · setTimeout</span>
+          </a></article>
+
+          <article class="ljm_card"><a href="./17-6.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>Ch17 · Promise</span><span class="ljm_dot"></span></div>
+            <h3>17-6.html</h3><p>Promise + async/await 包饺子流程：买原料 → Promise.all 并行和面+和馅 → 包饺子 → 吃饺子，带可视化节点、进度条和时间轴。</p>
+            <span class="ljm_tag">async/await · Promise.all</span>
+          </a></article>
+        </div>
+      </section>
+
+      <!-- 综合页面 -->
+      <section class="ljm_section">
+        <h2><span class="ljm_secDot"></span>综合页面</h2>
+        <div class="ljm_grid">
+          <article class="ljm_card"><a href="./apple.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>综合</span><span class="ljm_dot"></span></div>
+            <h3>apple.html</h3><p>Apple 风格综合页面，HTML + CSS + 少量 JS 交互。</p>
+          </a></article>
+
+          <article class="ljm_card"><a href="./Apple风格导航栏.html" target="_blank" rel="noopener noreferrer">
+            <div class="ljm_cardTop"><span>综合</span><span class="ljm_dot"></span></div>
+            <h3>Apple风格导航栏.html</h3><p>Apple 风格导航栏专项练习。</p>
+          </a></article>
+        </div>
+      </section>
+
+      <section class="ljm_section">
+        <div class="ljm_prompt">
+          <h3>说明</h3>
+          <p>
+            本首页汇总了项目目录 <code>d:\wangye\新建文件夹</code> 下全部 27 个 HTML 页面。
+            所有链接以新标签页打开，页面本身使用原生 HTML + CSS 构建，未引用任何 CDN 资源。
+            其中第 17 章涉及 fetch 跨域接口的页面（17-1 到 17-6）需要通过 HTTP 访问（如 <code>python -m http.server</code>），
+            不能直接用 <code>file://</code> 打开，否则浏览器会拦截跨域 fetch 请求。
+          </p>
+        </div>
+      </section>
+
+      <footer>李佳明 · 网页作品索引 · 原生 HTML + CSS</footer>
     </div>
   </body>
 </html>
