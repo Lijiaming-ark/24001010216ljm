@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-05
+  功能名称：ECharts 饼图与雷达图（本地 cdn/echarts.min.js）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECharts 饼图与雷达图 - 李佳明</title>
+<script src="cdn/echarts.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #1c2430, #232f3d 55%, #1a222d);
+    font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    color: #eef3fa;
+  }
+
+  .ljm_wrap {
+    width: min(1240px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 34px 0 50px;
+  }
+
+  .ljm_head { text-align: center; margin-bottom: 26px; }
+
+  .ljm_head h1 {
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, #f78fb3, #f5cd79, #78e08f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .ljm_head p { margin-top: 10px; color: #9fb0c6; font-size: 14px; }
+
+  .ljm_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+    gap: 22px;
+  }
+
+  .ljm_card {
+    border-radius: 20px;
+    border: 1px solid rgba(160, 180, 210, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+  }
+
+  .ljm_cardHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 0;
+  }
+
+  .ljm_cardHead h2 {
+    font-size: 17px;
+    color: #f0f5fc;
+    letter-spacing: 1px;
+  }
+
+  .ljm_cardHead h2 span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: 1px;
+  }
+
+  .ljm_src {
+    font-size: 12px;
+    color: #7f93ad;
+  }
+
+  .ljm_chart { width: 100%; height: 440px; }
+
+  .ljm_fallback {
+    display: none;
+    margin: 30px auto;
+    max-width: 700px;
+    padding: 18px 22px;
+    border-radius: 12px;
+    background: rgba(231, 76, 60, 0.12);
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    color: #ffb3ab;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .ljm_tips { margin-top: 20px; text-align: center; color: #7f93ad; font-size: 13px; line-height: 1.9; }
+</style>
+</head>
+<body>
+<div class="ljm_wrap">
+
+  <header class="ljm_head">
+    <h1>ECharts 图表演示</h1>
+    <p>饼图（Customized Pie）与雷达图（AQI 城市空气质量）· ECharts 5 已下载至本地 cdn 目录</p>
+  </header>
+
+  <div class="ljm_fallback" id="ljm_fallback">
+    ECharts 加载失败：请确认 <code>cdn/echarts.min.js</code> 存在，并通过 HTTP 服务访问本页面。
+  </div>
+
+  <div class="ljm_grid">
+    <div class="ljm_card">
+      <div class="ljm_cardHead">
+        <h2><span style="background:#f78fb3"></span>饼图 · Customized Pie</h2>
+        <span class="ljm_src">c=pie-custom</span>
+      </div>
+      <div class="ljm_chart" id="ljm_pieChart"></div>
+    </div>
+
+    <div class="ljm_card">
+      <div class="ljm_cardHead">
+        <h2><span style="background:#78e08f"></span>雷达图 · AQI 城市空气质量</h2>
+        <span class="ljm_src">c=radar-aqi</span>
+      </div>
+      <div class="ljm_chart" id="ljm_radarChart"></div>
+    </div>
+  </div>
+
+  <p class="ljm_tips">
+    复刻 ECharts 官方示例：pie-custom 与 radar-aqi · 鼠标悬停图块查看数值，点击图例可切换显示
+  </p>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  if (typeof echarts === 'undefined') {
+    document.getElementById('ljm_fallback').style.display = 'block';
+    return;
+  }
+
+  /* ===== 饼图：复刻官方示例 pie-custom ===== */
+  var ljm_pieChart = echarts.init(document.getElementById('ljm_pieChart'));
+  var ljm_pieOption = {
+    backgroundColor: 'transparent',
+    title: {
+      text: 'Customized Pie',
+      left: 'center',
+      top: 16,
+      textStyle: { color: '#ccc' }
+    },
+    tooltip: { trigger: 'item' },
+    visualMap: {
+      show: false,
+      min: 80,
+      max: 600,
+      inRange: { colorLightness: [0, 1] }
+    },
+    series: [{
+      name: 'Access From',
+      type: 'pie',
+      radius: '55%',
+      center: ['50%', '52%'],
+      data: [
+        { value: 335, name: 'Direct' },
+        { value: 310, name: 'Email' },
+        { value: 274, name: 'Union Ads' },
+        { value: 235, name: 'Video Ads' },
+        { value: 400, name: 'Search Engine' }
+      ].sort(function (ljm_a, ljm_b) { return ljm_a.value - ljm_b.value; }),
+      roseType: 'radius',
+      label: { color: 'rgba(230, 236, 245, 0.5)' },
+      labelLine: {
+        lineStyle: { color: 'rgba(230, 236, 245, 0.4)' },
+        smooth: 0.2,
+        length: 10,
+        length2: 20
+      },
+      itemStyle: {
+        color: '#c23531',
+        shadowBlur: 200,
+        shadowColor: 'rgba(0, 0, 0, 0.5)'
+      },
+      animationType: 'scale',
+      animationEasing: 'elasticOut',
+      animationDelay: function () { return Math.random() * 200; }
+    }]
+  };
+  ljm_pieChart.setOption(ljm_pieOption);
+
+  /* ===== 雷达图：复刻官方示例 radar-aqi ===== */
+  var ljm_radarChart = echarts.init(document.getElementById('ljm_radarChart'));
+  var ljm_lineStyle = { normal: { width: 1, opacity: 0.5 } };
+  var ljm_radarOption = {
+    backgroundColor: 'transparent',
+    title: {
+      text: 'AQI - 雷达图',
+      left: 'center',
+      top: 16,
+      textStyle: { color: '#eee' }
+    },
+    legend: {
+      bottom: 10,
+      data: ['北京', '上海', '广州'],
+      itemGap: 20,
+      textStyle: { color: '#fff', fontSize: 14 }
+    },
+    tooltip: { trigger: 'item' },
+    radar: {
+      center: ['50%', '52%'],
+      radius: '62%',
+      indicator: [
+        { name: 'AQI', max: 300 },
+        { name: 'PM2.5', max: 250 },
+        { name: 'PM10', max: 300 },
+        { name: 'CO', max: 5 },
+        { name: 'NO2', max: 200 },
+        { name: 'SO2', max: 100 }
+      ],
+      shape: 'circle',
+      splitNumber: 5,
+      axisName: { color: 'rgb(238, 197, 102)' },
+      splitLine: {
+        lineStyle: {
+          color: [
+            'rgba(238, 197, 102, 0.1)', 'rgba(238, 197, 102, 0.2)',
+            'rgba(238, 197, 102, 0.4)', 'rgba(238, 197, 102, 0.6)',
+            'rgba(238, 197, 102, 0.8)', 'rgba(238, 197, 102, 1)'
+          ].reverse()
+        }
+      },
+      splitArea: { show: false },
+      axisLine: { lineStyle: { color: 'rgba(238, 197, 102, 0.5)' } }
+    },
+    series: [{
+      name: '城市空气质量',
+      type: 'radar',
+      lineStyle: ljm_lineStyle.normal,
+      data: [
+        {
+          value: [55, 9, 56, 0.46, 18, 6],
+          name: '北京',
+          symbol: 'rect',
+          symbolSize: 5,
+          itemStyle: { color: '#f9713c' },
+          lineStyle: { color: '#f9713c' },
+          areaStyle: { color: 'rgba(249, 113, 60, 0.25)' }
+        },
+        {
+          value: [25, 11, 21, 0.65, 34, 9],
+          name: '上海',
+          symbolSize: 5,
+          itemStyle: { color: '#b3e4a1' },
+          lineStyle: { color: '#b3e4a1' },
+          areaStyle: { color: 'rgba(179, 228, 161, 0.25)' }
+        },
+        {
+          value: [23, 10, 20, 0.5, 30, 8],
+          name: '广州',
+          symbolSize: 5,
+          itemStyle: { color: '#5bc0de' },
+          lineStyle: { color: '#5bc0de' },
+          areaStyle: { color: 'rgba(91, 192, 222, 0.25)' }
+        }
+      ]
+    }]
+  };
+  ljm_radarChart.setOption(ljm_radarOption);
+
+  /* 窗口缩放自适应 */
+  window.addEventListener('resize', function () {
+    ljm_pieChart.resize();
+    ljm_radarChart.resize();
+  });
+})();
+</script>
+</body>
+</html>

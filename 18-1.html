@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-05
+  功能名称：Canvas 粒子文字动画
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas 粒子文字动画 - 李佳明</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 30% 20%, #1b2740 0%, #0b1220 60%, #05080f 100%);
+    font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    color: #e8eefc;
+    overflow-x: hidden;
+  }
+
+  .ljm_wrap {
+    width: min(1100px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 34px 0 50px;
+  }
+
+  .ljm_head {
+    text-align: center;
+    margin-bottom: 22px;
+  }
+
+  .ljm_head h1 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, #6ab7ff, #a98bff, #ff8bd1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .ljm_head p {
+    margin-top: 10px;
+    color: #8fa3c8;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+
+  .ljm_stage {
+    position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid rgba(120, 150, 220, 0.25);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 0 80px rgba(80, 120, 255, 0.06);
+    background: rgba(8, 14, 28, 0.7);
+  }
+
+  #ljm_canvas {
+    display: block;
+    width: 100%;
+    height: 520px;
+    cursor: crosshair;
+  }
+
+  .ljm_toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .ljm_btn {
+    border: 1px solid rgba(130, 160, 230, 0.4);
+    background: rgba(20, 32, 58, 0.85);
+    color: #cfe0ff;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
+    font-family: inherit;
+  }
+
+  .ljm_btn:hover {
+    transform: translateY(-2px);
+    background: rgba(60, 90, 160, 0.85);
+    box-shadow: 0 8px 20px rgba(70, 110, 220, 0.35);
+  }
+
+  .ljm_btn--active {
+    background: linear-gradient(90deg, #3d6fe0, #7a5cff);
+    border-color: transparent;
+  }
+
+  .ljm_tips {
+    margin-top: 18px;
+    text-align: center;
+    color: #6f84ad;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+</style>
+</head>
+<body>
+<div class="ljm_wrap">
+
+  <header class="ljm_head">
+    <h1>Canvas 粒子文字动画</h1>
+    <p>将文字“李佳明”像素化为粒子，鼠标靠近时粒子被排斥散开</p>
+  </header>
+
+  <div class="ljm_stage">
+    <canvas id="ljm_canvas"></canvas>
+  </div>
+
+  <div class="ljm_toolbar">
+    <button class="ljm_btn ljm_btn--active" id="ljm_btnWave">波浪模式</button>
+    <button class="ljm_btn" id="ljm_btnExplode">炸开粒子</button>
+    <button class="ljm_btn" id="ljm_btnRain">星空雨</button>
+    <button class="ljm_btn" id="ljm_btnReset">重置</button>
+  </div>
+
+  <p class="ljm_tips">
+    移动鼠标到画布上试试 · 粒子采样自离屏 Canvas 绘制的文字像素 · requestAnimationFrame 驱动
+  </p>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ljm_canvas = document.getElementById('ljm_canvas');
+  var ljm_ctx = ljm_canvas.getContext('2d');
+  var ljm_particles = [];
+  var ljm_mode = 'wave'; // wave | explode | rain
+  var ljm_mouse = { x: -9999, y: -9999, radius: 90 };
+  var ljm_rafId = null;
+  var ljm_tick = 0;
+
+  var ljm_colors = ['#6ab7ff', '#a98bff', '#ff8bd1', '#ffd166', '#7be0c3'];
+
+  function ljm_resize() {
+    var ljm_box = ljm_canvas.parentElement.getBoundingClientRect();
+    ljm_canvas.width = Math.floor(ljm_box.width);
+    ljm_canvas.height = 520;
+    ljm_buildParticles();
+  }
+
+  /* 离屏绘制文字，采样像素生成粒子目标点 */
+  function ljm_buildParticles() {
+    var ljm_off = document.createElement('canvas');
+    ljm_off.width = ljm_canvas.width;
+    ljm_off.height = ljm_canvas.height;
+    var ljm_offCtx = ljm_off.getContext('2d');
+
+    ljm_offCtx.fillStyle = '#fff';
+    ljm_offCtx.textAlign = 'center';
+    ljm_offCtx.textBaseline = 'middle';
+    var ljm_fontSize = Math.min(ljm_canvas.width / 4.2, 200);
+    ljm_offCtx.font = 'bold ' + ljm_fontSize + 'px "Microsoft YaHei", sans-serif';
+    ljm_offCtx.fillText('李佳明', ljm_canvas.width / 2, ljm_canvas.height / 2 - 30);
+
+    ljm_offCtx.font = '28px "Microsoft YaHei", sans-serif';
+    ljm_offCtx.fillText('CANVAS · PARTICLE · TEXT', ljm_canvas.width / 2, ljm_canvas.height / 2 + ljm_fontSize * 0.62);
+
+    var ljm_imgData = ljm_offCtx.getImageData(0, 0, ljm_off.width, ljm_off.height).data;
+    var ljm_gap = 6;
+
+    ljm_particles = [];
+    for (var ljm_y = 0; ljm_y < ljm_off.height; ljm_y += ljm_gap) {
+      for (var ljm_x = 0; ljm_x < ljm_off.width; ljm_x += ljm_gap) {
+        var ljm_alpha = ljm_imgData[(ljm_y * ljm_off.width + ljm_x) * 4 + 3];
+        if (ljm_alpha > 128) {
+          ljm_particles.push({
+            homeX: ljm_x,
+            homeY: ljm_y,
+            x: Math.random() * ljm_canvas.width,
+            y: Math.random() * ljm_canvas.height,
+            vx: 0,
+            vy: 0,
+            size: Math.random() * 2.2 + 1.4,
+            color: ljm_colors[Math.floor(Math.random() * ljm_colors.length)],
+            phase: Math.random() * Math.PI * 2
+          });
+        }
+      }
+    }
+  }
+
+  function ljm_updateParticle(ljm_p) {
+    var ljm_tx = ljm_p.homeX;
+    var ljm_ty = ljm_p.homeY;
+
+    if (ljm_mode === 'wave') {
+      ljm_ty += Math.sin(ljm_tick * 0.03 + ljm_p.phase) * 6;
+    } else if (ljm_mode === 'explode') {
+      var ljm_cx = ljm_canvas.width / 2;
+      var ljm_cy = ljm_canvas.height / 2;
+      var ljm_dx = ljm_p.homeX - ljm_cx;
+      var ljm_dy = ljm_p.homeY - ljm_cy;
+      var ljm_dist = Math.sqrt(ljm_dx * ljm_dx + ljm_dy * ljm_dy) || 1;
+      var ljm_push = 60 + Math.sin(ljm_tick * 0.02 + ljm_p.phase) * 40;
+      ljm_tx += (ljm_dx / ljm_dist) * ljm_push;
+      ljm_ty += (ljm_dy / ljm_dist) * ljm_push;
+    } else if (ljm_mode === 'rain') {
+      ljm_ty += Math.sin(ljm_tick * 0.05 + ljm_p.phase) * 14;
+      ljm_tx += Math.cos(ljm_tick * 0.04 + ljm_p.phase) * 10;
+    }
+
+    /* 鼠标排斥 */
+    var ljm_mdx = ljm_p.x - ljm_mouse.x;
+    var ljm_mdy = ljm_p.y - ljm_mouse.y;
+    var ljm_mdist = Math.sqrt(ljm_mdx * ljm_mdx + ljm_mdy * ljm_mdy);
+    if (ljm_mdist < ljm_mouse.radius) {
+      var ljm_force = (ljm_mouse.radius - ljm_mdist) / ljm_mouse.radius;
+      ljm_p.vx += (ljm_mdx / (ljm_mdist || 1)) * ljm_force * 6;
+      ljm_p.vy += (ljm_mdy / (ljm_mdist || 1)) * ljm_force * 6;
+    }
+
+    /* 弹簧回到目标点 */
+    ljm_p.vx += (ljm_tx - ljm_p.x) * 0.02;
+    ljm_p.vy += (ljm_ty - ljm_p.y) * 0.02;
+
+    /* 阻尼 */
+    ljm_p.vx *= 0.86;
+    ljm_p.vy *= 0.86;
+
+    ljm_p.x += ljm_p.vx;
+    ljm_p.y += ljm_p.vy;
+  }
+
+  function ljm_draw() {
+    ljm_ctx.clearRect(0, 0, ljm_canvas.width, ljm_canvas.height);
+
+    /* 背景星点 */
+    ljm_ctx.fillStyle = 'rgba(140, 170, 255, 0.12)';
+    for (var ljm_s = 0; ljm_s < 40; ljm_s++) {
+      var ljm_sx = (ljm_s * 97.3 + ljm_tick * 0.15) % ljm_canvas.width;
+      var ljm_sy = (ljm_s * 57.7) % ljm_canvas.height;
+      ljm_ctx.fillRect(ljm_sx, ljm_sy, 2, 2);
+    }
+
+    for (var ljm_i = 0; ljm_i < ljm_particles.length; ljm_i++) {
+      var ljm_p = ljm_particles[ljm_i];
+      ljm_updateParticle(ljm_p);
+      ljm_ctx.fillStyle = ljm_p.color;
+      ljm_ctx.beginPath();
+      ljm_ctx.arc(ljm_p.x, ljm_p.y, ljm_p.size, 0, Math.PI * 2);
+      ljm_ctx.fill();
+    }
+
+    /* 鼠标光圈 */
+    if (ljm_mouse.x > 0) {
+      ljm_ctx.strokeStyle = 'rgba(150, 180, 255, 0.25)';
+      ljm_ctx.lineWidth = 1;
+      ljm_ctx.beginPath();
+      ljm_ctx.arc(ljm_mouse.x, ljm_mouse.y, ljm_mouse.radius, 0, Math.PI * 2);
+      ljm_ctx.stroke();
+    }
+
+    ljm_tick++;
+    ljm_rafId = requestAnimationFrame(ljm_draw);
+  }
+
+  /* ===== 交互 ===== */
+  function ljm_setMouse(ljm_evt) {
+    var ljm_rect = ljm_canvas.getBoundingClientRect();
+    ljm_mouse.x = ljm_evt.clientX - ljm_rect.left;
+    ljm_mouse.y = ljm_evt.clientY - ljm_rect.top;
+  }
+
+  ljm_canvas.addEventListener('mousemove', ljm_setMouse);
+  ljm_canvas.addEventListener('mouseleave', function () {
+    ljm_mouse.x = -9999;
+    ljm_mouse.y = -9999;
+  });
+
+  var ljm_btns = {
+    ljm_btnWave: 'wave',
+    ljm_btnExplode: 'explode',
+    ljm_btnRain: 'rain'
+  };
+
+  Object.keys(ljm_btns).forEach(function (ljm_id) {
+    document.getElementById(ljm_id).addEventListener('click', function () {
+      ljm_mode = ljm_btns[ljm_id];
+      document.querySelectorAll('.ljm_btn').forEach(function (ljm_b) {
+        ljm_b.classList.remove('ljm_btn--active');
+      });
+      this.classList.add('ljm_btn--active');
+    });
+  });
+
+  document.getElementById('ljm_btnReset').addEventListener('click', function () {
+    ljm_particles.forEach(function (ljm_p) {
+      ljm_p.x = Math.random() * ljm_canvas.width;
+      ljm_p.y = Math.random() * ljm_canvas.height;
+      ljm_p.vx = 0;
+      ljm_p.vy = 0;
+    });
+  });
+
+  window.addEventListener('resize', ljm_resize);
+
+  ljm_resize();
+  ljm_draw();
+})();
+</script>
+</body>
+</html>

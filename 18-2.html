@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-05
+  功能名称：Canvas 电商系统架构图
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas 电商系统架构图 - 李佳明</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0f172a, #17233d 55%, #0f172a);
+    font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    color: #e6edf9;
+  }
+
+  .ljm_wrap {
+    width: min(1280px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 34px 0 50px;
+  }
+
+  .ljm_head { text-align: center; margin-bottom: 20px; }
+
+  .ljm_head h1 {
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, #4fc3f7, #7c9eff, #b388ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .ljm_head p { margin-top: 10px; color: #93a5c6; font-size: 14px; }
+
+  .ljm_panel {
+    border-radius: 20px;
+    border: 1px solid rgba(110, 140, 200, 0.28);
+    background: rgba(10, 18, 34, 0.75);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+  }
+
+  #ljm_canvas {
+    display: block;
+    width: 100%;
+    height: 720px;
+    cursor: default;
+  }
+
+  .ljm_bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .ljm_legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    font-size: 12.5px;
+    color: #a9badb;
+  }
+
+  .ljm_legendItem { display: inline-flex; align-items: center; gap: 6px; }
+
+  .ljm_legendDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .ljm_btn {
+    border: 1px solid rgba(120, 150, 215, 0.4);
+    background: rgba(24, 38, 66, 0.9);
+    color: #d5e2ff;
+    padding: 9px 20px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform .15s ease, background .2s ease;
+  }
+
+  .ljm_btn:hover { transform: translateY(-2px); background: rgba(52, 78, 132, 0.9); }
+
+  .ljm_tips { margin-top: 16px; text-align: center; color: #7789ad; font-size: 13px; line-height: 1.9; }
+</style>
+</head>
+<body>
+<div class="ljm_wrap">
+
+  <header class="ljm_head">
+    <h1>电商系统 · 全站架构图</h1>
+    <p>纯 Canvas 绘制：分层节点 + 连线 + 动态数据流，鼠标悬停节点可高亮关联链路</p>
+  </header>
+
+  <div class="ljm_panel">
+    <canvas id="ljm_canvas"></canvas>
+  </div>
+
+  <div class="ljm_bar">
+    <div class="ljm_legend" id="ljm_legend"></div>
+    <button class="ljm_btn" id="ljm_btnFlow">暂停数据流</button>
+  </div>
+
+  <p class="ljm_tips">移动鼠标到任意节点上查看说明 · 光点代表请求在系统间的流动方向</p>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ljm_canvas = document.getElementById('ljm_canvas');
+  var ljm_ctx = ljm_canvas.getContext('2d');
+  var ljm_tick = 0;
+  var ljm_flowOn = true;
+  var ljm_hoverNode = null;
+  var ljm_rafId = null;
+
+  /* ===== 架构数据定义 ===== */
+  var ljm_layers = [
+    { name: '用户层', color: '#4fc3f7' },
+    { name: '接入层', color: '#7c9eff' },
+    { name: '应用层', color: '#b388ff' },
+    { name: '服务层', color: '#ff8a80' },
+    { name: '中间件', color: '#ffd54f' },
+    { name: '数据层', color: '#69f0ae' }
+  ];
+
+  var ljm_nodes = [
+    /* 用户层 */
+    { id: 'pc',   label: 'PC 网站',   layer: 0, desc: '浏览器端 Web 商城' },
+    { id: 'app',  label: '移动 APP',  layer: 0, desc: 'iOS / Android 客户端' },
+    { id: 'mini', label: '小程序',    layer: 0, desc: '微信 / 支付宝小程序' },
+    { id: 'h5',   label: 'H5 页面',   layer: 0, desc: '活动页与分享落地页' },
+
+    /* 接入层 */
+    { id: 'cdn',    label: 'CDN 加速',   layer: 1, desc: '静态资源分发' },
+    { id: 'lb',     label: '负载均衡',   layer: 1, desc: 'Nginx 流量分发' },
+    { id: 'gateway',label: 'API 网关',   layer: 1, desc: '鉴权 / 限流 / 路由' },
+
+    /* 应用层 */
+    { id: 'home',   label: '首页模块', layer: 2, desc: '首页聚合与楼层配置' },
+    { id: 'cart',   label: '购物车',   layer: 2, desc: '加购 / 改数量 / 凑单' },
+    { id: 'order',  label: '订单中心', layer: 2, desc: '下单 / 拆单 / 售后' },
+    { id: 'pay',    label: '支付中心', layer: 2, desc: '收银台与支付渠道' },
+    { id: 'member', label: '会员中心', layer: 2, desc: '注册 / 登录 / 等级' },
+    { id: 'mkt',    label: '营销中心', layer: 2, desc: '优惠券 / 秒杀 / 拼团' },
+
+    /* 服务层 */
+    { id: 'svcUser',  label: '用户服务', layer: 3, desc: '账号、地址、实名' },
+    { id: 'svcGoods', label: '商品服务', layer: 3, desc: 'SPU / SKU / 类目' },
+    { id: 'svcOrder', label: '订单服务', layer: 3, desc: '订单状态机' },
+    { id: 'svcPay',   label: '支付服务', layer: 3, desc: '对账 / 退款 / 分账' },
+    { id: 'svcStock', label: '库存服务', layer: 3, desc: '预占 / 扣减 / 回补' },
+    { id: 'svcLogi',  label: '物流服务', layer: 3, desc: '运单与轨迹' },
+
+    /* 中间件 */
+    { id: 'mq',     label: '消息队列',   layer: 4, desc: 'RocketMQ 削峰解耦' },
+    { id: 'cache',  label: '分布式缓存', layer: 4, desc: 'Redis 集群' },
+    { id: 'search', label: '搜索引擎',   layer: 4, desc: 'ElasticSearch' },
+
+    /* 数据层 */
+    { id: 'mysql', label: 'MySQL 集群', layer: 5, desc: '分库分表存储' },
+    { id: 'redis', label: 'Redis',      layer: 5, desc: '热点数据 / 会话' },
+    { id: 'es',    label: 'ES 集群',    layer: 5, desc: '商品检索索引' },
+    { id: 'oss',   label: '对象存储',   layer: 5, desc: '图片与文件 OSS' }
+  ];
+
+  /* 调用关系（from -> to） */
+  var ljm_links = [
+    ['pc', 'cdn'], ['app', 'lb'], ['mini', 'lb'], ['h5', 'cdn'],
+    ['cdn', 'gateway'], ['lb', 'gateway'],
+    ['gateway', 'home'], ['gateway', 'cart'], ['gateway', 'order'],
+    ['gateway', 'pay'], ['gateway', 'member'], ['gateway', 'mkt'],
+    ['home', 'svcGoods'], ['cart', 'svcGoods'], ['cart', 'svcStock'],
+    ['order', 'svcOrder'], ['order', 'svcStock'], ['order', 'svcLogi'],
+    ['pay', 'svcPay'], ['member', 'svcUser'], ['mkt', 'svcGoods'],
+    ['svcUser', 'mq'], ['svcOrder', 'mq'], ['svcPay', 'mq'], ['svcStock', 'mq'],
+    ['svcGoods', 'cache'], ['svcGoods', 'search'], ['home', 'cache'],
+    ['svcUser', 'mysql'], ['svcOrder', 'mysql'], ['svcPay', 'mysql'],
+    ['svcGoods', 'mysql'], ['svcStock', 'mysql'], ['svcLogi', 'mysql'],
+    ['cache', 'redis'], ['search', 'es'], ['svcGoods', 'oss'], ['mq', 'mysql']
+  ];
+
+  var ljm_nodeMap = {};
+  var ljm_flows = [];
+
+  function ljm_layout() {
+    var ljm_box = ljm_canvas.parentElement.getBoundingClientRect();
+    ljm_canvas.width = Math.floor(ljm_box.width);
+    ljm_canvas.height = 720;
+
+    var ljm_W = ljm_canvas.width;
+    var ljm_top = 46;
+    var ljm_bottom = ljm_canvas.height - 40;
+    var ljm_layerH = (ljm_bottom - ljm_top) / ljm_layers.length;
+
+    /* 每层的节点数，用于水平均分 */
+    var ljm_counts = ljm_layers.map(function (l, ljm_i) {
+      return ljm_nodes.filter(function (n) { return n.layer === ljm_i; }).length;
+    });
+    var ljm_seen = ljm_layers.map(function () { return 0; });
+
+    ljm_nodes.forEach(function (ljm_n) {
+      var ljm_idx = ljm_seen[ljm_n.layer]++;
+      var ljm_total = ljm_counts[ljm_n.layer];
+      ljm_n.w = 116;
+      ljm_n.h = 44;
+      ljm_n.x = (ljm_W * (ljm_idx + 1)) / (ljm_total + 1);
+      ljm_n.y = ljm_top + ljm_layerH * ljm_n.layer + ljm_layerH / 2;
+      ljm_nodeMap[ljm_n.id] = ljm_n;
+    });
+
+    /* 生成流动光点 */
+    ljm_flows = [];
+    ljm_links.forEach(function (ljm_l, ljm_i) {
+      var ljm_dotCount = 1 + (ljm_i % 2);
+      for (var ljm_d = 0; ljm_d < ljm_dotCount; ljm_d++) {
+        ljm_flows.push({
+          link: ljm_i,
+          t: Math.random(),
+          speed: 0.0035 + Math.random() * 0.003
+        });
+      }
+    });
+  }
+
+  function ljm_roundRect(ljm_x, ljm_y, ljm_w, ljm_h, ljm_r) {
+    ljm_ctx.beginPath();
+    ljm_ctx.moveTo(ljm_x + ljm_r, ljm_y);
+    ljm_ctx.arcTo(ljm_x + ljm_w, ljm_y, ljm_x + ljm_w, ljm_y + ljm_h, ljm_r);
+    ljm_ctx.arcTo(ljm_x + ljm_w, ljm_y + ljm_h, ljm_x, ljm_y + ljm_h, ljm_r);
+    ljm_ctx.arcTo(ljm_x, ljm_y + ljm_h, ljm_x, ljm_y, ljm_r);
+    ljm_ctx.arcTo(ljm_x, ljm_y, ljm_x + ljm_w, ljm_y, ljm_r);
+    ljm_ctx.closePath();
+  }
+
+  function ljm_isActive(ljm_id) {
+    if (!ljm_hoverNode) { return true; }
+    if (ljm_id === ljm_hoverNode.id) { return true; }
+    return ljm_links.some(function (l) {
+      return (l[0] === ljm_hoverNode.id && l[1] === ljm_id) ||
+             (l[1] === ljm_hoverNode.id && l[0] === ljm_id);
+    });
+  }
+
+  function ljm_linkActive(ljm_l) {
+    if (!ljm_hoverNode) { return true; }
+    return ljm_l[0] === ljm_hoverNode.id || ljm_l[1] === ljm_hoverNode.id;
+  }
+
+  function ljm_draw() {
+    var ljm_W = ljm_canvas.width;
+    var ljm_H = ljm_canvas.height;
+    ljm_ctx.clearRect(0, 0, ljm_W, ljm_H);
+    var ljm_top = 46;
+    var ljm_layerH = (ljm_H - 40 - ljm_top) / ljm_layers.length;
+
+    /* 层背景带 + 层名 */
+    ljm_layers.forEach(function (ljm_l, ljm_i) {
+      var ljm_y = ljm_top + ljm_layerH * ljm_i;
+      ljm_ctx.fillStyle = ljm_i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'rgba(255,255,255,0.005)';
+      ljm_ctx.fillRect(0, ljm_y, ljm_W, ljm_layerH);
+      ljm_ctx.strokeStyle = 'rgba(120,150,220,0.12)';
+      ljm_ctx.beginPath();
+      ljm_ctx.moveTo(0, ljm_y);
+      ljm_ctx.lineTo(ljm_W, ljm_y);
+      ljm_ctx.stroke();
+
+      ljm_ctx.fillStyle = ljm_l.color;
+      ljm_ctx.font = 'bold 13px "Microsoft YaHei", sans-serif';
+      ljm_ctx.textAlign = 'left';
+      ljm_ctx.textBaseline = 'middle';
+      ljm_ctx.globalAlpha = 0.85;
+      ljm_ctx.fillText(ljm_l.name, 14, ljm_y + ljm_layerH / 2);
+      ljm_ctx.globalAlpha = 1;
+    });
+
+    /* 标题 */
+    ljm_ctx.fillStyle = '#eaf1ff';
+    ljm_ctx.font = 'bold 17px "Microsoft YaHei", sans-serif';
+    ljm_ctx.textAlign = 'center';
+    ljm_ctx.fillText('电商系统总体架构', ljm_W / 2, 24);
+
+    /* 连线 */
+    ljm_links.forEach(function (ljm_l) {
+      var ljm_a = ljm_nodeMap[ljm_l[0]];
+      var ljm_b = ljm_nodeMap[ljm_l[1]];
+      var ljm_active = ljm_linkActive(ljm_l);
+      ljm_ctx.strokeStyle = ljm_active ? 'rgba(126, 160, 235, 0.55)' : 'rgba(126,160,235,0.08)';
+      ljm_ctx.lineWidth = ljm_active ? 1.4 : 1;
+      ljm_ctx.beginPath();
+      ljm_ctx.moveTo(ljm_a.x, ljm_a.y + ljm_a.h / 2);
+      ljm_ctx.bezierCurveTo(
+        ljm_a.x, ljm_a.y + ljm_a.h / 2 + 30,
+        ljm_b.x, ljm_b.y - ljm_b.h / 2 - 30,
+        ljm_b.x, ljm_b.y - ljm_b.h / 2
+      );
+      ljm_ctx.stroke();
+    });
+
+    /* 流动光点 */
+    if (ljm_flowOn) {
+      ljm_flows.forEach(function (ljm_f) {
+        ljm_f.t += ljm_f.speed;
+        if (ljm_f.t > 1) { ljm_f.t = 0; }
+        var ljm_l = ljm_links[ljm_f.link];
+        if (!ljm_linkActive(ljm_l)) { return; }
+        var ljm_a = ljm_nodeMap[ljm_l[0]];
+        var ljm_b = ljm_nodeMap[ljm_l[1]];
+        var ljm_ft = ljm_f.t;
+        var ljm_x0 = ljm_a.x, ljm_y0 = ljm_a.y + ljm_a.h / 2;
+        var ljm_x3 = ljm_b.x, ljm_y3 = ljm_b.y - ljm_b.h / 2;
+        var ljm_y1 = ljm_y0 + 30, ljm_y2 = ljm_y3 - 30;
+        var ljm_mt = 1 - ljm_ft;
+        var ljm_px = ljm_mt * ljm_mt * ljm_mt * ljm_x0 + 3 * ljm_mt * ljm_mt * ljm_ft * ljm_x0 + 3 * ljm_mt * ljm_ft * ljm_ft * ljm_x3 + ljm_ft * ljm_ft * ljm_ft * ljm_x3;
+        var ljm_py = ljm_mt * ljm_mt * ljm_mt * ljm_y0 + 3 * ljm_mt * ljm_mt * ljm_ft * ljm_y1 + 3 * ljm_mt * ljm_ft * ljm_ft * ljm_y2 + ljm_ft * ljm_ft * ljm_ft * ljm_y3;
+        ljm_ctx.fillStyle = 'rgba(120, 200, 255, 0.95)';
+        ljm_ctx.beginPath();
+        ljm_ctx.arc(ljm_px, ljm_py, 2.6, 0, Math.PI * 2);
+        ljm_ctx.fill();
+      });
+    }
+
+    /* 节点 */
+    ljm_nodes.forEach(function (ljm_n) {
+      var ljm_active = ljm_isActive(ljm_n.id);
+      var ljm_color = ljm_layers[ljm_n.layer].color;
+      var ljm_x = ljm_n.x - ljm_n.w / 2;
+      var ljm_y = ljm_n.y - ljm_n.h / 2;
+      var ljm_hover = ljm_hoverNode === ljm_n;
+
+      ljm_ctx.globalAlpha = ljm_active ? 1 : 0.22;
+
+      /* 阴影与主体 */
+      ljm_ctx.save();
+      ljm_ctx.shadowColor = 'rgba(0,0,0,0.4)';
+      ljm_ctx.shadowBlur = ljm_hover ? 18 : 8;
+      ljm_ctx.shadowOffsetY = 3;
+      ljm_roundRect(ljm_x, ljm_y, ljm_n.w, ljm_n.h, 10);
+      var ljm_grad = ljm_ctx.createLinearGradient(ljm_x, ljm_y, ljm_x, ljm_y + ljm_n.h);
+      ljm_grad.addColorStop(0, 'rgba(28, 44, 78, 0.98)');
+      ljm_grad.addColorStop(1, 'rgba(16, 26, 48, 0.98)');
+      ljm_ctx.fillStyle = ljm_grad;
+      ljm_ctx.fill();
+      ljm_ctx.restore();
+
+      /* 边框 */
+      ljm_ctx.lineWidth = ljm_hover ? 2.2 : 1.3;
+      ljm_ctx.strokeStyle = ljm_color;
+      ljm_roundRect(ljm_x, ljm_y, ljm_n.w, ljm_n.h, 10);
+      ljm_ctx.stroke();
+
+      /* 左侧色条 */
+      ljm_ctx.fillStyle = ljm_color;
+      ljm_roundRect(ljm_x + 4, ljm_y + 8, 4, ljm_n.h - 16, 2);
+      ljm_ctx.fill();
+
+      /* 文字 */
+      ljm_ctx.fillStyle = '#eef3ff';
+      ljm_ctx.font = (ljm_hover ? 'bold ' : '') + '14px "Microsoft YaHei", sans-serif';
+      ljm_ctx.textAlign = 'center';
+      ljm_ctx.textBaseline = 'middle';
+      ljm_ctx.fillText(ljm_n.label, ljm_n.x + 3, ljm_n.y);
+
+      ljm_ctx.globalAlpha = 1;
+    });
+
+    /* 悬停提示 */
+    if (ljm_hoverNode) {
+      var ljm_n2 = ljm_hoverNode;
+      var ljm_text = ljm_n2.label + '：' + ljm_n2.desc;
+      ljm_ctx.font = '13px "Microsoft YaHei", sans-serif';
+      var ljm_tw = ljm_ctx.measureText(ljm_text).width + 26;
+      var ljm_th = 32;
+      var ljm_tx = Math.min(Math.max(ljm_n2.x - ljm_tw / 2, 8), ljm_W - ljm_tw - 8);
+      var ljm_ty = ljm_n2.y - ljm_n2.h / 2 - ljm_th - 10;
+      if (ljm_ty < 6) { ljm_ty = ljm_n2.y + ljm_n2.h / 2 + 10; }
+
+      ljm_ctx.save();
+      ljm_ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ljm_ctx.shadowBlur = 14;
+      ljm_roundRect(ljm_tx, ljm_ty, ljm_tw, ljm_th, 8);
+      ljm_ctx.fillStyle = 'rgba(230, 240, 255, 0.97)';
+      ljm_ctx.fill();
+      ljm_ctx.restore();
+
+      ljm_ctx.fillStyle = '#1b2740';
+      ljm_ctx.textAlign = 'center';
+      ljm_ctx.textBaseline = 'middle';
+      ljm_ctx.fillText(ljm_text, ljm_tx + ljm_tw / 2, ljm_ty + ljm_th / 2);
+    }
+
+    ljm_tick++;
+    ljm_rafId = requestAnimationFrame(ljm_draw);
+  }
+
+  /* ===== 悬停检测 ===== */
+  ljm_canvas.addEventListener('mousemove', function (ljm_evt) {
+    var ljm_rect = ljm_canvas.getBoundingClientRect();
+    var ljm_mx = ljm_evt.clientX - ljm_rect.left;
+    var ljm_my = ljm_evt.clientY - ljm_rect.top;
+
+    var ljm_found = null;
+    for (var ljm_i = 0; ljm_i < ljm_nodes.length; ljm_i++) {
+      var ljm_n = ljm_nodes[ljm_i];
+      if (Math.abs(ljm_mx - ljm_n.x) <= ljm_n.w / 2 &&
+          Math.abs(ljm_my - ljm_n.y) <= ljm_n.h / 2) {
+        ljm_found = ljm_n;
+        break;
+      }
+    }
+    ljm_hoverNode = ljm_found;
+    ljm_canvas.style.cursor = ljm_found ? 'pointer' : 'default';
+  });
+
+  ljm_canvas.addEventListener('mouseleave', function () {
+    ljm_hoverNode = null;
+  });
+
+  /* ===== 数据流开关 ===== */
+  document.getElementById('ljm_btnFlow').addEventListener('click', function () {
+    ljm_flowOn = !ljm_flowOn;
+    this.textContent = ljm_flowOn ? '暂停数据流' : '开启数据流';
+  });
+
+  /* ===== 图例 ===== */
+  var ljm_legendEl = document.getElementById('ljm_legend');
+  ljm_layers.forEach(function (ljm_l) {
+    var ljm_item = document.createElement('span');
+    ljm_item.className = 'ljm_legendItem';
+    ljm_item.innerHTML = '<span class="ljm_legendDot" style="background:' + ljm_l.color + '"></span>' + ljm_l.name;
+    ljm_legendEl.appendChild(ljm_item);
+  });
+
+  window.addEventListener('resize', ljm_layout);
+
+  ljm_layout();
+  ljm_draw();
+})();
+</script>
+</body>
+</html>

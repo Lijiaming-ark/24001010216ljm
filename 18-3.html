@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-05
+  功能名称：基于知识库的智能客服系统架构图（SVG · 科研方向）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能客服系统架构图（SVG）- 李佳明</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(155deg, #101c2e, #16283f 55%, #0d1726);
+    font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    color: #e8f0fc;
+  }
+
+  .ljm_wrap {
+    width: min(1320px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 34px 0 50px;
+  }
+
+  .ljm_head { text-align: center; margin-bottom: 20px; }
+
+  .ljm_head h1 {
+    font-size: clamp(1.5rem, 3vw, 2.3rem);
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, #5eead4, #60a5fa, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .ljm_head p { margin-top: 10px; color: #93a7c7; font-size: 14px; }
+
+  .ljm_panel {
+    border-radius: 20px;
+    border: 1px solid rgba(110, 150, 210, 0.25);
+    background: rgba(9, 17, 30, 0.8);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+  }
+
+  #ljm_svgBox { width: 100%; display: block; }
+
+  .ljm_nodeRect { cursor: pointer; transition: filter .2s ease; }
+
+  .ljm_bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .ljm_legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; font-size: 12.5px; color: #a9badb; }
+  .ljm_legendItem { display: inline-flex; align-items: center; gap: 6px; }
+  .ljm_legendDot { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+
+  .ljm_btn {
+    border: 1px solid rgba(120, 160, 220, 0.4);
+    background: rgba(24, 38, 64, 0.9);
+    color: #d5e4ff;
+    padding: 9px 20px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform .15s ease, background .2s ease;
+  }
+
+  .ljm_btn:hover { transform: translateY(-2px); background: rgba(52, 80, 134, 0.9); }
+
+  /* ===== 科研指标面板 ===== */
+  .ljm_metrics {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+  }
+
+  .ljm_metricCard {
+    background: linear-gradient(180deg, rgba(24, 38, 64, 0.9), rgba(14, 24, 42, 0.9));
+    border: 1px solid rgba(110, 150, 210, 0.25);
+    border-radius: 16px;
+    padding: 18px 20px;
+  }
+
+  .ljm_metricCard h3 { font-size: 14px; color: #cfe0ff; margin-bottom: 4px; }
+  .ljm_metricCard p { font-size: 12px; color: #8ba0c4; margin-bottom: 12px; }
+
+  .ljm_barTrack {
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .ljm_barFill {
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    transition: width 1.2s cubic-bezier(.22,.9,.3,1);
+  }
+
+  .ljm_metricVal {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #5eead4;
+  }
+
+  .ljm_tips { margin-top: 18px; text-align: center; color: #7789ad; font-size: 13px; line-height: 1.9; }
+</style>
+</head>
+<body>
+<div class="ljm_wrap">
+
+  <header class="ljm_head">
+    <h1>基于知识库的智能客服系统 · 架构图</h1>
+    <p>纯 SVG 绘制（科研方向）：悬停节点查看说明并高亮关联链路，流动虚线表示请求与知识流向</p>
+  </header>
+
+  <div class="ljm_panel">
+    <svg id="ljm_svgBox" viewBox="0 0 1280 780" role="img" aria-label="智能客服系统架构图"></svg>
+  </div>
+
+  <div class="ljm_bar">
+    <div class="ljm_legend" id="ljm_legend"></div>
+    <button class="ljm_btn" id="ljm_btnFlow">暂停数据流</button>
+  </div>
+
+  <!-- 科研评估指标 -->
+  <section class="ljm_metrics" id="ljm_metrics">
+    <div class="ljm_metricCard">
+      <h3>意图识别准确率</h3>
+      <p>NLU 模块在测试集上的 Intent Accuracy</p>
+      <div class="ljm_barTrack"><div class="ljm_barFill" data-ljm_val="93" style="background:linear-gradient(90deg,#5eead4,#38bdf8);"></div></div>
+      <div class="ljm_metricVal">93.2%</div>
+    </div>
+    <div class="ljm_metricCard">
+      <h3>知识检索召回率</h3>
+      <p>向量检索 Recall@5（知识库命中率）</p>
+      <div class="ljm_barTrack"><div class="ljm_barFill" data-ljm_val="89" style="background:linear-gradient(90deg,#60a5fa,#818cf8);"></div></div>
+      <div class="ljm_metricVal">89.5%</div>
+    </div>
+    <div class="ljm_metricCard">
+      <h3>答案满意度</h3>
+      <p>用户点好评率（在线评估）</p>
+      <div class="ljm_barTrack"><div class="ljm_barFill" data-ljm_val="86" style="background:linear-gradient(90deg,#c084fc,#f472b6);"></div></div>
+      <div class="ljm_metricVal">86.0%</div>
+    </div>
+    <div class="ljm_metricCard">
+      <h3>平均响应时间</h3>
+      <p>端到端推理延迟（P95）</p>
+      <div class="ljm_barTrack"><div class="ljm_barFill" data-ljm_val="78" style="background:linear-gradient(90deg,#fbbf24,#fb923c);"></div></div>
+      <div class="ljm_metricVal">0.78 s</div>
+    </div>
+  </section>
+
+  <p class="ljm_tips">悬停任意节点查看职责说明 · 图中虚线流动表示数据/知识的传递方向 · 下方为科研评估指标</p>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var LJM_SVG_NS = 'http://www.w3.org/2000/svg';
+  var ljm_svg = document.getElementById('ljm_svgBox');
+
+  /* ===== 数据定义 ===== */
+  var ljm_layers = [
+    { name: '用户接入层', color: '#5eead4' },
+    { name: '会话接入层', color: '#38bdf8' },
+    { name: '智能理解层 · 科研核心', color: '#c084fc' },
+    { name: '对话决策层', color: '#f472b6' },
+    { name: '知识库层', color: '#fbbf24' },
+    { name: '数据与模型层', color: '#4ade80' }
+  ];
+
+  var ljm_nodes = [
+    /* 用户接入层 */
+    { id: 'web',   label: 'Web 在线客服', layer: 0, desc: '网页端聊天窗口，文字/表情/图片消息' },
+    { id: 'app',   label: '移动 APP',     layer: 0, desc: 'App 内嵌客服 SDK' },
+    { id: 'wx',    label: '微信公众号',   layer: 0, desc: '公众号 / 小程序消息通道' },
+    { id: 'tel',   label: '电话语音',     layer: 0, desc: '呼叫中心语音接入' },
+
+    /* 会话接入层 */
+    { id: 'gw',    label: 'API 网关',      layer: 1, desc: '鉴权、限流、协议适配' },
+    { id: 'ws',    label: 'WebSocket',     layer: 1, desc: '长连接双向实时通信' },
+    { id: 'sess',  label: '会话管理',      layer: 1, desc: '会话路由、排队、人机切换' },
+    { id: 'asr',   label: '语音识别 ASR',  layer: 1, desc: '语音转文字（科研：端到端声学模型）' },
+
+    /* 智能理解层 */
+    { id: 'nlu',   label: '意图识别',     layer: 2, desc: 'BERT 分类模型识别用户意图' },
+    { id: 'ner',   label: '实体抽取',     layer: 2, desc: '抽取订单号、商品名等槽位实体' },
+    { id: 'rw',    label: '问题改写',     layer: 2, desc: '指代消解与多轮 query 改写' },
+    { id: 'senti', label: '情感分析',     layer: 2, desc: '识别不满情绪，触发人工接管' },
+
+    /* 对话决策层 */
+    { id: 'dst',   label: '对话状态跟踪', layer: 3, desc: 'DST 维护多轮对话上下文' },
+    { id: 'rag',   label: '检索增强生成', layer: 3, desc: 'RAG：检索知识 + LLM 生成答案' },
+    { id: 'rank',  label: '答案排序',     layer: 3, desc: '多候选答案重排序（Re-rank）' },
+    { id: 'dm',    label: '对话管理',     layer: 3, desc: '策略决策：回答/追问/转人工' },
+
+    /* 知识库层 */
+    { id: 'crawl', label: '知识采集',     layer: 4, desc: 'FAQ 文档、工单、历史会话导入' },
+    { id: 'clean', label: '知识清洗',     layer: 4, desc: '去重、切分、结构化处理' },
+    { id: 'emb',   label: '向量 Embedding', layer: 4, desc: '知识 chunk 向量化编码' },
+    { id: 'kg',    label: '知识图谱',     layer: 4, desc: '实体关系建模，支撑推理问答' },
+
+    /* 数据与模型层 */
+    { id: 'vdb',   label: '向量数据库',   layer: 5, desc: 'Milvus 存储知识向量索引' },
+    { id: 'gdb',   label: '图数据库',     layer: 5, desc: 'Neo4j 存储知识图谱' },
+    { id: 'db',    label: 'MySQL 集群',   layer: 5, desc: '会话记录、用户与配置数据' },
+    { id: 'train', label: '模型训练平台', layer: 5, desc: 'GPU 集群微调 NLU / LLM 模型' }
+  ];
+
+  /* 请求流（自上而下）与知识流（自下而上） */
+  var ljm_links = [
+    ['web', 'gw'], ['app', 'gw'], ['wx', 'gw'], ['tel', 'asr'],
+    ['gw', 'ws'], ['ws', 'sess'], ['asr', 'sess'],
+    ['sess', 'nlu'], ['sess', 'senti'], ['nlu', 'ner'], ['nlu', 'rw'],
+    ['ner', 'dst'], ['rw', 'dst'], ['senti', 'dm'],
+    ['dst', 'dm'], ['dm', 'rag'], ['rag', 'rank'],
+    ['rag', 'vdb'], ['rag', 'kg'], ['rank', 'dm'],
+    ['crawl', 'clean'], ['clean', 'emb'], ['emb', 'vdb'], ['clean', 'kg'],
+    ['kg', 'gdb'], ['sess', 'db'], ['dm', 'db'],
+    ['train', 'nlu'], ['train', 'rag'], ['vdb', 'rag']
+  ];
+
+  var ljm_nodeMap = {};
+  var ljm_hoverId = null;
+  var ljm_flowOn = true;
+
+  /* ===== 布局 ===== */
+  var LJM_W = 1280, LJM_H = 780, LJM_TOP = 56, LJM_BOTTOM = LJM_H - 34;
+  var ljm_layerH = (LJM_BOTTOM - LJM_TOP) / ljm_layers.length;
+
+  var ljm_counts = ljm_layers.map(function (ljm_l, ljm_i) {
+    return ljm_nodes.filter(function (ljm_n) { return ljm_n.layer === ljm_i; }).length;
+  });
+  var ljm_seen = ljm_layers.map(function () { return 0; });
+
+  ljm_nodes.forEach(function (ljm_n) {
+    var ljm_idx = ljm_seen[ljm_n.layer]++;
+    var ljm_total = ljm_counts[ljm_n.layer];
+    ljm_n.w = 132; ljm_n.h = 46;
+    ljm_n.x = (LJM_W * (ljm_idx + 1)) / (ljm_total + 1);
+    ljm_n.y = LJM_TOP + ljm_layerH * ljm_n.layer + ljm_layerH / 2;
+    ljm_nodeMap[ljm_n.id] = ljm_n;
+  });
+
+  /* ===== SVG 工具 ===== */
+  function ljm_el(ljm_tag, ljm_attrs) {
+    var ljm_dom = document.createElementNS(LJM_SVG_NS, ljm_tag);
+    Object.keys(ljm_attrs || {}).forEach(function (ljm_k) { ljm_dom.setAttribute(ljm_k, ljm_attrs[ljm_k]); });
+    return ljm_dom;
+  }
+
+  function ljm_linkPath(ljm_a, ljm_b) {
+    var ljm_y0 = ljm_a.y + ljm_a.h / 2, ljm_y3 = ljm_b.y - ljm_b.h / 2;
+    if (ljm_b.y < ljm_a.y) { ljm_y0 = ljm_a.y - ljm_a.h / 2; ljm_y3 = ljm_b.y + ljm_b.h / 2; }
+    var ljm_bend = (ljm_y3 - ljm_y0) * 0.45;
+    return 'M ' + ljm_a.x + ' ' + ljm_y0 +
+           ' C ' + ljm_a.x + ' ' + (ljm_y0 + ljm_bend) + ', ' + ljm_b.x + ' ' + (ljm_y3 - ljm_bend) + ', ' + ljm_b.x + ' ' + ljm_y3;
+  }
+
+  function ljm_isRelated(ljm_id) {
+    if (!ljm_hoverId) { return true; }
+    if (ljm_id === ljm_hoverId) { return true; }
+    return ljm_links.some(function (ljm_l) {
+      return (ljm_l[0] === ljm_hoverId && ljm_l[1] === ljm_id) || (ljm_l[1] === ljm_hoverId && ljm_l[0] === ljm_id);
+    });
+  }
+
+  function ljm_linkActive(ljm_l) {
+    if (!ljm_hoverId) { return true; }
+    return ljm_l[0] === ljm_hoverId || ljm_l[1] === ljm_hoverId;
+  }
+
+  /* ===== 渲染 ===== */
+  function ljm_render() {
+    ljm_svg.innerHTML = '';
+
+    /* 渐变与箭头定义 */
+    var ljm_defs = ljm_el('defs', {});
+    var ljm_grad = ljm_el('linearGradient', { id: 'ljm_nodeGrad', x1: '0', y1: '0', x2: '0', y2: '1' });
+    ljm_grad.appendChild(ljm_el('stop', { offset: '0%', 'stop-color': '#1e2f4e', 'stop-opacity': 0.98 }));
+    ljm_grad.appendChild(ljm_el('stop', { offset: '100%', 'stop-color': '#101c33', 'stop-opacity': 0.98 }));
+    ljm_defs.appendChild(ljm_grad);
+    ljm_layers.forEach(function (ljm_l, ljm_i) {
+      var ljm_marker = ljm_el('marker', {
+        id: 'ljm_arrow' + ljm_i, viewBox: '0 0 10 10', refX: 9, refY: 5,
+        markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse'
+      });
+      ljm_marker.appendChild(ljm_el('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: ljm_l.color }));
+      ljm_defs.appendChild(ljm_marker);
+    });
+    ljm_svg.appendChild(ljm_defs);
+
+    /* 标题 */
+    var ljm_titleText = ljm_el('text', {
+      x: LJM_W / 2, y: 30, 'text-anchor': 'middle',
+      fill: '#eaf2ff', 'font-size': 20, 'font-weight': 'bold', 'font-family': 'Microsoft YaHei'
+    });
+    ljm_titleText.textContent = '基于知识库的智能客服系统架构（科研方向）';
+    ljm_svg.appendChild(ljm_titleText);
+
+    /* 层背景与层名 */
+    ljm_layers.forEach(function (ljm_l, ljm_i) {
+      var ljm_y = LJM_TOP + ljm_layerH * ljm_i;
+      ljm_svg.appendChild(ljm_el('rect', {
+        x: 0, y: ljm_y, width: LJM_W, height: ljm_layerH,
+        fill: ljm_i % 2 === 0 ? 'rgba(255,255,255,0.025)' : 'rgba(255,255,255,0.005)'
+      }));
+      ljm_svg.appendChild(ljm_el('line', {
+        x1: 0, y1: ljm_y, x2: LJM_W, y2: ljm_y, stroke: 'rgba(120,150,220,0.14)'
+      }));
+      var ljm_layerText = ljm_el('text', {
+        x: 16, y: ljm_y + ljm_layerH / 2, fill: ljm_l.color,
+        'font-size': 13, 'font-weight': 'bold', 'font-family': 'Microsoft YaHei',
+        'dominant-baseline': 'middle', opacity: 0.9
+      });
+      ljm_layerText.textContent = ljm_l.name;
+      ljm_svg.appendChild(ljm_layerText);
+    });
+
+    /* 连线组 */
+    var ljm_gLinks = ljm_el('g', {});
+    ljm_links.forEach(function (ljm_l) {
+      var ljm_a = ljm_nodeMap[ljm_l[0]], ljm_b = ljm_nodeMap[ljm_l[1]];
+      var ljm_active = ljm_linkActive(ljm_l);
+      var ljm_path = ljm_el('path', {
+        d: ljm_linkPath(ljm_a, ljm_b),
+        fill: 'none',
+        stroke: ljm_active ? ljm_layers[ljm_b.layer].color : 'rgba(130,160,230,0.08)',
+        'stroke-width': ljm_active ? 1.5 : 1,
+        opacity: ljm_active ? 0.6 : 1,
+        'marker-end': 'url(#ljm_arrow' + ljm_b.layer + ')'
+      });
+      if (ljm_flowOn && ljm_active) {
+        ljm_path.setAttribute('stroke-dasharray', '6 6');
+        var ljm_anim = ljm_el('animate', {
+          attributeName: 'stroke-dashoffset',
+          from: '24', to: '0', dur: '1.2s',
+          repeatCount: 'indefinite'
+        });
+        ljm_path.appendChild(ljm_anim);
+      }
+      ljm_gLinks.appendChild(ljm_path);
+    });
+    ljm_svg.appendChild(ljm_gLinks);
+
+    /* 节点组 */
+    var ljm_gNodes = ljm_el('g', {});
+    ljm_nodes.forEach(function (ljm_n) {
+      var ljm_color = ljm_layers[ljm_n.layer].color;
+      var ljm_active = ljm_isRelated(ljm_n.id);
+      var ljm_hover = ljm_hoverId === ljm_n.id;
+
+      var ljm_g = ljm_el('g', { opacity: ljm_active ? 1 : 0.2 });
+      var ljm_rect = ljm_el('rect', {
+        x: ljm_n.x - ljm_n.w / 2, y: ljm_n.y - ljm_n.h / 2, width: ljm_n.w, height: ljm_n.h, rx: 10,
+        fill: 'url(#ljm_nodeGrad)',
+        stroke: ljm_color,
+        'stroke-width': ljm_hover ? 2.4 : 1.3,
+        'class': 'ljm_nodeRect',
+        'data-ljm_id': ljm_n.id
+      });
+      if (ljm_hover) { ljm_rect.setAttribute('filter', 'drop-shadow(0 0 10px ' + ljm_color + ')'); }
+      ljm_g.appendChild(ljm_rect);
+
+      ljm_g.appendChild(ljm_el('rect', {
+        x: ljm_n.x - ljm_n.w / 2 + 5, y: ljm_n.y - ljm_n.h / 2 + 9, width: 4, height: ljm_n.h - 18, rx: 2, fill: ljm_color
+      }));
+
+      var ljm_label = ljm_el('text', {
+        x: ljm_n.x + 3, y: ljm_n.y, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
+        fill: '#eef3ff', 'font-size': 14, 'font-family': 'Microsoft YaHei',
+        'font-weight': ljm_hover ? 'bold' : 'normal', 'pointer-events': 'none'
+      });
+      ljm_label.textContent = ljm_n.label;
+      ljm_g.appendChild(ljm_label);
+
+      ljm_gNodes.appendChild(ljm_g);
+    });
+    ljm_svg.appendChild(ljm_gNodes);
+
+    /* 提示气泡 */
+    if (ljm_hoverId) {
+      var ljm_tipNode = ljm_nodeMap[ljm_hoverId];
+      var ljm_tipText = ljm_tipNode.label + '：' + ljm_tipNode.desc;
+      var ljm_tw = Math.max(200, ljm_tipText.length * 13 + 30);
+      var ljm_th = 36;
+      var ljm_tx = Math.min(Math.max(ljm_tipNode.x - ljm_tw / 2, 8), LJM_W - ljm_tw - 8);
+      var ljm_ty = ljm_tipNode.y - ljm_tipNode.h / 2 - ljm_th - 10;
+      if (ljm_ty < 8) { ljm_ty = ljm_tipNode.y + ljm_tipNode.h / 2 + 10; }
+
+      var ljm_tipG = ljm_el('g', { 'pointer-events': 'none' });
+      ljm_tipG.appendChild(ljm_el('rect', {
+        x: ljm_tx, y: ljm_ty, width: ljm_tw, height: ljm_th, rx: 8,
+        fill: 'rgba(232, 242, 255, 0.97)',
+        filter: 'drop-shadow(0 6px 14px rgba(0,0,0,0.5))'
+      }));
+      var ljm_ttNode = ljm_el('text', {
+        x: ljm_tx + ljm_tw / 2, y: ljm_ty + ljm_th / 2, 'text-anchor': 'middle',
+        'dominant-baseline': 'middle', fill: '#13233c',
+        'font-size': 13, 'font-family': 'Microsoft YaHei'
+      });
+      ljm_ttNode.textContent = ljm_tipText;
+      ljm_tipG.appendChild(ljm_ttNode);
+      ljm_svg.appendChild(ljm_tipG);
+    }
+  }
+
+  /* ===== 交互 ===== */
+  ljm_svg.addEventListener('mousemove', function (ljm_evt) {
+    var ljm_target = ljm_evt.target;
+    var ljm_idHover = ljm_target && ljm_target.getAttribute ? ljm_target.getAttribute('data-ljm_id') : null;
+    if (ljm_idHover !== ljm_hoverId) {
+      ljm_hoverId = ljm_idHover;
+      ljm_render();
+    }
+  });
+
+  ljm_svg.addEventListener('mouseleave', function () {
+    if (ljm_hoverId) {
+      ljm_hoverId = null;
+      ljm_render();
+    }
+  });
+
+  document.getElementById('ljm_btnFlow').addEventListener('click', function () {
+    ljm_flowOn = !ljm_flowOn;
+    this.textContent = ljm_flowOn ? '暂停数据流' : '开启数据流';
+    ljm_render();
+  });
+
+  /* ===== 图例 ===== */
+  var ljm_legendEl = document.getElementById('ljm_legend');
+  ljm_layers.forEach(function (ljm_l) {
+    var ljm_item = document.createElement('span');
+    ljm_item.className = 'ljm_legendItem';
+    ljm_item.innerHTML = '<span class="ljm_legendDot" style="background:' + ljm_l.color + '"></span>' + ljm_l.name.replace(' · 科研核心', '');
+    ljm_legendEl.appendChild(ljm_item);
+  });
+
+  /* ===== 科研指标动画 ===== */
+  var ljm_fills = document.querySelectorAll('.ljm_barFill');
+  function ljm_animateBars() {
+    ljm_fills.forEach(function (ljm_f) {
+      ljm_f.style.width = ljm_f.getAttribute('data-ljm_val') + '%';
+    });
+  }
+  if ('IntersectionObserver' in window) {
+    var ljm_io = new IntersectionObserver(function (ljm_entries) {
+      ljm_entries.forEach(function (ljm_en) {
+        if (ljm_en.isIntersecting) {
+          ljm_animateBars();
+          ljm_io.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    ljm_io.observe(document.getElementById('ljm_metrics'));
+  } else {
+    ljm_animateBars();
+  }
+
+  ljm_render();
+})();
+</script>
+</body>
+</html>

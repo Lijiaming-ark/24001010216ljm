@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<!--
+  姓名：李佳明
+  日期：2026-11-05
+  功能名称：基于 ECharts 的智能客服数据大屏（三列布局 · 中间顶部全国咨询地图）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能客服运营数据大屏 - 李佳明</title>
+<script src="cdn/echarts.min.js"></script>
+<script src="cdn/china.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    height: 100vh;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(24, 86, 160, 0.35), transparent 60%),
+      linear-gradient(160deg, #04080f 0%, #071426 48%, #040a14 100%);
+    font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+    color: #d6ecff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .ljm_app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 14px 12px;
+  }
+
+  /* ===== 顶栏 ===== */
+  .ljm_head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 58px;
+    padding: 0 20px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(10, 32, 62, 0.9), rgba(12, 48, 92, 0.55), rgba(10, 32, 62, 0.9));
+    border: 1px solid rgba(56, 140, 220, 0.28);
+    box-shadow: inset 0 0 40px rgba(24, 96, 180, 0.22);
+  }
+
+  .ljm_head::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -1px;
+    width: 46%;
+    height: 2px;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, transparent, #4fd1ff, transparent);
+  }
+
+  .ljm_head h1 {
+    font-size: clamp(18px, 1.6vw, 26px);
+    letter-spacing: 4px;
+    text-align: center;
+    background: linear-gradient(180deg, #ffffff 20%, #6fd6ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    white-space: nowrap;
+  }
+
+  .ljm_headSide {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #7fa6cf;
+    white-space: nowrap;
+  }
+
+  .ljm_dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #37e2a0;
+    box-shadow: 0 0 8px #37e2a0;
+    animation: ljmBlink 1.4s ease-in-out infinite;
+  }
+
+  @keyframes ljmBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.25; }
+  }
+
+  .ljm_clock {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 15px;
+    color: #8fe3ff;
+    letter-spacing: 1px;
+  }
+
+  /* ===== KPI ===== */
+  .ljm_kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    height: 84px;
+    flex: 0 0 auto;
+  }
+
+  .ljm_kpi {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 18px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(11, 34, 63, 0.82), rgba(8, 22, 42, 0.66));
+    border: 1px solid rgba(56, 140, 220, 0.24);
+    overflow: hidden;
+  }
+
+  .ljm_kpi::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #4fd1ff, transparent);
+  }
+
+  .ljm_kpiIcon {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #061223;
+    background: linear-gradient(135deg, #7fe3ff, #3b9ff0);
+    flex: 0 0 auto;
+  }
+
+  .ljm_kpiBody { display: flex; flex-direction: column; gap: 2px; }
+
+  .ljm_kpiLabel { font-size: 12px; color: #7fa6cf; letter-spacing: 1px; }
+
+  .ljm_kpiVal {
+    font-family: Consolas, Monaco, monospace;
+    font-size: clamp(18px, 1.6vw, 25px);
+    font-weight: 700;
+    color: #eaf8ff;
+    text-shadow: 0 0 18px rgba(80, 200, 255, 0.45);
+    line-height: 1.2;
+  }
+
+  .ljm_kpiVal small { font-size: 12px; color: #7fa6cf; margin-left: 3px; }
+
+  .ljm_kpiTrend {
+    margin-left: auto;
+    font-size: 11px;
+    color: #37e2a0;
+  }
+
+  .ljm_kpiTrend--down { color: #ff8f9c; }
+
+  /* ===== 三列主体 ===== */
+  .ljm_main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 22% 1fr 22%;
+    gap: 12px;
+  }
+
+  .ljm_col {
+    display: grid;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  .ljm_col--left { grid-template-rows: 1fr 1fr 1fr; }
+  .ljm_col--center { grid-template-rows: 1.62fr 1fr; }
+  .ljm_col--right { grid-template-rows: 1fr 0.94fr 1.14fr; }
+
+  /* ===== 面板 ===== */
+  .ljm_panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 8px 10px 6px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(10, 30, 56, 0.78), rgba(6, 18, 34, 0.72));
+    border: 1px solid rgba(56, 140, 220, 0.22);
+    box-shadow: inset 0 0 26px rgba(20, 80, 150, 0.14);
+  }
+
+  .ljm_panel::before,
+  .ljm_panel::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid rgba(79, 209, 255, 0.75);
+  }
+
+  .ljm_panel::before {
+    left: -1px;
+    top: -1px;
+    border-right: none;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+  }
+
+  .ljm_panel::after {
+    right: -1px;
+    bottom: -1px;
+    border-left: none;
+    border-top: none;
+    border-bottom-right-radius: 8px;
+  }
+
+  .ljm_panelHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    height: 24px;
+    flex: 0 0 auto;
+  }
+
+  .ljm_panelHead h2 {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #dcf1ff;
+    white-space: nowrap;
+  }
+
+  .ljm_panelHead h2::before {
+    content: "";
+    width: 3px;
+    height: 13px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #7fe3ff, #2f7fd6);
+    box-shadow: 0 0 8px rgba(90, 200, 255, 0.8);
+  }
+
+  .ljm_tag {
+    font-size: 10.5px;
+    color: #6fd6ff;
+    padding: 1px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 209, 255, 0.3);
+    background: rgba(35, 130, 200, 0.14);
+    white-space: nowrap;
+  }
+
+  .ljm_chart {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+  }
+
+  /* ===== 热门问题 ===== */
+  .ljm_hotList {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 4px;
+  }
+
+  .ljm_hotItem { display: flex; align-items: center; gap: 8px; font-size: 11.5px; }
+
+  .ljm_hotIdx {
+    width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    flex: 0 0 auto;
+    text-align: center;
+    line-height: 17px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 10px;
+    color: #9fc6ea;
+    background: rgba(45, 110, 175, 0.32);
+  }
+
+  .ljm_hotItem:nth-child(1) .ljm_hotIdx { color: #061223; background: linear-gradient(135deg, #ffd166, #ffb020); }
+  .ljm_hotItem:nth-child(2) .ljm_hotIdx { color: #061223; background: linear-gradient(135deg, #b9d9f2, #8fb6d8); }
+  .ljm_hotItem:nth-child(3) .ljm_hotIdx { color: #061223; background: linear-gradient(135deg, #f0b27a, #d98b4a); }
+
+  .ljm_hotName {
+    flex: 0 0 40%;
+    color: #b9d6f2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ljm_hotBar {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(60, 120, 180, 0.2);
+    overflow: hidden;
+  }
+
+  .ljm_hotBar i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #1f7fc4, #4fd1ff);
+    box-shadow: 0 0 8px rgba(79, 209, 255, 0.5);
+  }
+
+  .ljm_hotNum {
+    flex: 0 0 34px;
+    text-align: right;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 11px;
+    color: #6fd6ff;
+  }
+
+  /* ===== 实时会话 ===== */
+  .ljm_feed {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ljm_feedItem {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(30, 80, 135, 0.16);
+    border-left: 2px solid rgba(79, 209, 255, 0.55);
+    font-size: 11px;
+    line-height: 1.5;
+    color: #a9c8e6;
+  }
+
+  .ljm_feedTime {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 10.5px;
+    color: #5f8ab3;
+    flex: 0 0 auto;
+  }
+
+  .ljm_feedText {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ljm_feedFlag {
+    flex: 0 0 auto;
+    font-size: 10px;
+    padding: 0 6px;
+    border-radius: 999px;
+    color: #37e2a0;
+    background: rgba(55, 226, 160, 0.12);
+  }
+
+  .ljm_feedFlag--bot { color: #6fd6ff; background: rgba(79, 209, 255, 0.12); }
+
+  /* ===== 地图面板 ===== */
+  .ljm_mapWrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ljm_mapStat {
+    position: absolute;
+    left: 12px;
+    top: 8px;
+    z-index: 2;
+    display: flex;
+    gap: 16px;
+    pointer-events: none;
+  }
+
+  .ljm_mapStat div { display: flex; flex-direction: column; }
+
+  .ljm_mapStat span { font-size: 10.5px; color: #6f96bf; letter-spacing: 1px; }
+
+  .ljm_mapStat b {
+    font-family: Consolas, Monaco, monospace;
+    font-size: 17px;
+    color: #7fe3ff;
+    font-weight: 600;
+  }
+
+  .ljm_fallback {
+    display: none;
+    margin: 0 0 10px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    background: rgba(231, 76, 60, 0.12);
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    color: #ffb3ab;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  /* ===== 小屏降级 ===== */
+  @media (max-width: 1100px) {
+    body { height: auto; overflow: auto; }
+    .ljm_app { height: auto; }
+    .ljm_main { grid-template-columns: 1fr; }
+    .ljm_col--left, .ljm_col--center, .ljm_col--right { grid-template-rows: none; }
+    .ljm_panel { min-height: 320px; }
+    .ljm_kpis { grid-template-columns: repeat(2, 1fr); height: auto; }
+    .ljm_kpi { min-height: 74px; }
+    .ljm_head { flex-wrap: wrap; height: auto; padding: 10px 16px; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ljm_app">
+
+  <header class="ljm_head">
+    <div class="ljm_headSide">
+      <span class="ljm_dot"></span>
+      <span>数据实时刷新</span>
+    </div>
+    <h1>智能客服运营数据大屏</h1>
+    <div class="ljm_headSide">
+      <span id="ljm_date">2026-11-05</span>
+      <span class="ljm_clock" id="ljm_clock">00:00:00</span>
+    </div>
+  </header>
+
+  <section class="ljm_kpis">
+    <div class="ljm_kpi">
+      <div class="ljm_kpiIcon">咨</div>
+      <div class="ljm_kpiBody">
+        <span class="ljm_kpiLabel">今日咨询总量</span>
+        <span class="ljm_kpiVal" id="ljm_kpiTotal">12,486</span>
+      </div>
+      <span class="ljm_kpiTrend">▲ 8.6%</span>
+    </div>
+    <div class="ljm_kpi">
+      <div class="ljm_kpiIcon">智</div>
+      <div class="ljm_kpiBody">
+        <span class="ljm_kpiLabel">智能解决率</span>
+        <span class="ljm_kpiVal">92.7<small>%</small></span>
+      </div>
+      <span class="ljm_kpiTrend">▲ 1.4%</span>
+    </div>
+    <div class="ljm_kpi">
+      <div class="ljm_kpiIcon">时</div>
+      <div class="ljm_kpiBody">
+        <span class="ljm_kpiLabel">平均响应时长</span>
+        <span class="ljm_kpiVal">1.8<small>s</small></span>
+      </div>
+      <span class="ljm_kpiTrend ljm_kpiTrend--down">▼ 0.3s</span>
+    </div>
+    <div class="ljm_kpi">
+      <div class="ljm_kpiIcon">席</div>
+      <div class="ljm_kpiBody">
+        <span class="ljm_kpiLabel">在线人工坐席</span>
+        <span class="ljm_kpiVal" id="ljm_kpiAgent">186</span>
+      </div>
+      <span class="ljm_kpiTrend">▲ 12</span>
+    </div>
+  </section>
+
+  <div class="ljm_fallback" id="ljm_fallback">
+    ECharts 加载失败：请确认 <code>cdn/echarts.min.js</code> 存在，并使用浏览器打开本页面。
+  </div>
+
+  <main class="ljm_main">
+
+    <!-- 左列 -->
+    <section class="ljm_col ljm_col--left">
+      <div class="ljm_panel">
+        <div class="ljm_panelHead"><h2>咨询渠道分布</h2><span class="ljm_tag">今日</span></div>
+        <div class="ljm_chart" id="ljm_chartChannel"></div>
+      </div>
+
+      <div class="ljm_panel">
+        <div class="ljm_panelHead"><h2>用户意图占比</h2><span class="ljm_tag">NLU</span></div>
+        <div class="ljm_chart" id="ljm_chartIntent"></div>
+      </div>
+
+      <div class="ljm_panel">
+        <div class="ljm_panelHead"><h2>响应时长趋势</h2><span class="ljm_tag">近 7 天</span></div>
+        <div class="ljm_chart" id="ljm_chartResponse"></div>
+      </div>
+    </section>
+
+    <!-- 中列 -->
+    <section class="ljm_col ljm_col--center">
+      <div class="ljm_panel">
+        <div class="ljm_panelHead"><h2>全国咨询热力分布</h2><span class="ljm_tag">实时 · 可缩放</span></div>
+        <div class="ljm_mapWrap">
+          <div class="ljm_mapStat">
+            <div><span>覆盖省份</span><b>34</b></div>
+            <div><span>活跃城市</span><b>268</b></div>
+            <div><span>接入坐席</span><b>1,860</b></div>
+          </div>
+          <div class="ljm_chart" id="ljm_chartMap"></div>
+        </div>
+      </div>
+
+      <div class="ljm_panel">
+        <div class="ljm_panelHead"><h2>24 小时咨询趋势</h2><span class="ljm_tag">小时粒度</span></div>
+        <div class="ljm_chart" id="ljm_chartTrend"></div>
+      </div>
+    </section>
+
+    <!-- 右列 -->
+    <section class="ljm_col ljm_col--right">
+      <div class="ljm_panel">
+        <div class="ljm_panelHead"><h2>服务满意度</h2><span class="ljm_tag">CSAT</span></div>
+        <div class="ljm_chart" id="ljm_chartGauge"></div>
+      </div>
+
+      <div class="ljm_panel">
+        <div class="ljm_panelHead"><h2>热门问题 TOP5</h2><span class="ljm_tag">7 天</span></div>
+        <div class="ljm_hotList" id="ljm_hotList"></div>
+      </div>
+
+      <div class="ljm_panel">
+        <div class="ljm_panelHead"><h2>实时会话流水</h2><span class="ljm_tag">LIVE</span></div>
+        <div class="ljm_feed" id="ljm_feed"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ljm_fallback = document.getElementById('ljm_fallback');
+
+  if (typeof echarts === 'undefined') {
+    ljm_fallback.style.display = 'block';
+    return;
+  }
+
+  /* ===================== 通用样式 ===================== */
+  var ljm_axisLabel = { color: '#7fa6cf', fontSize: 10 };
+  var ljm_splitLine = { lineStyle: { color: 'rgba(60, 120, 190, 0.16)', type: 'dashed' } };
+  var ljm_tooltip = {
+    backgroundColor: 'rgba(6, 18, 34, 0.94)',
+    borderColor: 'rgba(64, 150, 255, 0.35)',
+    borderWidth: 1,
+    textStyle: { color: '#dcecff', fontSize: 11 }
+  };
+
+  var ljm_charts = [];
+
+  function ljm_init(ljm_id) {
+    var ljm_chart = echarts.init(document.getElementById(ljm_id));
+    ljm_charts.push(ljm_chart);
+    return ljm_chart;
+  }
+
+  /* ===================== 1. 咨询渠道分布 ===================== */
+  var ljm_channelChart = ljm_init('ljm_chartChannel');
+
+  ljm_channelChart.setOption({
+    grid: { left: 4, right: 34, top: 8, bottom: 2, containLabel: true },
+    tooltip: Object.assign({ trigger: 'axis', axisPointer: { type: 'shadow' } }, ljm_tooltip),
+    xAxis: { type: 'value', show: false, max: 3300 },
+    yAxis: {
+      type: 'category',
+      inverse: true,
+      data: ['网页在线', '微信公众号', 'APP 内嵌', '小程序', '400 电话'],
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { color: '#9dc0e4', fontSize: 11 }
+    },
+    series: [{
+      type: 'bar',
+      barWidth: 11,
+      itemStyle: {
+        borderRadius: 6,
+        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+          { offset: 0, color: '#1b6fb5' },
+          { offset: 1, color: '#4fd1ff' }
+        ]),
+        shadowBlur: 10,
+        shadowColor: 'rgba(79, 209, 255, 0.35)'
+      },
+      label: { show: true, position: 'right', color: '#bfe4ff', fontSize: 10 },
+      data: [2860, 2140, 1760, 1320, 860]
+    }]
+  });
+
+  /* ===================== 2. 用户意图占比 ===================== */
+  var ljm_intentChart = ljm_init('ljm_chartIntent');
+
+  ljm_intentChart.setOption({
+    tooltip: Object.assign({ trigger: 'item', formatter: '{b}<br/>{c} 次（{d}%）' }, ljm_tooltip),
+    legend: {
+      orient: 'vertical',
+      right: 0,
+      top: 'center',
+      itemWidth: 8,
+      itemHeight: 8,
+      itemGap: 7,
+      textStyle: { color: '#9dc0e4', fontSize: 10 }
+    },
+    color: ['#4fd1ff', '#37e2a0', '#ffd166', '#a98bff', '#ff8f9c', '#5f8ab3'],
+    series: [{
+      type: 'pie',
+      radius: ['36%', '62%'],
+      center: ['31%', '52%'],
+      roseType: 'radius',
+      itemStyle: { borderColor: 'rgba(6, 16, 30, 0.9)', borderWidth: 2, borderRadius: 4 },
+      label: { show: false },
+      labelLine: { show: false },
+      data: [
+        { value: 32, name: '订单查询' },
+        { value: 21, name: '退换货' },
+        { value: 18, name: '物流进度' },
+        { value: 12, name: '账号问题' },
+        { value: 9, name: '优惠活动' },
+        { value: 8, name: '其他' }
+      ]
+    }]
+  });
+
+  /* ===================== 3. 响应时长趋势 ===================== */
+  var ljm_responseChart = ljm_init('ljm_chartResponse');
+
+  ljm_responseChart.setOption({
+    grid: { left: 4, right: 10, top: 26, bottom: 2, containLabel: true },
+    tooltip: Object.assign({ trigger: 'axis' }, ljm_tooltip),
+    legend: {
+      top: 0,
+      right: 0,
+      itemWidth: 10,
+      itemHeight: 6,
+      textStyle: { color: '#8fb6dd', fontSize: 10 }
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: ['11-01', '11-02', '11-03', '11-04', '11-05', '11-06', '11-07'],
+      axisLine: { lineStyle: { color: 'rgba(60, 120, 190, 0.35)' } },
+      axisTick: { show: false },
+      axisLabel: ljm_axisLabel
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: Object.assign({ formatter: '{value}s' }, ljm_axisLabel),
+      splitLine: ljm_splitLine,
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [
+      {
+        name: '智能客服',
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 5,
+        data: [12, 11, 13, 10, 9, 11, 10],
+        itemStyle: { color: '#4fd1ff' },
+        lineStyle: { width: 2, shadowBlur: 10, shadowColor: 'rgba(79, 209, 255, 0.5)' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(79, 209, 255, 0.35)' },
+            { offset: 1, color: 'rgba(79, 209, 255, 0)' }
+          ])
+        }
+      },
+      {
+        name: '人工坐席',
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 5,
+        data: [48, 52, 45, 50, 43, 46, 44],
+        itemStyle: { color: '#ffd166' },
+        lineStyle: { width: 2 },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(255, 209, 102, 0.22)' },
+            { offset: 1, color: 'rgba(255, 209, 102, 0)' }
+          ])
+        }
+      }
+    ]
+  });
+
+  /* ===================== 4. 全国咨询热力地图 ===================== */
+  var ljm_mapChart = ljm_init('ljm_chartMap');
+
+  ljm_mapChart.showLoading({
+    text: '地图数据加载中',
+    color: '#4fd1ff',
+    textColor: '#7fa6cf',
+    maskColor: 'rgba(6, 16, 30, 0.6)',
+    fontSize: 11
+  });
+
+  var ljm_provinceData = [
+    { name: '北京市', value: 860 }, { name: '天津市', value: 320 },
+    { name: '河北省', value: 520 }, { name: '山西省', value: 260 },
+    { name: '内蒙古自治区', value: 180 }, { name: '辽宁省', value: 380 },
+    { name: '吉林省', value: 200 }, { name: '黑龙江省', value: 240 },
+    { name: '上海市', value: 920 }, { name: '江苏省', value: 780 },
+    { name: '浙江省', value: 830 }, { name: '安徽省', value: 340 },
+    { name: '福建省', value: 460 }, { name: '江西省', value: 280 },
+    { name: '山东省', value: 690 }, { name: '河南省', value: 610 },
+    { name: '湖北省', value: 450 }, { name: '湖南省', value: 430 },
+    { name: '广东省', value: 1280 }, { name: '广西壮族自治区', value: 300 },
+    { name: '海南省', value: 150 }, { name: '重庆市', value: 390 },
+    { name: '四川省', value: 620 }, { name: '贵州省', value: 210 },
+    { name: '云南省', value: 260 }, { name: '西藏自治区', value: 60 },
+    { name: '陕西省', value: 350 }, { name: '甘肃省', value: 140 },
+    { name: '青海省', value: 70 }, { name: '宁夏回族自治区', value: 80 },
+    { name: '新疆维吾尔自治区', value: 160 }, { name: '台湾省', value: 120 },
+    { name: '香港特别行政区', value: 210 }, { name: '澳门特别行政区', value: 60 }
+  ];
+
+  var ljm_cityData = [
+    { name: '北京', value: [116.40, 39.90, 860] },
+    { name: '上海', value: [121.47, 31.23, 920] },
+    { name: '广州', value: [113.26, 23.13, 760] },
+    { name: '深圳', value: [114.06, 22.55, 680] },
+    { name: '杭州', value: [120.15, 30.28, 540] },
+    { name: '成都', value: [104.07, 30.57, 470] },
+    { name: '武汉', value: [114.30, 30.59, 390] },
+    { name: '西安', value: [108.94, 34.34, 320] },
+    { name: '沈阳', value: [123.43, 41.80, 280] },
+    { name: '乌鲁木齐', value: [87.62, 43.82, 160] }
+  ];
+
+  function ljm_renderMap(ljm_geoJson) {
+    echarts.registerMap('ljm_china', ljm_geoJson);
+
+    ljm_mapChart.hideLoading();
+    ljm_mapChart.setOption({
+      tooltip: Object.assign({
+        trigger: 'item',
+        formatter: function (ljm_params) {
+          if (ljm_params.seriesType === 'effectScatter' || ljm_params.seriesType === 'lines') {
+            return ljm_params.name;
+          }
+          var ljm_v = ljm_params.value;
+          return ljm_params.name + '<br/>咨询量：' + (isNaN(ljm_v) ? '—' : ljm_v);
+        }
+      }, ljm_tooltip),
+      visualMap: {
+        min: 0,
+        max: 1300,
+        left: 10,
+        bottom: 6,
+        orient: 'vertical',
+        itemWidth: 8,
+        itemHeight: 64,
+        text: ['高', '低'],
+        textStyle: { color: '#7fa6cf', fontSize: 10 },
+        calculable: false,
+        inRange: { color: ['#0b2b4d', '#10527f', '#1a86bd', '#35c6f2'] }
+      },
+      geo: {
+        map: 'ljm_china',
+        roam: true,
+        zoom: 1.22,
+        center: [104, 36],
+        top: 26,
+        bottom: 18,
+        left: 8,
+        right: 8,
+        itemStyle: {
+          areaColor: '#0a2340',
+          borderColor: '#2f7fd6',
+          borderWidth: 0.9,
+          shadowColor: 'rgba(38, 132, 255, 0.55)',
+          shadowBlur: 14,
+          shadowOffsetY: 8
+        },
+        emphasis: {
+          itemStyle: { areaColor: '#17518c' },
+          label: { show: true, color: '#eaf6ff', fontSize: 11 }
+        },
+        label: { show: false }
+      },
+      series: [
+        {
+          name: '咨询量',
+          type: 'map',
+          geoIndex: 0,
+          data: ljm_provinceData
+        },
+        {
+          name: '热点城市',
+          type: 'effectScatter',
+          coordinateSystem: 'geo',
+          zlevel: 2,
+          rippleEffect: { brushType: 'stroke', scale: 3 },
+          symbolSize: function (ljm_val) { return Math.max(5, ljm_val[2] / 120); },
+          itemStyle: { color: '#5ff0d8', shadowBlur: 12, shadowColor: '#5ff0d8' },
+          label: {
+            show: true,
+            position: 'right',
+            formatter: '{b}',
+            color: '#cfe9ff',
+            fontSize: 10
+          },
+          data: ljm_cityData
+        },
+        {
+          name: '数据汇聚',
+          type: 'lines',
+          coordinateSystem: 'geo',
+          zlevel: 1,
+          effect: {
+            show: true,
+            period: 4,
+            trailLength: 0.25,
+            symbol: 'arrow',
+            symbolSize: 5,
+            color: '#7fe3ff'
+          },
+          lineStyle: {
+            color: '#3aa8e0',
+            width: 1,
+            opacity: 0.32,
+            curveness: 0.25
+          },
+          data: ljm_cityData
+            .filter(function (ljm_city) { return ljm_city.name !== '北京'; })
+            .map(function (ljm_city) {
+              return { coords: [ljm_city.value.slice(0, 2), [116.40, 39.90]] };
+            })
+        }
+      ]
+    });
+  }
+
+  if (window.LJM_CHINA_GEO) {
+    ljm_renderMap(window.LJM_CHINA_GEO);
+  } else {
+    /* 没有本地 china.js 时尝试用 fetch 读取 china.json */
+    fetch('cdn/china.json')
+      .then(function (ljm_response) {
+        if (!ljm_response.ok) { throw new Error('HTTP ' + ljm_response.status); }
+        return ljm_response.json();
+      })
+      .then(ljm_renderMap)
+      .catch(function () {
+        ljm_mapChart.hideLoading();
+        ljm_mapChart.setOption({
+          title: {
+            text: '地图数据缺失\n请确认 cdn/china.js 存在',
+            left: 'center',
+            top: 'middle',
+            textStyle: { color: '#ff9d94', fontSize: 13, lineHeight: 22 }
+          }
+        });
+      });
+  }
+
+  /* ===================== 5. 24 小时趋势 ===================== */
+  var ljm_hours = [];
+  for (var ljm_i = 0; ljm_i < 24; ljm_i++) {
+    ljm_hours.push((ljm_i < 10 ? '0' : '') + ljm_i + ':00');
+  }
+
+  var ljm_trendChart = ljm_init('ljm_chartTrend');
+
+  ljm_trendChart.setOption({
+    grid: { left: 6, right: 12, top: 28, bottom: 2, containLabel: true },
+    tooltip: Object.assign({ trigger: 'axis' }, ljm_tooltip),
+    legend: {
+      top: 0,
+      right: 0,
+      itemWidth: 10,
+      itemHeight: 6,
+      textStyle: { color: '#8fb6dd', fontSize: 10 }
+    },
+    xAxis: {
+      type: 'category',
+      data: ljm_hours,
+      axisLine: { lineStyle: { color: 'rgba(60, 120, 190, 0.35)' } },
+      axisTick: { show: false },
+      axisLabel: Object.assign({ interval: 2 }, ljm_axisLabel)
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: ljm_axisLabel,
+      splitLine: ljm_splitLine,
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [
+      {
+        name: '咨询量',
+        type: 'bar',
+        barWidth: '46%',
+        data: [120, 86, 64, 52, 48, 70, 160, 320, 520, 720, 860, 940,
+               780, 820, 900, 860, 780, 700, 760, 880, 960, 830, 520, 260],
+        itemStyle: {
+          borderRadius: [3, 3, 0, 0],
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#4fd1ff' },
+            { offset: 1, color: 'rgba(27, 111, 181, 0.25)' }
+          ])
+        }
+      },
+      {
+        name: '解决量',
+        type: 'line',
+        smooth: true,
+        symbol: 'none',
+        data: [110, 80, 60, 48, 45, 65, 150, 300, 490, 680, 820, 900,
+               740, 780, 860, 820, 740, 660, 720, 840, 920, 790, 490, 240],
+        itemStyle: { color: '#37e2a0' },
+        lineStyle: { width: 2, shadowBlur: 11, shadowColor: 'rgba(55, 226, 160, 0.45)' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(55, 226, 160, 0.25)' },
+            { offset: 1, color: 'rgba(55, 226, 160, 0)' }
+          ])
+        }
+      }
+    ]
+  });
+
+  /* ===================== 6. 满意度仪表盘 ===================== */
+  var ljm_gaugeChart = ljm_init('ljm_chartGauge');
+
+  ljm_gaugeChart.setOption({
+    series: [{
+      type: 'gauge',
+      startAngle: 210,
+      endAngle: -30,
+      min: 0,
+      max: 100,
+      radius: '94%',
+      center: ['50%', '56%'],
+      progress: {
+        show: true,
+        width: 9,
+        roundCap: true,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            { offset: 0, color: '#1b6fb5' },
+            { offset: 1, color: '#5ff0d8' }
+          ]),
+          shadowBlur: 12,
+          shadowColor: 'rgba(95, 240, 216, 0.45)'
+        }
+      },
+      axisLine: { lineStyle: { width: 9, color: [[1, 'rgba(40, 90, 140, 0.32)']] } },
+      pointer: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+      axisLabel: { show: false },
+      anchor: { show: false },
+      detail: {
+        valueAnimation: true,
+        formatter: '{value}%',
+        color: '#5ff0d8',
+        fontSize: 26,
+        fontWeight: 700,
+        offsetCenter: [0, '6%']
+      },
+      title: {
+        offsetCenter: [0, '46%'],
+        color: '#7fa6cf',
+        fontSize: 11
+      },
+      data: [{ value: 96.4, name: '用户满意度' }]
+    }]
+  });
+
+  /* ===================== 7. 热门问题 TOP5 ===================== */
+  var ljm_hotData = [
+    { name: '物流到哪里了', value: 1860 },
+    { name: '怎么申请退款', value: 1420 },
+    { name: '发票怎么开', value: 1180 },
+    { name: '优惠券怎么用', value: 860 },
+    { name: '账号如何解绑', value: 640 }
+  ];
+
+  var ljm_maxHot = ljm_hotData[0].value;
+
+  document.getElementById('ljm_hotList').innerHTML = ljm_hotData.map(function (ljm_item, ljm_index) {
+    return '<div class="ljm_hotItem">' +
+      '<span class="ljm_hotIdx">' + (ljm_index + 1) + '</span>' +
+      '<span class="ljm_hotName">' + ljm_item.name + '</span>' +
+      '<span class="ljm_hotBar"><i style="width:' + Math.round(ljm_item.value / ljm_maxHot * 100) + '%"></i></span>' +
+      '<span class="ljm_hotNum">' + ljm_item.value + '</span>' +
+      '</div>';
+  }).join('');
+
+  /* ===================== 8. 实时会话流水 ===================== */
+  var ljm_feedTemplates = [
+    { city: '广东', text: '用户咨询「订单 20261105 物流进度」', type: 'bot' },
+    { city: '浙江', text: '用户申请「七天无理由退货」', type: 'bot' },
+    { city: '北京', text: '用户咨询「发票抬头如何修改」', type: 'agent' },
+    { city: '江苏', text: '用户咨询「优惠券叠加规则」', type: 'bot' },
+    { city: '四川', text: '用户投诉「配送超时，转人工」', type: 'agent' },
+    { city: '上海', text: '用户咨询「会员积分兑换」', type: 'bot' },
+    { city: '山东', text: '用户查询「账号实名认证」', type: 'agent' },
+    { city: '湖北', text: '用户咨询「换货流程与运费」', type: 'bot' }
+  ];
+
+  var ljm_feedEl = document.getElementById('ljm_feed');
+  var ljm_feedIndex = 0;
+
+  function ljm_feedTime() {
+    var ljm_d = new Date();
+    var ljm_pad = function (ljm_n) { return (ljm_n < 10 ? '0' : '') + ljm_n; };
+    return ljm_pad(ljm_d.getHours()) + ':' + ljm_pad(ljm_d.getMinutes()) + ':' + ljm_pad(ljm_d.getSeconds());
+  }
+
+  function ljm_pushFeed() {
+    var ljm_item = ljm_feedTemplates[ljm_feedIndex % ljm_feedTemplates.length];
+    ljm_feedIndex++;
+
+    var ljm_row = document.createElement('div');
+    ljm_row.className = 'ljm_feedItem';
+    ljm_row.innerHTML =
+      '<span class="ljm_feedTime">' + ljm_feedTime() + '</span>' +
+      '<span class="ljm_feedText">' + ljm_item.city + ' · ' + ljm_item.text + '</span>' +
+      '<span class="ljm_feedFlag' + (ljm_item.type === 'bot' ? ' ljm_feedFlag--bot' : '') + '">' +
+      (ljm_item.type === 'bot' ? 'AI' : '人工') + '</span>';
+
+    ljm_feedEl.insertBefore(ljm_row, ljm_feedEl.firstChild);
+
+    while (ljm_feedEl.children.length > 4) {
+      ljm_feedEl.removeChild(ljm_feedEl.lastChild);
+    }
+  }
+
+  for (var ljm_f = 0; ljm_f < 4; ljm_f++) {
+    ljm_pushFeed();
+  }
+
+  setInterval(ljm_pushFeed, 3200);
+
+  /* ===================== 9. 时钟与 KPI 刷新 ===================== */
+  var ljm_weekNames = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+
+  function ljm_tickClock() {
+    var ljm_now = new Date();
+    var ljm_pad = function (ljm_n) { return (ljm_n < 10 ? '0' : '') + ljm_n; };
+
+    document.getElementById('ljm_date').textContent =
+      ljm_now.getFullYear() + '-' + ljm_pad(ljm_now.getMonth() + 1) + '-' + ljm_pad(ljm_now.getDate()) +
+      ' ' + ljm_weekNames[ljm_now.getDay()];
+
+    document.getElementById('ljm_clock').textContent =
+      ljm_pad(ljm_now.getHours()) + ':' + ljm_pad(ljm_now.getMinutes()) + ':' + ljm_pad(ljm_now.getSeconds());
+  }
+
+  ljm_tickClock();
+  setInterval(ljm_tickClock, 1000);
+
+  var ljm_totalBase = 12486;
+  var ljm_agentBase = 186;
+
+  setInterval(function () {
+    ljm_totalBase += Math.floor(Math.random() * 18) + 3;
+    ljm_agentBase = 180 + Math.floor(Math.random() * 14);
+
+    document.getElementById('ljm_kpiTotal').textContent =
+      ljm_totalBase.toLocaleString('en-US');
+    document.getElementById('ljm_kpiAgent').textContent = ljm_agentBase;
+  }, 5000);
+
+  /* ===================== 10. 自适应 ===================== */
+  function ljm_resizeAll() {
+    ljm_charts.forEach(function (ljm_chart) { ljm_chart.resize(); });
+  }
+
+  window.addEventListener('resize', ljm_resizeAll);
+
+  if (typeof ResizeObserver !== 'undefined') {
+    document.querySelectorAll('.ljm_chart').forEach(function (ljm_box) {
+      var ljm_target = null;
+
+      new ResizeObserver(function () {
+        if (ljm_target) { ljm_target.resize(); }
+      }).observe(ljm_box);
+
+      ljm_charts.forEach(function (ljm_chart) {
+        if (ljm_chart.getDom() === ljm_box) { ljm_target = ljm_chart; }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
